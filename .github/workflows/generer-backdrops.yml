@@ -1,4 +1,4 @@
-nom: Générer les Backdrops
+name: Générer les Backdrops
 
 on:
   schedule:
