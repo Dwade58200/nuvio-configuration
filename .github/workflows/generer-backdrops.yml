@@ -1,9 +1,22 @@
-nom: Générer les Backdrops
+name: Générer les Backdrops
 
 on:
   schedule:
     - cron: "0 4 1 * *"  # 1er du mois à 4h00 UTC
-  workflow_dispatch:      # Lancement manuel
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Mode simulation (aucun appel TMDB, aucun commit)"
+        type: boolean
+        default: false
+      groupe:
+        description: "Ne traiter qu'un seul groupe (ex: Genres) — laisser vide pour tous"
+        required: false
+        default: ""
+      limite:
+        description: "Limiter le nombre de dossiers traités (tests rapides) — laisser vide pour tous"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -31,16 +44,17 @@ jobs:
       - name: Générer les backdrops
         env:
           PYTHONDONTWRITEBYTECODE: "1"
-          CLE_API_TMDB: ${{ secrets.CLE_API_TMDB }}
-          CLE_API_FANART: ${{ secrets.CLE_API_FANART }}
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          GROUPE: ${{ inputs.groupe }}
+          LIMITE: ${{ inputs.limite }}
         run: |
-          python3 -B scripts/generer_backdrops.py \
-            --cle-api "$CLE_API_TMDB" \
-            --cle-fanart "$CLE_API_FANART" \
-            --collections Templates/Nuvio-Collections-Dwade58200.json \
-            --sortie collections \
-            --profil compresse \
-            --parallelisme 3
+          ARGS=(--collections Templates/Nuvio-Collections-Dwade58200.json --sortie collections --profil compresse --parallelisme 3)
+          if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run); fi
+          if [ -n "$GROUPE" ]; then ARGS+=(--groupe "$GROUPE"); fi
+          if [ -n "$LIMITE" ]; then ARGS+=(--limite "$LIMITE"); fi
+          python3 -B scripts/generer_backdrops.py "${ARGS[@]}"
 
       - name: Nettoyer les caches Python
         run: |
@@ -48,6 +62,7 @@ jobs:
 
       - name: Commiter et pousser les changements
         id: publication
+        if: ${{ inputs.dry_run != true }}
         run: |
           if git diff --quiet; then
             echo "Aucun changement à commiter."
@@ -61,6 +76,6 @@ jobs:
           git push
           echo "modifie=true" >> "$GITHUB_OUTPUT"
 
-      - name: Vider le cache CDN
+      - name: Vider le cache CDN jsDelivr
         if: steps.publication.outputs.modifie == 'true'
-        run: python3 -B scripts/purger_cache.py
+        run: python3 -B scripts/purger_cache.py --depot "${{ github.repository }}" --branche "${{ github.ref_name }}"
