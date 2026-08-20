@@ -17,6 +17,14 @@ on:
         description: "Limiter le nombre de dossiers traités (tests rapides) — laisser vide pour tous"
         required: false
         default: ""
+      desactiver_mosaique:
+        description: "Débug : forcer l'ancien mode 1 seul backdrop par dossier"
+        type: boolean
+        default: false
+      mettre_a_jour_urls:
+        description: "Mettre à jour heroBackdropUrl dans le JSON (à activer seulement quand de nouveaux dossiers viennent d'être résolus, pas à chaque run)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -49,12 +57,23 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
           GROUPE: ${{ inputs.groupe }}
           LIMITE: ${{ inputs.limite }}
+          DESACTIVER_MOSAIQUE: ${{ inputs.desactiver_mosaique }}
         run: |
           ARGS=(--collections Templates/Nuvio-Collections-Dwade58200.json --sortie collections --profil compresse --parallelisme 3)
           if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run); fi
           if [ -n "$GROUPE" ]; then ARGS+=(--groupe "$GROUPE"); fi
           if [ -n "$LIMITE" ]; then ARGS+=(--limite "$LIMITE"); fi
+          if [ "$DESACTIVER_MOSAIQUE" != "true" ]; then ARGS+=(--mosaique); fi
           python3 -B scripts/generer_backdrops.py "${ARGS[@]}"
+
+      - name: Mettre à jour heroBackdropUrl vers les images générées
+        if: ${{ inputs.dry_run != true && inputs.mettre_a_jour_urls == true }}
+        run: |
+          python3 -B scripts/mettre_a_jour_urls.py \
+            --collections Templates/Nuvio-Collections-Dwade58200.json \
+            --sortie collections \
+            --depot "${{ github.repository }}" \
+            --branche "${{ github.ref_name }}"
 
       - name: Nettoyer les caches Python
         run: |
@@ -64,7 +83,7 @@ jobs:
         id: publication
         if: ${{ inputs.dry_run != true }}
         run: |
-          git add collections/
+          git add collections/ Templates/
           if git diff --cached --quiet; then
             echo "Aucun changement à commiter."
             echo "modifie=false" >> "$GITHUB_OUTPUT"
@@ -72,7 +91,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: actualiser les backdrops des collections"
+          git commit -m "chore: actualiser les backdrops et les heroBackdropUrl"
           git push
           echo "modifie=true" >> "$GITHUB_OUTPUT"
 
