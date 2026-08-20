@@ -60,6 +60,8 @@ except ImportError:  # pragma: no cover
     print("Le paquet 'Pillow' est requis : pip install Pillow", file=sys.stderr)
     raise
 
+import mosaique as mosaique_module  # module compagnon, scripts/mosaique.py
+
 
 # ---------------------------------------------------------------------------
 # Configuration générale
@@ -452,6 +454,64 @@ class ClientTMDB:
 
         return None, None, None
 
+    def resoudre_backdrops_multiples(
+        self, requete: RequeteTMDB, limite: int = 12, pages: int = 2
+    ) -> list[tuple[str, int, str]]:
+        """Retourne jusqu'à `limite` tuples (backdrop_path, tmdb_id, media_type)
+        pour une requête donnée -- utilisé pour la mosaïque multi-titres.
+        """
+        resultats: list[tuple[str, int, str]] = []
+        try:
+            if requete.kind == "collection":
+                data = self._get(f"/collection/{requete.tmdb_id}")
+                parts = data.get("parts") or []
+                parts = sorted(parts, key=lambda p: p.get("popularity", 0), reverse=True)
+                for item in parts:
+                    if item.get("backdrop_path"):
+                        resultats.append((item["backdrop_path"], item.get("id"), "collection"))
+                    if len(resultats) >= limite:
+                        break
+                return resultats
+
+            if requete.kind == "endpoint":
+                for page in range(1, pages + 1):
+                    data = self._get(requete.endpoint, {"page": page})
+                    items = data.get("results", [])
+                    if not items:
+                        break
+                    for item in items:
+                        if item.get("backdrop_path"):
+                            resultats.append((item["backdrop_path"], item.get("id"), requete.media_type))
+                        if len(resultats) >= limite:
+                            return resultats
+                return resultats
+
+            if requete.kind == "discover":
+                params = dict(requete.params)
+                mot_cle = params.pop("__keyword_search__", None)
+                if mot_cle:
+                    keyword_id = self.rechercher_mot_cle(mot_cle)
+                    if not keyword_id:
+                        return []
+                    params["with_keywords"] = keyword_id
+                for page in range(1, pages + 1):
+                    data = self._get(f"/discover/{requete.media_type}", {**params, "page": page})
+                    items = data.get("results", [])
+                    if not items:
+                        break
+                    for item in items:
+                        if item.get("backdrop_path"):
+                            resultats.append((item["backdrop_path"], item.get("id"), requete.media_type))
+                        if len(resultats) >= limite:
+                            return resultats
+                return resultats
+
+        except requests.RequestException as exc:
+            logging.debug("Erreur TMDB multiples (%s): %s", requete.kind, exc)
+            return resultats
+
+        return resultats
+
 
 class ClientFanart:
     def __init__(self, cle_api: str | None, session: requests.Session | None = None):
@@ -531,6 +591,7 @@ class GenerateurBackdrops:
         repertoire_sortie: Path,
         profil: str = "standard",
         dry_run: bool = False,
+        mosaique: bool = False,
     ):
         self.session = requests.Session()
         self.tmdb = ClientTMDB(cle_tmdb, session=self.session)
@@ -538,6 +599,79 @@ class GenerateurBackdrops:
         self.repertoire_sortie = repertoire_sortie
         self.profil = profil
         self.dry_run = dry_run
+        self.mosaique = mosaique
+
+    def _dimensions_canvas(self) -> tuple[int, int]:
+        largeur = PROFILS_QUALITE.get(self.profil, PROFILS_QUALITE["standard"])["largeur"]
+        # on vise un canvas plus grand pour la mosaïque (plus de détail par tuile)
+        largeur = max(largeur, 1280)
+        hauteur = round(largeur * 9 / 16)
+        return largeur, hauteur
+
+    def _telecharger_images_pour_mosaique(
+        self, candidats: list[tuple[str, int, str]]
+    ) -> list["Image.Image"]:
+        """Télécharge en parallèle les backdrops des candidats et retourne
+        les images PIL valides (dans l'ordre, en ignorant les échecs)."""
+        images: dict[int, Any] = {}
+
+        def _telecharger(index_et_candidat):
+            index, (backdrop_path, _tmdb_id, _media_type) = index_et_candidat
+            url = f"{TMDB_IMAGE_BASE}/w780{backdrop_path}"
+            try:
+                r = self.session.get(url, timeout=20)
+                r.raise_for_status()
+                return index, mosaique_module.image_depuis_bytes(r.content)
+            except Exception:  # noqa: BLE001
+                return index, None
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+            for index, image in executor.map(_telecharger, enumerate(candidats)):
+                if image is not None:
+                    images[index] = image
+
+        return [images[i] for i in sorted(images)]
+
+    def traiter_dossier_mosaique(
+        self, groupe_titre: str, dossier_titre: str, requetes: list[RequeteTMDB], chemin_sortie: Path
+    ) -> ResultatDossier | None:
+        """Tente une génération en mosaïque. Retourne None si pas assez
+        d'images trouvées (l'appelant doit alors retomber sur le mode
+        single-backdrop)."""
+        candidats: list[tuple[str, int, str]] = []
+        vus: set[tuple[str, int]] = set()
+
+        # on interleave les requêtes pour ne pas être dominé par la première
+        listes_par_requete = [self.tmdb.resoudre_backdrops_multiples(req, limite=12) for req in requetes]
+        max_len = max((len(liste) for liste in listes_par_requete), default=0)
+        for i in range(max_len):
+            for liste in listes_par_requete:
+                if i < len(liste):
+                    backdrop_path, tmdb_id, media_type = liste[i]
+                    cle = (media_type, tmdb_id)
+                    if cle not in vus:
+                        vus.add(cle)
+                        candidats.append((backdrop_path, tmdb_id, media_type))
+            if len(candidats) >= 12:
+                break
+
+        if mosaique_module.choisir_grille(len(candidats)) is None:
+            return None  # pas assez d'images -> repli sur le mode single-image
+
+        images = self._telecharger_images_pour_mosaique(candidats[:12])
+        if mosaique_module.choisir_grille(len(images)) is None:
+            return None  # trop d'échecs de téléchargement -> repli aussi
+
+        largeur, hauteur = self._dimensions_canvas()
+        resultat = mosaique_module.generer_mosaique(images, largeur, hauteur, titre_repli=dossier_titre)
+        if resultat is None:
+            return None
+
+        chemin_sortie.parent.mkdir(parents=True, exist_ok=True)
+        resultat.image.save(chemin_sortie, "JPEG", quality=PROFILS_QUALITE.get(self.profil, PROFILS_QUALITE["standard"])["qualite"], optimize=True)
+
+        detail = f"mosaïque {resultat.nb_tuiles} tuiles, accent RGB{resultat.accent}"
+        return ResultatDossier(groupe_titre, dossier_titre, "genere", detail, None)
 
     def traiter_dossier(self, groupe_titre: str, dossier: dict[str, Any]) -> ResultatDossier:
         dossier_titre = dossier.get("title", "sans-titre")
@@ -554,7 +688,15 @@ class GenerateurBackdrops:
         chemin_sortie = self.repertoire_sortie / chemin_relatif
 
         if self.dry_run:
-            return ResultatDossier(groupe_titre, dossier_titre, "genere", f"(dry-run) {len(requetes)} requête(s) prête(s)", str(chemin_relatif))
+            mode = "mosaïque" if self.mosaique else "single"
+            return ResultatDossier(groupe_titre, dossier_titre, "genere", f"(dry-run, mode {mode}) {len(requetes)} requête(s) prête(s)", str(chemin_relatif))
+
+        if self.mosaique:
+            resultat_mosaique = self.traiter_dossier_mosaique(groupe_titre, dossier_titre, requetes, chemin_sortie)
+            if resultat_mosaique is not None:
+                resultat_mosaique.chemin = str(chemin_relatif)
+                return resultat_mosaique
+            # sinon : pas assez d'images -> on continue avec le mode single-backdrop ci-dessous
 
         for requete in requetes:
             backdrop_path, tmdb_id, media_type = self.tmdb.resoudre_backdrop(requete)
@@ -648,6 +790,7 @@ def main() -> int:
     parser.add_argument("--groupe", default=None, help="Ne traiter qu'un seul groupe (ex: Genres)")
     parser.add_argument("--limite", type=int, default=None, help="Limiter le nombre de dossiers (tests)")
     parser.add_argument("--dry-run", action="store_true", help="Simule sans appeler TMDB ni écrire d'image")
+    parser.add_argument("--mosaique", action="store_true", help="Génère une mosaïque multi-titres + couleur d'accent au lieu d'un seul backdrop (repli automatique si pas assez d'images)")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -667,6 +810,7 @@ def main() -> int:
         repertoire_sortie=Path(args.sortie),
         profil=args.profil,
         dry_run=args.dry_run,
+        mosaique=args.mosaique,
     )
     resultats = generateur.generer_tout(
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
