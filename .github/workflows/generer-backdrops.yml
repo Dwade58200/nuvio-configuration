@@ -64,14 +64,14 @@ jobs:
         id: publication
         if: ${{ inputs.dry_run != true }}
         run: |
-          if git diff --quiet; then
+          git add collections/
+          if git diff --cached --quiet; then
             echo "Aucun changement à commiter."
             echo "modifie=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add collections/
           git commit -m "chore: actualiser les backdrops des collections"
           git push
           echo "modifie=true" >> "$GITHUB_OUTPUT"
