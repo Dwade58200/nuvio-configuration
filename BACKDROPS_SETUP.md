@@ -11,14 +11,37 @@ adapté à la structure de collections propre à ce dépôt.
 Le script `scripts/generer_backdrops.py` lit `Templates/Nuvio-Collections-Dwade58200.json`,
 et pour **chaque dossier de chaque groupe actif**, il :
 
-1. Regarde les `sources` du dossier et essaie de construire une requête TMDB fiable
-   (collection, discover avec filtres, ou endpoint générique) ;
+1. Regarde les `sources` du dossier et essaie de construire une ou plusieurs
+   requêtes TMDB fiables (collection, discover avec filtres, ou endpoint
+   générique) ;
 2. Si aucune source directe n'est exploitable, tente un repli heuristique
    (ex : dossier "Action" dans le groupe Genres → genre TMDB "Action" ;
    thématique "Arts martiaux" → recherche par mot-clé TMDB "martial arts") ;
-3. Télécharge le premier backdrop trouvé (TMDB, avec repli Fanart.tv si besoin) ;
-4. Redimensionne/compresse l'image et l'enregistre dans
-   `collections/<groupe>/backdrop/<dossier>.jpg`.
+3. Récupère jusqu'à 12 titres (films/séries) correspondants, et compose
+   une **mosaïque** avec dégradé + couleur d'accent extraite automatiquement
+   (voir section dédiée ci-dessous) ; si moins de 6 titres sont trouvés,
+   bascule automatiquement sur l'ancien mode "1 seul backdrop" ;
+4. Enregistre l'image dans `collections/<groupe>/backdrop/<dossier>.jpg`.
+
+## 🎨 Mode mosaïque (par défaut)
+
+Au lieu d'un backdrop unique, chaque dossier peut afficher une grille de
+6 à 12 affiches des titres qu'il contient, avec :
+- un dégradé sombre du bas vers le haut (pour la lisibilité d'un futur titre) ;
+- une teinte diffuse d'une **couleur d'accent** extraite automatiquement à
+  partir du premier titre trouvé (moyenne des couleurs, saturation/luminosité
+  ajustées pour rester exploitable en dégradé).
+
+C'est le comportement **par défaut** (`--mosaique`, activé aussi dans le
+workflow GitHub Actions). Si un dossier n'a pas assez de titres résolus
+(moins de 6), le script repasse automatiquement sur l'ancien mode "1 seul
+backdrop TMDB/Fanart", sans erreur.
+
+Pour forcer l'ancien comportement (debug, comparaison) :
+```bash
+python3 scripts/generer_backdrops.py --collections ... # sans --mosaique
+```
+Ou, depuis GitHub Actions, coche **desactiver_mosaique** au déclenchement manuel.
 
 ### ⚠️ Phase 1 : couverture actuelle
 
@@ -41,6 +64,17 @@ Sur les collections actuelles, la couverture est :
 
 Les dossiers non résolus sont **journalisés avec la raison** (jamais échoués
 en silence) — voir le résumé affiché à la fin de chaque exécution.
+
+## 🔗 Mise à jour des URLs (`heroBackdropUrl`)
+
+Un second script, `scripts/mettre_a_jour_urls.py`, met à jour le champ
+`heroBackdropUrl` du JSON de collections pour qu'il pointe vers ton propre
+CDN. **Il n'a pas besoin de tourner à chaque exécution** : l'URL d'un
+backdrop dépend uniquement du chemin du fichier (groupe + titre du
+dossier), qui ne change pas d'un mois à l'autre — seule l'image derrière
+cette URL est remplacée. Il suffit donc de le lancer une fois pour les
+dossiers déjà résolus, puis de le relancer uniquement quand de *nouveaux*
+dossiers deviennent résolvables (ex : après l'intégration de Trakt).
 
 ## ✅ Configuration requise
 
@@ -83,6 +117,7 @@ Options utiles de `generer_backdrops.py` :
 | Option | Effet |
 |---|---|
 | `--dry-run` | Ne fait aucun appel réseau, affiche juste ce qui serait généré |
+| `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 6 titres) |
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
 | `--profil {standard,haute,compresse}` | Taille/qualité de sortie |
@@ -93,9 +128,16 @@ Options utiles de `generer_backdrops.py` :
 1. Onglet **Actions** → workflow **Générer les Backdrops** → **Run workflow**
 2. Le déclenchement manuel permet aussi de cocher **dry_run**, ou de préciser
    un `groupe`/une `limite` pour un test rapide sans tout régénérer.
+3. La mosaïque est **active par défaut** (aussi sur le cron mensuel) ; coche
+   **desactiver_mosaique** uniquement pour du débug/comparaison.
+4. La case **mettre_a_jour_urls** est décochée par défaut (voir plus haut
+   pourquoi) : coche-la uniquement la première fois, ou après une phase qui
+   débloque de nouveaux dossiers.
 
 Le workflow tourne aussi automatiquement le **1er de chaque mois à 4h00 UTC**
-(modifiable dans `.github/workflows/generer-backdrops.yml`, section `cron`).
+(modifiable dans `.github/workflows/generer-backdrops.yml`, section `cron`) —
+cette exécution planifiée régénère les mosaïques mais ne touche jamais au
+JSON (`mettre_a_jour_urls` reste désactivé par défaut).
 
 ## 📂 Structure de fichiers
 
@@ -109,9 +151,14 @@ nuvio-configuration/
 │   └── <groupe>/backdrop/*.jpg      # Images générées (ex: genres/backdrop/action.jpg)
 ├── scripts/
 │   ├── generer_backdrops.py         # Script principal
+│   ├── mosaique.py                  # Composition de la grille + couleur d'accent
+│   ├── mettre_a_jour_urls.py        # Met à jour heroBackdropUrl vers le CDN du repo
 │   └── purger_cache.py              # Purge du cache CDN jsDelivr
 ├── tests/
 │   ├── test_generer_backdrops.py    # Tests de la logique de résolution
+│   ├── test_mosaique.py             # Tests du module de mosaïque (hors-ligne)
+│   ├── test_mosaique_integration.py # Test bout-en-bout du mode mosaïque
+│   ├── test_mettre_a_jour_urls.py   # Tests de la mise à jour des URLs
 │   └── test_pipeline_integration.py # Test bout-en-bout (HTTP simulé)
 └── BACKDROPS_SETUP.md               # Ce fichier
 ```
@@ -130,14 +177,14 @@ définition.
 fichiers ~7 jours ; le workflow purge automatiquement le cache après chaque
 commit, mais tu peux aussi lancer `python3 scripts/purger_cache.py` toi-même.
 
-## 🗺️ Prochaines étapes (phases suivantes)
+## 🗺️ Idées pour plus tard (non planifiées)
 
-- Intégrer l'API Trakt pour résoudre les listes/recommandations (couvre
-  "Recommandation", plusieurs Franchises et 1 Thématique)
-- Mosaïque multi-titres + couleur d'accent, comme chez luckynumb3rs
+Le projet s'arrête ici pour l'instant (mosaïque + accent color = dernière
+phase prévue). Pistes possibles si tu veux reprendre un jour :
+
+- Intégrer l'API Trakt pour résoudre les ~28 dossiers restants
+  ("Recommandation", quelques Franchises/Thématiques)
 - Génération de variantes `.webp` en plus du `.jpg`
-- Mise à jour automatique des champs `heroBackdropUrl` dans le JSON de
-  collections une fois les images poussées
 
 ---
 
