@@ -136,6 +136,24 @@ def preparer_tuile(image: Image.Image, largeur: int, hauteur: int) -> Image.Imag
 # Grille inclinée en cascade
 # ---------------------------------------------------------------------------
 
+def dimensions_grille(largeur_canvas: int, hauteur_canvas: int, echelle: float = 1.0) -> tuple[int, int]:
+    """Retourne (colonnes, lignes) de la grille pour un canvas donné --
+    factorisé pour pouvoir calculer le nombre de cases à remplir AVANT de
+    télécharger les images (et ainsi récupérer assez d'images distinctes
+    pour éviter les répétitions rapprochées)."""
+    tuile_largeur = max(1, int(TUILE_LARGEUR * echelle))
+    tuile_hauteur = max(1, int(TUILE_HAUTEUR * echelle))
+    ecart = max(1, int(ECART * echelle))
+    colonnes = math.ceil(largeur_canvas / (tuile_largeur + ecart)) + MARGE_CASES
+    lignes = math.ceil(hauteur_canvas / (tuile_hauteur + ecart)) + MARGE_CASES
+    return colonnes, lignes
+
+
+def nombre_cellules_grille(largeur_canvas: int, hauteur_canvas: int, echelle: float = 1.0) -> int:
+    colonnes, lignes = dimensions_grille(largeur_canvas, hauteur_canvas, echelle)
+    return colonnes * lignes
+
+
 def construire_grille_inclinee(
     images: Sequence[Image.Image],
     largeur_canvas: int,
@@ -154,8 +172,7 @@ def construire_grille_inclinee(
     tuile_hauteur = max(1, int(TUILE_HAUTEUR * echelle))
     ecart = max(1, int(ECART * echelle))
 
-    colonnes = math.ceil(largeur_canvas / (tuile_largeur + ecart)) + MARGE_CASES
-    lignes = math.ceil(hauteur_canvas / (tuile_hauteur + ecart)) + MARGE_CASES
+    colonnes, lignes = dimensions_grille(largeur_canvas, hauteur_canvas, echelle)
     decalage_px = int(DECALAGE_LIGNE * (tuile_largeur + ecart))
 
     grille_largeur = colonnes * (tuile_largeur + ecart) + lignes * decalage_px
@@ -264,15 +281,18 @@ def generer_mosaique(
 ) -> ResultatMosaique | None:
     """Retourne None si pas assez d'images pour composer une mosaïque
     (l'appelant doit alors retomber sur le mode "un seul backdrop").
-    Si on a peu d'images mais au moins `MINIMUM_IMAGES_DISTINCTES`, elles
-    sont répétées (cycle) jusqu'à `TUILES_CIBLE`, comme luckynumb3rs."""
+    Complète (cycle) jusqu'à couvrir TOUTES les cases de la grille -- si
+    `images_sources` contient déjà assez d'images distinctes pour ça,
+    aucune répétition n'a lieu du tout."""
     if not assez_d_images(len(images_sources)):
         return None
 
     accent = calculer_couleur_accent(images_sources[0]) if images_sources else couleur_accent_deterministe(titre_repli)
-    images_completees = completer_jusqua(images_sources, TUILES_CIBLE)
 
     echelle = largeur_canvas / 1920  # les constantes de tuile sont calibrées pour un canvas 1920px
+    cellules = nombre_cellules_grille(largeur_canvas, hauteur_canvas, echelle)
+    images_completees = completer_jusqua(images_sources, cellules)
+
     canvas = construire_grille_inclinee(images_completees, largeur_canvas, hauteur_canvas, echelle=echelle)
     canvas = appliquer_degrade(canvas, accent)
 
