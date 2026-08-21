@@ -40,6 +40,7 @@ import concurrent.futures
 import io
 import json
 import logging
+import math
 import re
 import sys
 import time
@@ -81,6 +82,13 @@ GROUPE_VIBES = "Vibe"
 GROUPE_ANNEES = "📅 Années"
 GROUPE_FRANCHISES = "Franchises"
 GROUPE_SPORTS = "Sports"
+
+# Certains dossiers ont, en plus d'une source TMDB "globale" (withOriginalLanguage
+# absent), une source dupliquée filtrée sur une langue précise (ex: catalogues
+# "🇫🇷 France" avec withOriginalLanguage="fr"). Sur demande explicite, on ne
+# conserve que les catalogues mondiaux/globaux -> ces sources langue-spécifique
+# sont exclues pour éviter les quasi-doublons et le biais vers un seul pays.
+LANGUES_SOURCES_EXCLUES = {"fr"}
 
 # Slug de sortie (chemin sur disque / URL jsDelivr), aligné sur la
 # convention déjà utilisée par luckynumb3rs pour rester cohérent.
@@ -282,7 +290,12 @@ def construire_requetes(
             if type_source == "COLLECTION" and source.get("tmdbId"):
                 requetes.append(RequeteTMDB(kind="collection", tmdb_id=source["tmdbId"]))
             elif type_source == "DISCOVER":
-                params = _mapper_filtres_discover(source.get("filters") or {}, media_type)
+                filtres = source.get("filters") or {}
+                langue_source = (filtres.get("withOriginalLanguage") or "").lower()
+                if langue_source in LANGUES_SOURCES_EXCLUES:
+                    ignorees.append(f"source langue-spécifique exclue ({langue_source}) -- catalogue global conservé")
+                    continue
+                params = _mapper_filtres_discover(filtres, media_type)
                 requetes.append(
                     RequeteTMDB(
                         kind="discover",
@@ -479,7 +492,10 @@ class ClientTMDB:
                 parts = sorted(parts, key=lambda p: p.get("popularity", 0), reverse=True)
                 for item in parts:
                     if item.get("backdrop_path"):
-                        resultats.append((item["backdrop_path"], item.get("id"), "collection", item.get("original_language")))
+                        # une collection ne contient que des films -> media_type "movie",
+                        # pas "collection" (sinon le même film n'est pas reconnu comme
+                        # doublon s'il apparaît aussi via une requête discover/endpoint)
+                        resultats.append((item["backdrop_path"], item.get("id"), "movie", item.get("original_language")))
                     if len(resultats) >= limite:
                         break
                 return resultats
@@ -682,10 +698,7 @@ class GenerateurBackdrops:
         backdrop_path, tmdb_id, media_type, langue_originale = candidat
 
         if self.fanart.cle_api and tmdb_id:
-            if media_type == "collection":
-                media_type_fanart = "movie"
-                identifiant = tmdb_id
-            elif media_type == "tv":
+            if media_type == "tv":
                 media_type_fanart = "tv"
                 identifiant = self.tmdb.recuperer_tvdb_id(tmdb_id)
             else:
@@ -723,7 +736,7 @@ class GenerateurBackdrops:
             except Exception:  # noqa: BLE001
                 return index, None
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:
             for index, image in executor.map(_traiter, enumerate(candidats)):
                 if image is not None:
                     images[index] = image
@@ -736,11 +749,19 @@ class GenerateurBackdrops:
         """Tente une génération en mosaïque. Retourne None si pas assez
         d'images trouvées (l'appelant doit alors retomber sur le mode
         single-backdrop)."""
+        largeur, hauteur = self._dimensions_canvas()
+        # nombre de cases de la grille -> on vise ce nombre d'images DISTINCTES
+        # pour éviter les répétitions rapprochées d'une même affiche
+        cible = mosaique_module.nombre_cellules_grille(largeur, hauteur, echelle=largeur / 1920)
+        pages_necessaires = min(6, math.ceil(cible / 18) + 1)
+
         candidats: list[tuple[str, int, str, str | None]] = []
         vus: set[tuple[str, int]] = set()
 
         # on interleave les requêtes pour ne pas être dominé par la première
-        listes_par_requete = [self.tmdb.resoudre_backdrops_multiples(req, limite=12) for req in requetes]
+        listes_par_requete = [
+            self.tmdb.resoudre_backdrops_multiples(req, limite=cible, pages=pages_necessaires) for req in requetes
+        ]
         max_len = max((len(liste) for liste in listes_par_requete), default=0)
         for i in range(max_len):
             for liste in listes_par_requete:
@@ -750,17 +771,16 @@ class GenerateurBackdrops:
                     if cle not in vus:
                         vus.add(cle)
                         candidats.append((backdrop_path, tmdb_id, media_type, langue_originale))
-            if len(candidats) >= 12:
+            if len(candidats) >= cible:
                 break
 
         if not mosaique_module.assez_d_images(len(candidats)):
             return None  # pas assez d'images -> repli sur le mode single-image
 
-        images = self._telecharger_images_pour_mosaique(candidats[:12])
+        images = self._telecharger_images_pour_mosaique(candidats[:cible])
         if not mosaique_module.assez_d_images(len(images)):
             return None  # trop d'échecs de téléchargement -> repli aussi
 
-        largeur, hauteur = self._dimensions_canvas()
         resultat = mosaique_module.generer_mosaique(images, largeur, hauteur, titre_repli=dossier_titre)
         if resultat is None:
             return None
