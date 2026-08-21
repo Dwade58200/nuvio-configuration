@@ -165,6 +165,56 @@ def test_source_tmdb_discover():
     assert requetes[0].params["with_genres"] == "35,10749"
 
 
+def test_source_francaise_exclue_seul_le_catalogue_global_est_garde():
+    """Cas réel : 'Populaire' a deux sources DISCOVER par media type, une
+    globale et une filtrée withOriginalLanguage=fr -> seule la globale
+    doit produire une requête."""
+    dossier = {
+        "title": "Populaire",
+        "sources": [
+            {
+                "provider": "tmdb",
+                "tmdbSourceType": "DISCOVER",
+                "mediaType": "MOVIE",
+                "sortBy": "popularity.desc",
+                "filters": {},  # catalogue global (pas de withOriginalLanguage)
+            },
+            {
+                "provider": "tmdb",
+                "tmdbSourceType": "DISCOVER",
+                "mediaType": "MOVIE",
+                "sortBy": "popularity.desc",
+                "filters": {"withOriginalLanguage": "fr"},  # variante France -> à exclure
+            },
+        ],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_DECOUVRIR, dossier)
+    assert len(requetes) == 1
+    assert "with_original_language" not in requetes[0].params
+    assert any("langue-spécifique exclue" in raison for raison in ignorees)
+
+
+def test_source_francaise_seule_ne_laisse_aucune_requete_tmdb():
+    """Si un dossier n'a QUE une source française (pas de globale), elle est
+    quand même exclue -- même s'il ne reste alors plus de requête TMDB pour
+    cette source (d'autres sources du dossier, ex: addon, peuvent compenser)."""
+    dossier = {
+        "title": "Top",
+        "sources": [
+            {
+                "provider": "tmdb",
+                "tmdbSourceType": "DISCOVER",
+                "mediaType": "MOVIE",
+                "sortBy": "popularity.desc",
+                "filters": {"withOriginalLanguage": "fr"},
+            }
+        ],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_DECOUVRIR, dossier)
+    assert requetes == []
+    assert any("langue-spécifique exclue" in raison for raison in ignorees)
+
+
 def test_source_trakt_est_ignoree():
     dossier = {
         "title": "007",
