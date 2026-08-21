@@ -57,9 +57,15 @@ le script prend le meilleur disponible.
 C'est le comportement **par défaut** (`--mosaique`, activé aussi dans le
 workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
 de 3 titres distincts résolus, le script repasse automatiquement sur
-l'ancien mode "1 seul backdrop TMDB/Fanart", sans erreur. Entre 3 et 11
-titres, ils sont répétés (cycle) pour compléter la grille, comme
-luckynumb3rs.
+l'ancien mode "1 seul backdrop TMDB/Fanart", sans erreur.
+
+**Pas de doublon visible** : la grille inclinée contient environ 70 cases
+(quelle que soit la résolution de sortie). Le script récupère donc jusqu'à
+~70 titres distincts par dossier (pagination TMDB automatique) pour remplir
+toute la grille sans répéter la même affiche. Si un dossier a réellement
+moins de titres disponibles que de cases (catalogue restreint), les
+images sont répétées (cycle) en dernier recours pour compléter, comme le
+fait luckynumb3rs -- mais uniquement dans ce cas.
 
 Pour forcer l'ancien comportement (debug, comparaison) :
 ```bash
