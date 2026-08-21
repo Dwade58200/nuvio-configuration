@@ -13,14 +13,18 @@ et pour **chaque dossier de chaque groupe actif**, il :
 
 1. Regarde les `sources` du dossier et essaie de construire une ou plusieurs
    requêtes TMDB fiables (collection, discover avec filtres, ou endpoint
-   générique) ;
+   générique). Les sources dupliquées filtrées sur une langue précise
+   (ex : catalogues "🇫🇷 France" avec `withOriginalLanguage=fr`) sont
+   exclues -- seuls les catalogues **globaux/mondiaux** sont conservés ;
 2. Si aucune source directe n'est exploitable, tente un repli heuristique
    (ex : dossier "Action" dans le groupe Genres → genre TMDB "Action" ;
    thématique "Arts martiaux" → recherche par mot-clé TMDB "martial arts") ;
-3. Récupère jusqu'à 12 titres (films/séries) correspondants, et compose
-   une **mosaïque** avec dégradé + couleur d'accent extraite automatiquement
-   (voir section dédiée ci-dessous) ; si moins de 6 titres sont trouvés,
-   bascule automatiquement sur l'ancien mode "1 seul backdrop" ;
+3. Récupère jusqu'à 12 titres (films/séries) correspondants -- dédupliqués
+   même si un même film provient à la fois d'une collection et d'un
+   catalogue discover -- et compose une **mosaïque** avec dégradé +
+   couleur d'accent extraite automatiquement (voir section dédiée
+   ci-dessous) ; en dessous de 3 titres distincts, bascule automatiquement
+   sur l'ancien mode "1 seul backdrop" ;
 4. Enregistre l'image dans `collections/<groupe>/backdrop/<dossier>.jpg`.
 
 ## 🎨 Mode mosaïque (par défaut)
