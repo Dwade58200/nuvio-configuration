@@ -168,6 +168,29 @@ def test_generer_mosaique_cas_nominal():
     assert len(resultat.accent) == 3
 
 
+def test_nombre_cellules_grille_1920x1080():
+    """Verrouille le nombre de cases réel de la grille (bug historique :
+    seulement 12 images étaient récupérées pour ~72 cases, causant des
+    répétitions visibles d'une même affiche toutes les ~2 rangées)."""
+    from mosaique import nombre_cellules_grille
+
+    cellules = nombre_cellules_grille(1920, 1080, echelle=1.0)
+    assert cellules >= 60  # la grille a largement plus de 12 cases
+
+
+def test_generer_mosaique_sans_repetition_si_assez_d_images_distinctes():
+    """Avec autant d'images distinctes que de cases, AUCUNE tuile ne doit
+    être répétée dans la grille finale."""
+    from mosaique import nombre_cellules_grille
+
+    cellules = nombre_cellules_grille(1920, 1080, echelle=1.0)
+    # une couleur strictement unique par image, pour les repérer après coup
+    images = [_image_couleur((i % 256, (i * 7) % 256, (i * 13) % 256)) for i in range(cellules)]
+    resultat = generer_mosaique(images, 1920, 1080, titre_repli="Test")
+    assert resultat is not None
+    assert resultat.nb_tuiles == cellules  # toutes les images distinctes sont utilisées, aucune répétée pour compléter
+
+
 def test_generer_mosaique_complete_si_peu_d_images():
     """Avec seulement 4 images distinctes (>= seuil minimum de 3, < 12),
     la mosaïque doit quand même se générer en répétant les images,
