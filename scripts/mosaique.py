@@ -4,11 +4,11 @@
 mosaique.py
 ============
 
-Génère un backdrop "mosaïque" à partir de plusieurs affiches/backdrops
-d'un même dossier (plusieurs films/séries), avec un dégradé teinté par une
-couleur d'accent extraite automatiquement -- inspiré du rendu de
-luckynumb3rs (stremio-perfect-setup), en version simplifiée (grille droite,
-pas de tuiles inclinées).
+Génère un backdrop "mosaïque" à partir de plusieurs AFFICHES (posters)
+d'un même dossier, disposées en grille inclinée façon cascade -- inspiré
+du rendu de luckynumb3rs (stremio-perfect-setup) : les titres restent
+lisibles car ils sont déjà incrustés dans les affiches TMDB elles-mêmes
+(le script n'écrit aucun texte).
 
 Toute la logique ici est indépendante du réseau et testable avec de
 simples objets PIL.Image en mémoire (voir tests/test_mosaique.py).
@@ -18,35 +18,50 @@ from __future__ import annotations
 
 import colorsys
 import io
+import itertools
+import math
 from dataclasses import dataclass
 from typing import Sequence
 
 from PIL import Image, ImageDraw, ImageFilter
 
 # ---------------------------------------------------------------------------
-# Réglages de grille
+# Réglages de la grille inclinée
 # ---------------------------------------------------------------------------
 
-GAP = 6           # espace entre les tuiles, en pixels (à l'échelle 1920x1080)
-RAYON_COIN = 10    # arrondi des coins de chaque tuile
+TUILE_LARGEUR = 372       # taille de référence d'une tuile, avant mise à l'échelle canvas (paysage, ~16:9, comme le rendu luckynumb3rs)
+TUILE_HAUTEUR = 210
+ECART = 9                 # espace entre tuiles
+RAYON_COIN = 9              # arrondi des coins de chaque tuile
+DECALAGE_LIGNE = 0.5      # décalage horizontal d'une ligne à l'autre (cascade)
+INCLINAISON_DEG = 10       # angle de rotation de la grille entière
+MARGE_CASES = 3           # cases en trop (au-delà du canvas) pour couvrir les coins après rotation
 
-# Nombre d'images disponibles -> (colonnes, lignes). Du plus dense au plus
-# clairsemé ; en dessous du minimum, on ne fait pas de mosaïque.
-PALIERS_GRILLE: list[tuple[int, tuple[int, int]]] = [
-    (12, (4, 3)),
-    (9, (3, 3)),
-    (6, (3, 2)),
-]
-MINIMUM_TUILES = 6
+MINIMUM_IMAGES_DISTINCTES = 3   # en dessous, pas assez de variété -> repli sur mode single-backdrop
+TUILES_CIBLE = 12               # nombre de tuiles visées (on répète les images si besoin, comme luckynumb3rs)
 
 
+def assez_d_images(nombre_images: int) -> bool:
+    return nombre_images >= MINIMUM_IMAGES_DISTINCTES
+
+
+def completer_jusqua(images: Sequence[Image.Image], minimum: int = TUILES_CIBLE) -> list[Image.Image]:
+    """Répète les images disponibles (cycle) jusqu'à atteindre `minimum`,
+    comme le fait luckynumb3rs (`ensure_minimum_tiles`) -- évite une
+    mosaïque trop pauvre quand peu de titres sont disponibles."""
+    if not images:
+        return []
+    resultat = list(images)
+    cycle = itertools.cycle(images)
+    while len(resultat) < minimum:
+        resultat.append(next(cycle))
+    return resultat
+
+
+# Compatibilité : gardé pour ne pas casser d'éventuels appels existants qui
+# testent juste "a-t-on assez d'images ?" (retourne un couple factice).
 def choisir_grille(nombre_images: int) -> tuple[int, int] | None:
-    """Retourne (colonnes, lignes) selon le nombre d'images dispo, ou None
-    si on n'en a pas assez pour une mosaïque cohérente."""
-    for seuil, dims in PALIERS_GRILLE:
-        if nombre_images >= seuil:
-            return dims
-    return None
+    return (1, 1) if assez_d_images(nombre_images) else None
 
 
 # ---------------------------------------------------------------------------
@@ -113,81 +128,121 @@ def arrondir_coins(image: Image.Image, rayon: int) -> Image.Image:
     return image
 
 
+def preparer_tuile(image: Image.Image, largeur: int, hauteur: int) -> Image.Image:
+    return arrondir_coins(recadrer_pour_tuile(image, largeur, hauteur), max(4, int(RAYON_COIN * largeur / TUILE_LARGEUR)))
+
+
 # ---------------------------------------------------------------------------
-# Composition de la grille
+# Grille inclinée en cascade
 # ---------------------------------------------------------------------------
 
-def construire_grille(
+def construire_grille_inclinee(
     images: Sequence[Image.Image],
     largeur_canvas: int,
     hauteur_canvas: int,
+    echelle: float = 1.0,
 ) -> Image.Image:
-    """Compose une grille de tuiles recadrées/arrondies sur un canvas RGBA.
-
-    Le nombre d'images utilisées est déterminé par `choisir_grille`;
-    les images en trop sont ignorées, celles en trop peu font échouer
-    l'appel (vérifier `choisir_grille` avant d'appeler cette fonction).
+    """Construit une grille de tuiles décalées ligne par ligne (cascade),
+    puis la fait pivoter légèrement avant de la centrer sur le canvas
+    final -- même principe que le rendu de luckynumb3rs, en implémentation
+    propre.
     """
-    grille = choisir_grille(len(images))
-    if grille is None:
-        raise ValueError(f"Pas assez d'images pour une mosaïque ({len(images)} < {MINIMUM_TUILES}).")
-    colonnes, lignes = grille
-    n_tuiles = colonnes * lignes
+    if not images:
+        raise ValueError("Aucune image fournie pour construire la grille.")
 
-    tuile_largeur = (largeur_canvas - GAP * (colonnes + 1)) // colonnes
-    tuile_hauteur = (hauteur_canvas - GAP * (lignes + 1)) // lignes
+    tuile_largeur = max(1, int(TUILE_LARGEUR * echelle))
+    tuile_hauteur = max(1, int(TUILE_HAUTEUR * echelle))
+    ecart = max(1, int(ECART * echelle))
 
-    canvas = Image.new("RGBA", (largeur_canvas, hauteur_canvas), (12, 12, 14, 255))
+    colonnes = math.ceil(largeur_canvas / (tuile_largeur + ecart)) + MARGE_CASES
+    lignes = math.ceil(hauteur_canvas / (tuile_hauteur + ecart)) + MARGE_CASES
+    decalage_px = int(DECALAGE_LIGNE * (tuile_largeur + ecart))
 
-    for index in range(n_tuiles):
-        image_source = images[index % len(images)]
-        tuile = recadrer_pour_tuile(image_source, tuile_largeur, tuile_hauteur)
-        tuile = arrondir_coins(tuile, RAYON_COIN)
+    grille_largeur = colonnes * (tuile_largeur + ecart) + lignes * decalage_px
+    grille_hauteur = lignes * (tuile_hauteur + ecart)
+    grille = Image.new("RGBA", (grille_largeur, grille_hauteur), (0, 0, 0, 0))
 
-        col = index % colonnes
-        ligne = index // colonnes
-        x = GAP + col * (tuile_largeur + GAP)
-        y = GAP + ligne * (tuile_hauteur + GAP)
-        canvas.alpha_composite(tuile, (x, y))
+    cycle_images = itertools.cycle(images)
+    for ligne in range(lignes):
+        for colonne in range(colonnes):
+            source = next(cycle_images)
+            tuile = preparer_tuile(source, tuile_largeur, tuile_hauteur)
+            x = ligne * decalage_px + colonne * (tuile_largeur + ecart)
+            y = ligne * (tuile_hauteur + ecart)
+            grille.alpha_composite(tuile, (x, y))
+
+    pivotee = grille.rotate(INCLINAISON_DEG, expand=True, resample=Image.BICUBIC)
+
+    canvas = Image.new("RGBA", (largeur_canvas, hauteur_canvas), (10, 10, 12, 255))
+    x_centre = (largeur_canvas - pivotee.width) // 2
+    y_centre = (hauteur_canvas - pivotee.height) // 2
+    canvas.alpha_composite(pivotee, (x_centre, y_centre))
 
     return canvas
 
 
 # ---------------------------------------------------------------------------
-# Dégradé teinté par la couleur d'accent
+# Dégradé multi-couches teinté par la couleur d'accent
 # ---------------------------------------------------------------------------
 
+def _degrade_lineaire(largeur: int, hauteur: int, direction: str, couleur: tuple[int, int, int] = (6, 6, 8)) -> Image.Image:
+    """Dégradé calculé à basse résolution puis mis à l'échelle (rapide),
+    même technique que le script de référence."""
+    petite_largeur = max(1, largeur // 4)
+    petite_hauteur = max(1, hauteur // 4)
+    image = Image.new("RGBA", (petite_largeur, petite_hauteur), (0, 0, 0, 0))
+    pixels = image.load()
+
+    if direction == "gauche":
+        for x in range(petite_largeur):
+            proportion = max(0.0, 1.0 - x / (petite_largeur * 0.5))
+            alpha = int(190 * proportion**1.6)
+            if alpha:
+                for y in range(petite_hauteur):
+                    pixels[x, y] = (*couleur, alpha)
+
+    elif direction == "bas":
+        for y in range(petite_hauteur):
+            proportion = max(0.0, (y - petite_hauteur * 0.45) / (petite_hauteur * 0.55))
+            alpha = int(200 * proportion**1.4)
+            if alpha:
+                for x in range(petite_largeur):
+                    pixels[x, y] = (*couleur, alpha)
+
+    elif direction == "coin_bas_gauche":
+        diagonale_max = math.hypot(petite_largeur, petite_hauteur)
+        for x in range(petite_largeur):
+            for y in range(petite_hauteur):
+                distance = math.hypot(x, petite_hauteur - y)
+                base = max(0.0, 1.0 - (distance / diagonale_max) / 0.6)
+                alpha = int(220 * base**2.0)
+                if alpha:
+                    pixels[x, y] = (*couleur, min(255, alpha))
+
+    return image.resize((largeur, hauteur), Image.BILINEAR)
+
+
 def appliquer_degrade(canvas: Image.Image, accent: tuple[int, int, int]) -> Image.Image:
-    """Applique par-dessus le canvas :
-    - un dégradé sombre du bas vers le haut (lisibilité d'un futur titre) ;
-    - une teinte diffuse de la couleur d'accent en bas à gauche.
-    """
+    """Superpose plusieurs dégradés pour un rendu 'vignette' proche de
+    luckynumb3rs : assombrissement bas + gauche + coin bas-gauche, et une
+    lueur diffuse de la couleur d'accent en haut-droite."""
     largeur, hauteur = canvas.size
-    overlay = Image.new("RGBA", (largeur, hauteur), (0, 0, 0, 0))
 
-    # Dégradé sombre bas -> haut
-    degrade_sombre = Image.new("L", (1, hauteur), color=0)
-    for y in range(hauteur):
-        proportion = y / max(1, hauteur - 1)  # 0 en haut, 1 en bas
-        degrade_sombre.putpixel((0, y), int(210 * (proportion ** 1.6)))
-    degrade_sombre = degrade_sombre.resize((largeur, hauteur))
-    overlay_sombre = Image.new("RGBA", (largeur, hauteur), (5, 5, 8, 255))
-    overlay_sombre.putalpha(degrade_sombre)
-    overlay = Image.alpha_composite(overlay, overlay_sombre)
+    degrade_gauche = _degrade_lineaire(largeur, hauteur, "gauche")
+    degrade_bas = _degrade_lineaire(largeur, hauteur, "bas")
+    degrade_coin = _degrade_lineaire(largeur, hauteur, "coin_bas_gauche")
 
-    # Teinte accent diffuse, coin bas-gauche
-    teinte = Image.new("RGBA", (largeur, hauteur), (0, 0, 0, 0))
-    rayon = int(largeur * 0.55)
-    cercle = Image.new("L", (rayon * 2, rayon * 2), 0)
-    dessin = ImageDraw.Draw(cercle)
-    dessin.ellipse([(0, 0), (rayon * 2, rayon * 2)], fill=140)
-    cercle = cercle.filter(ImageFilter.GaussianBlur(rayon // 3))
-    bloc_couleur = Image.new("RGBA", cercle.size, (*accent, 255))
-    bloc_couleur.putalpha(cercle)
-    teinte.alpha_composite(bloc_couleur, (-rayon // 2, hauteur - rayon))
-    overlay = Image.alpha_composite(overlay, teinte)
+    resultat = Image.alpha_composite(canvas, degrade_coin)
+    resultat = Image.alpha_composite(resultat, degrade_gauche)
+    resultat = Image.alpha_composite(resultat, degrade_bas)
 
-    return Image.alpha_composite(canvas, overlay)
+    # Lueur d'accent diffuse, coin haut-droite
+    petite_lueur = _degrade_lineaire(largeur // 4, hauteur // 4, "coin_bas_gauche", couleur=accent)
+    lueur = petite_lueur.rotate(180).resize((largeur, hauteur), Image.BILINEAR)
+    lueur = lueur.filter(ImageFilter.GaussianBlur(radius=max(24, largeur // 70)))
+    resultat = Image.alpha_composite(resultat, lueur)
+
+    return resultat
 
 
 # ---------------------------------------------------------------------------
@@ -208,20 +263,20 @@ def generer_mosaique(
     titre_repli: str = "",
 ) -> ResultatMosaique | None:
     """Retourne None si pas assez d'images pour composer une mosaïque
-    (l'appelant doit alors retomber sur le mode "un seul backdrop")."""
-    grille = choisir_grille(len(images_sources))
-    if grille is None:
+    (l'appelant doit alors retomber sur le mode "un seul backdrop").
+    Si on a peu d'images mais au moins `MINIMUM_IMAGES_DISTINCTES`, elles
+    sont répétées (cycle) jusqu'à `TUILES_CIBLE`, comme luckynumb3rs."""
+    if not assez_d_images(len(images_sources)):
         return None
 
-    if images_sources:
-        accent = calculer_couleur_accent(images_sources[0])
-    else:
-        accent = couleur_accent_deterministe(titre_repli)
+    accent = calculer_couleur_accent(images_sources[0]) if images_sources else couleur_accent_deterministe(titre_repli)
+    images_completees = completer_jusqua(images_sources, TUILES_CIBLE)
 
-    canvas = construire_grille(images_sources, largeur_canvas, hauteur_canvas)
+    echelle = largeur_canvas / 1920  # les constantes de tuile sont calibrées pour un canvas 1920px
+    canvas = construire_grille_inclinee(images_completees, largeur_canvas, hauteur_canvas, echelle=echelle)
     canvas = appliquer_degrade(canvas, accent)
 
-    return ResultatMosaique(image=canvas.convert("RGB"), accent=accent, nb_tuiles=grille[0] * grille[1])
+    return ResultatMosaique(image=canvas.convert("RGB"), accent=accent, nb_tuiles=len(images_sources))
 
 
 def image_depuis_bytes(donnees: bytes) -> Image.Image:
