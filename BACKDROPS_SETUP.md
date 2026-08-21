@@ -25,17 +25,37 @@ et pour **chaque dossier de chaque groupe actif**, il :
 
 ## 🎨 Mode mosaïque (par défaut)
 
-Au lieu d'un backdrop unique, chaque dossier peut afficher une grille de
-6 à 12 affiches des titres qu'il contient, avec :
-- un dégradé sombre du bas vers le haut (pour la lisibilité d'un futur titre) ;
-- une teinte diffuse d'une **couleur d'accent** extraite automatiquement à
-  partir du premier titre trouvé (moyenne des couleurs, saturation/luminosité
-  ajustées pour rester exploitable en dégradé).
+Chaque dossier affiche une grille de tuiles **paysage** (16:9), disposées en
+cascade inclinée -- même principe visuel que luckynumb3rs. Par-dessus :
+- un dégradé sombre (bas, gauche, coin bas-gauche) pour un effet vignette ;
+- une lueur diffuse d'une **couleur d'accent** extraite automatiquement à
+  partir du premier titre trouvé, placée en haut à droite.
+
+### ⚠️ Important : le titre affiché sur chaque tuile dépend de Fanart.tv
+
+Le script n'écrit **aucun texte** lui-même. Les titres/logos visibles sur
+les tuiles viennent des artworks **"thumb"** de [Fanart.tv](https://fanart.tv)
+(`moviethumb`/`tvthumb`) -- des visuels communautaires qui incluent déjà le
+titre stylisé. **Sans clé `FANART_API_KEY` configurée, les tuiles utilisent
+le backdrop TMDB brut (sans aucun texte)** : la mosaïque reste jolie mais
+sans titre visible.
+
+Pour avoir les titres :
+1. Crée un compte sur https://fanart.tv/profile/api-access/ et récupère une clé
+2. Ajoute-la comme secret GitHub `FANART_API_KEY` (voir section suivante)
+
+Priorité de langue pour le choix de l'artwork (comme luckynumb3rs) :
+langue préférée (`--langue-preferee`, `fr` par défaut) → langue originale du
+titre → version sans texte → n'importe quelle autre langue disponible.
+Toutes les fiches Fanart n'ont pas forcément de version dans chaque langue ;
+le script prend le meilleur disponible.
 
 C'est le comportement **par défaut** (`--mosaique`, activé aussi dans le
-workflow GitHub Actions). Si un dossier n'a pas assez de titres résolus
-(moins de 6), le script repasse automatiquement sur l'ancien mode "1 seul
-backdrop TMDB/Fanart", sans erreur.
+workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
+de 3 titres distincts résolus, le script repasse automatiquement sur
+l'ancien mode "1 seul backdrop TMDB/Fanart", sans erreur. Entre 3 et 11
+titres, ils sont répétés (cycle) pour compléter la grille, comme
+luckynumb3rs.
 
 Pour forcer l'ancien comportement (debug, comparaison) :
 ```bash
@@ -43,11 +63,7 @@ python3 scripts/generer_backdrops.py --collections ... # sans --mosaique
 ```
 Ou, depuis GitHub Actions, coche **desactiver_mosaique** au déclenchement manuel.
 
-### ⚠️ Phase 1 : couverture actuelle
-
-Ce n'est **pas encore** un portage 1:1 du système de luckynumb3rs (pas de
-mosaïque multi-titres, pas de couleur d'accent). C'est la fondation propre
-et testée sur laquelle on va itérer.
+### Couverture actuelle
 
 Sur les collections actuelles, la couverture est :
 
@@ -82,14 +98,15 @@ dossiers deviennent résolvables (ex : après l'intégration de Trakt).
 
 - **TMDB** : créez un compte sur https://www.themoviedb.org/settings/api et
   récupérez une clé API (v3).
-- **Fanart.tv** (optionnel, utilisé en repli quand TMDB n'a pas de backdrop) :
+- **Fanart.tv** (fortement recommandé -- c'est la source des titres/logos
+  incrustés sur les tuiles de la mosaïque, voir section précédente) :
   https://fanart.tv/profile/api-access/
 
 ### 2. Secrets GitHub
 
 Dans **Settings → Secrets and variables → Actions** du dépôt, créez :
 - `TMDB_API_KEY`
-- `FANART_API_KEY` (optionnel)
+- `FANART_API_KEY` (recommandé -- sans lui, les mosaïques n'ont pas de titre visible)
 
 ## 📝 Utilisation
 
