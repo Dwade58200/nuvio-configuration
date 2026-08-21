@@ -416,6 +416,15 @@ class ClientTMDB:
         self._cache_keyword[mot] = keyword_id
         return keyword_id
 
+    def recuperer_tvdb_id(self, tmdb_id: int) -> int | None:
+        """Fanart.tv indexe les séries par TheTVDB, pas par TMDB -- il faut
+        d'abord résoudre l'identifiant externe."""
+        try:
+            data = self._get(f"/tv/{tmdb_id}/external_ids")
+            return data.get("tvdb_id")
+        except requests.RequestException:
+            return None
+
     def resoudre_backdrop(self, requete: RequeteTMDB) -> tuple[str | None, int | None, str | None]:
         """Retourne (backdrop_path, tmdb_id_du_resultat, media_type) ou (None, None, None)."""
         try:
@@ -456,11 +465,13 @@ class ClientTMDB:
 
     def resoudre_backdrops_multiples(
         self, requete: RequeteTMDB, limite: int = 12, pages: int = 2
-    ) -> list[tuple[str, int, str]]:
-        """Retourne jusqu'à `limite` tuples (backdrop_path, tmdb_id, media_type)
-        pour une requête donnée -- utilisé pour la mosaïque multi-titres.
+    ) -> list[tuple[str, int, str, str | None]]:
+        """Retourne jusqu'à `limite` tuples (backdrop_path, tmdb_id, media_type,
+        langue_originale) pour une requête donnée -- utilisé pour la mosaïque
+        multi-titres. La langue originale sert à prioriser les artworks
+        Fanart.tv dans la bonne langue (voir ClientFanart.choisir_url).
         """
-        resultats: list[tuple[str, int, str]] = []
+        resultats: list[tuple[str, int, str, str | None]] = []
         try:
             if requete.kind == "collection":
                 data = self._get(f"/collection/{requete.tmdb_id}")
@@ -468,7 +479,7 @@ class ClientTMDB:
                 parts = sorted(parts, key=lambda p: p.get("popularity", 0), reverse=True)
                 for item in parts:
                     if item.get("backdrop_path"):
-                        resultats.append((item["backdrop_path"], item.get("id"), "collection"))
+                        resultats.append((item["backdrop_path"], item.get("id"), "collection", item.get("original_language")))
                     if len(resultats) >= limite:
                         break
                 return resultats
@@ -481,7 +492,7 @@ class ClientTMDB:
                         break
                     for item in items:
                         if item.get("backdrop_path"):
-                            resultats.append((item["backdrop_path"], item.get("id"), requete.media_type))
+                            resultats.append((item["backdrop_path"], item.get("id"), requete.media_type, item.get("original_language")))
                         if len(resultats) >= limite:
                             return resultats
                 return resultats
@@ -501,7 +512,7 @@ class ClientTMDB:
                         break
                     for item in items:
                         if item.get("backdrop_path"):
-                            resultats.append((item["backdrop_path"], item.get("id"), requete.media_type))
+                            resultats.append((item["backdrop_path"], item.get("id"), requete.media_type, item.get("original_language")))
                         if len(resultats) >= limite:
                             return resultats
                 return resultats
@@ -518,28 +529,81 @@ class ClientFanart:
         self.cle_api = cle_api
         self.session = session or requests.Session()
 
-    def recuperer_backdrop(self, tmdb_id: int, media_type: str) -> str | None:
-        if not self.cle_api or not tmdb_id:
+    def _normaliser_langue(self, valeur: Any) -> str | None:
+        if valeur is None:
             return None
+        valeur = str(valeur).strip().lower()
+        return None if valeur in ("", "00", "none", "null") else valeur
+
+    def _donnees(self, tmdb_ou_tvdb_id: int, media_type: str) -> dict[str, Any] | None:
         chemin = "movies" if media_type == "movie" else "tv"
         try:
             r = self.session.get(
-                f"{FANART_API_BASE}/{chemin}/{tmdb_id}",
+                f"{FANART_API_BASE}/{chemin}/{tmdb_ou_tvdb_id}",
                 params={"api_key": self.cle_api},
                 timeout=15,
             )
             if r.status_code != 200:
                 return None
-            data = r.json()
-            for cle in ("moviebackground", "showbackground", "tvthumb"):
-                items = data.get(cle) or []
-                images_fr = [i for i in items if i.get("lang") in ("fr", "00")]
-                choix = images_fr or items
-                if choix:
-                    return choix[0]["url"]
+            return r.json()
         except requests.RequestException:
             return None
-        return None
+
+    def _groupes_candidats(self, data: dict[str, Any], media_type: str) -> list[list[dict[str, Any]]]:
+        """Ordre de priorité : thumb (avec titre incrusté) puis background."""
+        if media_type == "tv":
+            return [data.get("tvthumb") or [], data.get("showbackground") or []]
+        return [data.get("moviethumb") or [], data.get("moviebackground") or []]
+
+    def choisir_url(
+        self, data: dict[str, Any] | None, media_type: str, langue_preferee: str | None, langue_originale: str | None
+    ) -> tuple[str | None, str | None]:
+        """Retourne (url, bucket) où bucket indique la raison du choix :
+        'preferee' | 'originale' | 'sans_texte' | 'autre' | None."""
+        if not data:
+            return None, None
+
+        langue_preferee = self._normaliser_langue(langue_preferee)
+        langue_originale = self._normaliser_langue(langue_originale)
+
+        paniers: dict[str, list[tuple[int, dict[str, Any]]]] = {
+            "preferee": [], "originale": [], "sans_texte": [], "autre": []
+        }
+
+        for rang_groupe, candidats in enumerate(self._groupes_candidats(data, media_type)):
+            for candidat in candidats:
+                langue = self._normaliser_langue(candidat.get("lang"))
+                if langue_preferee and langue == langue_preferee:
+                    paniers["preferee"].append((rang_groupe, candidat))
+                elif langue_originale and langue == langue_originale:
+                    paniers["originale"].append((rang_groupe, candidat))
+                elif langue is None:
+                    paniers["sans_texte"].append((rang_groupe, candidat))
+                elif langue:
+                    paniers["autre"].append((rang_groupe, candidat))
+
+        for panier in ("preferee", "originale", "sans_texte", "autre"):
+            if paniers[panier]:
+                meilleur = sorted(paniers[panier], key=lambda t: (t[0], -int(t[1].get("likes", 0))))[0][1]
+                if meilleur.get("url"):
+                    return meilleur["url"], panier
+
+        return None, None
+
+    def recuperer_thumb(
+        self, identifiant: int, media_type: str, langue_preferee: str, langue_originale: str | None
+    ) -> tuple[str | None, str | None]:
+        """Retourne (url, bucket). `identifiant` = tmdb_id pour un film,
+        tvdb_id pour une série (Fanart indexe les séries par TheTVDB, pas TMDB)."""
+        if not self.cle_api or not identifiant:
+            return None, None
+        data = self._donnees(identifiant, media_type)
+        return self.choisir_url(data, media_type, langue_preferee, langue_originale)
+
+    def recuperer_backdrop(self, tmdb_id: int, media_type: str) -> str | None:
+        """Ancienne API simple, gardée pour compatibilité (mode single-backdrop)."""
+        url, _bucket = self.recuperer_thumb(tmdb_id, media_type, langue_preferee="fr", langue_originale=None)
+        return url
 
 
 # ---------------------------------------------------------------------------
@@ -592,6 +656,7 @@ class GenerateurBackdrops:
         profil: str = "standard",
         dry_run: bool = False,
         mosaique: bool = False,
+        langue_preferee: str = "fr",
     ):
         self.session = requests.Session()
         self.tmdb = ClientTMDB(cle_tmdb, session=self.session)
@@ -600,6 +665,7 @@ class GenerateurBackdrops:
         self.profil = profil
         self.dry_run = dry_run
         self.mosaique = mosaique
+        self.langue_preferee = langue_preferee
 
     def _dimensions_canvas(self) -> tuple[int, int]:
         largeur = PROFILS_QUALITE.get(self.profil, PROFILS_QUALITE["standard"])["largeur"]
@@ -608,16 +674,48 @@ class GenerateurBackdrops:
         hauteur = round(largeur * 9 / 16)
         return largeur, hauteur
 
+    def _resoudre_url_tuile(self, candidat: tuple[str, int, str, str | None]) -> str | None:
+        """Pour un candidat donné, essaie d'abord une image Fanart.tv
+        "thumb" (avec titre incrusté), puis retombe sur le backdrop TMDB
+        brut (sans texte) si indisponible -- même logique que luckynumb3rs.
+        """
+        backdrop_path, tmdb_id, media_type, langue_originale = candidat
+
+        if self.fanart.cle_api and tmdb_id:
+            if media_type == "collection":
+                media_type_fanart = "movie"
+                identifiant = tmdb_id
+            elif media_type == "tv":
+                media_type_fanart = "tv"
+                identifiant = self.tmdb.recuperer_tvdb_id(tmdb_id)
+            else:
+                media_type_fanart = "movie"
+                identifiant = tmdb_id
+
+            if identifiant:
+                url, _bucket = self.fanart.recuperer_thumb(
+                    identifiant, media_type_fanart, self.langue_preferee, langue_originale
+                )
+                if url:
+                    return url
+
+        if backdrop_path:
+            return f"{TMDB_IMAGE_BASE}/w1280{backdrop_path}"
+        return None
+
     def _telecharger_images_pour_mosaique(
-        self, candidats: list[tuple[str, int, str]]
+        self, candidats: list[tuple[str, int, str, str | None]]
     ) -> list["Image.Image"]:
-        """Télécharge en parallèle les backdrops des candidats et retourne
-        les images PIL valides (dans l'ordre, en ignorant les échecs)."""
+        """Résout (Fanart puis repli TMDB) et télécharge en parallèle les
+        images des candidats ; retourne les images PIL valides (dans
+        l'ordre, en ignorant les échecs)."""
         images: dict[int, Any] = {}
 
-        def _telecharger(index_et_candidat):
-            index, (backdrop_path, _tmdb_id, _media_type) = index_et_candidat
-            url = f"{TMDB_IMAGE_BASE}/w780{backdrop_path}"
+        def _traiter(index_et_candidat):
+            index, candidat = index_et_candidat
+            url = self._resoudre_url_tuile(candidat)
+            if not url:
+                return index, None
             try:
                 r = self.session.get(url, timeout=20)
                 r.raise_for_status()
@@ -626,7 +724,7 @@ class GenerateurBackdrops:
                 return index, None
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-            for index, image in executor.map(_telecharger, enumerate(candidats)):
+            for index, image in executor.map(_traiter, enumerate(candidats)):
                 if image is not None:
                     images[index] = image
 
@@ -638,7 +736,7 @@ class GenerateurBackdrops:
         """Tente une génération en mosaïque. Retourne None si pas assez
         d'images trouvées (l'appelant doit alors retomber sur le mode
         single-backdrop)."""
-        candidats: list[tuple[str, int, str]] = []
+        candidats: list[tuple[str, int, str, str | None]] = []
         vus: set[tuple[str, int]] = set()
 
         # on interleave les requêtes pour ne pas être dominé par la première
@@ -647,19 +745,19 @@ class GenerateurBackdrops:
         for i in range(max_len):
             for liste in listes_par_requete:
                 if i < len(liste):
-                    backdrop_path, tmdb_id, media_type = liste[i]
+                    backdrop_path, tmdb_id, media_type, langue_originale = liste[i]
                     cle = (media_type, tmdb_id)
                     if cle not in vus:
                         vus.add(cle)
-                        candidats.append((backdrop_path, tmdb_id, media_type))
+                        candidats.append((backdrop_path, tmdb_id, media_type, langue_originale))
             if len(candidats) >= 12:
                 break
 
-        if mosaique_module.choisir_grille(len(candidats)) is None:
+        if not mosaique_module.assez_d_images(len(candidats)):
             return None  # pas assez d'images -> repli sur le mode single-image
 
         images = self._telecharger_images_pour_mosaique(candidats[:12])
-        if mosaique_module.choisir_grille(len(images)) is None:
+        if not mosaique_module.assez_d_images(len(images)):
             return None  # trop d'échecs de téléchargement -> repli aussi
 
         largeur, hauteur = self._dimensions_canvas()
@@ -670,7 +768,7 @@ class GenerateurBackdrops:
         chemin_sortie.parent.mkdir(parents=True, exist_ok=True)
         resultat.image.save(chemin_sortie, "JPEG", quality=PROFILS_QUALITE.get(self.profil, PROFILS_QUALITE["standard"])["qualite"], optimize=True)
 
-        detail = f"mosaïque {resultat.nb_tuiles} tuiles, accent RGB{resultat.accent}"
+        detail = f"mosaïque {resultat.nb_tuiles} tuiles distinctes, accent RGB{resultat.accent}"
         return ResultatDossier(groupe_titre, dossier_titre, "genere", detail, None)
 
     def traiter_dossier(self, groupe_titre: str, dossier: dict[str, Any]) -> ResultatDossier:
@@ -791,6 +889,7 @@ def main() -> int:
     parser.add_argument("--limite", type=int, default=None, help="Limiter le nombre de dossiers (tests)")
     parser.add_argument("--dry-run", action="store_true", help="Simule sans appeler TMDB ni écrire d'image")
     parser.add_argument("--mosaique", action="store_true", help="Génère une mosaïque multi-titres + couleur d'accent au lieu d'un seul backdrop (repli automatique si pas assez d'images)")
+    parser.add_argument("--langue-preferee", default="fr", help="Code langue Fanart.tv préféré pour les artworks avec titre incrusté (défaut: fr)")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -811,6 +910,7 @@ def main() -> int:
         profil=args.profil,
         dry_run=args.dry_run,
         mosaique=args.mosaique,
+        langue_preferee=args.langue_preferee,
     )
     resultats = generateur.generer_tout(
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
