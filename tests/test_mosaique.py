@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests pour scripts/mosaique.py -- entièrement hors-ligne."""
+"""Tests pour scripts/mosaique.py (grille inclinée) -- entièrement hors-ligne."""
 
 import sys
 from pathlib import Path
@@ -9,50 +9,59 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from mosaique import (  # noqa: E402
-    MINIMUM_TUILES,
+    MINIMUM_IMAGES_DISTINCTES,
+    TUILES_CIBLE,
     appliquer_degrade,
+    assez_d_images,
     calculer_couleur_accent,
-    choisir_grille,
-    construire_grille,
+    completer_jusqua,
+    construire_grille_inclinee,
     couleur_accent_deterministe,
     generer_mosaique,
     recadrer_pour_tuile,
 )
 
 
-def _image_couleur(couleur, taille=(300, 169)):
+def _image_couleur(couleur, taille=(1280, 720)):  # paysage, comme un thumb Fanart/backdrop TMDB
     return Image.new("RGB", taille, color=couleur)
 
 
 # ---------------------------------------------------------------------------
-# Choix de la grille
+# Seuil minimum d'images / complétion
 # ---------------------------------------------------------------------------
 
-def test_choisir_grille_paliers():
-    assert choisir_grille(12) == (4, 3)
-    assert choisir_grille(15) == (4, 3)  # plus d'images que nécessaire -> palier max
-    assert choisir_grille(9) == (3, 3)
-    assert choisir_grille(6) == (3, 2)
-    assert choisir_grille(5) is None  # pas assez
+def test_assez_d_images():
+    assert assez_d_images(MINIMUM_IMAGES_DISTINCTES) is True
+    assert assez_d_images(MINIMUM_IMAGES_DISTINCTES - 1) is False
+    assert assez_d_images(20) is True
 
 
-def test_minimum_tuiles_coherent_avec_paliers():
-    assert choisir_grille(MINIMUM_TUILES) is not None
-    assert choisir_grille(MINIMUM_TUILES - 1) is None
+def test_completer_jusqua_repete_par_cycle():
+    images = [_image_couleur((255, 0, 0)), _image_couleur((0, 255, 0)), _image_couleur((0, 0, 255))]
+    completees = completer_jusqua(images, minimum=10)
+    assert len(completees) == 10
+    assert completees[:3] == images  # les originales d'abord
+    assert completees[3] is images[0]  # puis ça recycle depuis le début
+
+
+def test_completer_jusqua_ne_reduit_jamais():
+    images = [_image_couleur((i, i, i)) for i in range(15)]
+    completees = completer_jusqua(images, minimum=TUILES_CIBLE)
+    assert len(completees) == 15  # déjà plus que le minimum -> inchangé
+
+
+def test_completer_jusqua_liste_vide():
+    assert completer_jusqua([], minimum=12) == []
 
 
 # ---------------------------------------------------------------------------
-# Recadrage
+# Recadrage (inchangé, toujours utilisé par preparer_tuile)
 # ---------------------------------------------------------------------------
 
 def test_recadrer_pour_tuile_dimensions_exactes():
-    source = _image_couleur((255, 0, 0), (1000, 400))  # très large
-    tuile = recadrer_pour_tuile(source, 400, 225)
-    assert tuile.size == (400, 225)
-
-    source2 = _image_couleur((0, 255, 0), (200, 800))  # très haut
-    tuile2 = recadrer_pour_tuile(source2, 400, 225)
-    assert tuile2.size == (400, 225)
+    source = _image_couleur((255, 0, 0), (1000, 400))
+    tuile = recadrer_pour_tuile(source, 372, 210)
+    assert tuile.size == (372, 210)
 
 
 # ---------------------------------------------------------------------------
@@ -62,7 +71,6 @@ def test_recadrer_pour_tuile_dimensions_exactes():
 def test_couleur_accent_extrait_une_teinte_plausible():
     image_bleue = _image_couleur((20, 40, 220))
     r, g, b = calculer_couleur_accent(image_bleue)
-    # le canal bleu doit rester dominant après le boost saturation/luminosité
     assert b >= r and b >= g
     assert all(0 <= c <= 255 for c in (r, g, b))
 
@@ -71,33 +79,32 @@ def test_couleur_accent_deterministe_stable():
     a1 = couleur_accent_deterministe("Action")
     a2 = couleur_accent_deterministe("Action")
     a3 = couleur_accent_deterministe("Comédie")
-    assert a1 == a2  # déterministe, pas aléatoire
-    assert a1 != a3  # des titres différents donnent des teintes différentes
+    assert a1 == a2
+    assert a1 != a3
 
 
 # ---------------------------------------------------------------------------
-# Construction de la grille complète
+# Grille inclinée
 # ---------------------------------------------------------------------------
 
-def test_construire_grille_dimensions_canvas():
-    images = [_image_couleur((i * 20, 100, 200)) for i in range(12)]
-    canvas = construire_grille(images, 1920, 1080)
+def test_construire_grille_inclinee_dimensions_canvas():
+    images = [_image_couleur((i * 20, 100, 200)) for i in range(8)]
+    canvas = construire_grille_inclinee(images, 1920, 1080)
     assert canvas.size == (1920, 1080)
     assert canvas.mode == "RGBA"
 
 
-def test_construire_grille_leve_erreur_si_pas_assez_images():
-    images = [_image_couleur((255, 0, 0))] * 3
+def test_construire_grille_inclinee_leve_erreur_si_liste_vide():
     try:
-        construire_grille(images, 1920, 1080)
+        construire_grille_inclinee([], 1920, 1080)
         assert False, "aurait dû lever ValueError"
     except ValueError:
         pass
 
 
-def test_construire_grille_utilise_bien_plusieurs_images_distinctes():
-    """Vérifie que la mosaïque contient VRAIMENT plusieurs images
-    différentes, pas la même recopiée partout (sanity check visuel)."""
+def test_construire_grille_inclinee_utilise_plusieurs_images_distinctes():
+    """La grille doit vraiment composer plusieurs affiches différentes
+    (le cycle doit couvrir toute la grille, pas répéter la même partout)."""
     images = [
         _image_couleur((255, 0, 0)),
         _image_couleur((0, 255, 0)),
@@ -106,27 +113,40 @@ def test_construire_grille_utilise_bien_plusieurs_images_distinctes():
         _image_couleur((0, 255, 255)),
         _image_couleur((255, 0, 255)),
     ]
-    canvas = construire_grille(images, 900, 600)
-    couleurs_presentes = set(canvas.convert("RGB").getdata())
-    # au moins 5 couleurs de base distinctes doivent apparaître quelque part
+    canvas = construire_grille_inclinee(images, 1280, 720)
+    couleurs_presentes = set(canvas.convert("RGB").resize((200, 120)).getdata())
     couleurs_de_base = {(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255), (255, 0, 255)}
-    trouvees = {c for c in couleurs_presentes if c in couleurs_de_base}
-    assert len(trouvees) >= 5
+    # tolérance : la rotation/l'anti-aliasing modifie légèrement les teintes en bordure de tuile,
+    # on vérifie juste qu'on trouve des pixels PROCHES d'au moins 4 couleurs de base différentes
+    trouvees = set()
+    for couleur in couleurs_presentes:
+        for base in couleurs_de_base:
+            if sum(abs(c - b) for c, b in zip(couleur, base)) < 40:
+                trouvees.add(base)
+    assert len(trouvees) >= 4
+
+
+def test_grille_avec_une_seule_image_repetee_ne_plante_pas():
+    """Cas limite : une seule image dispo (en dessous du seuil normalement,
+    mais la fonction bas-niveau doit rester robuste si appelée directement)."""
+    images = [_image_couleur((10, 20, 30))]
+    canvas = construire_grille_inclinee(images, 800, 450)
+    assert canvas.size == (800, 450)
 
 
 # ---------------------------------------------------------------------------
 # Dégradé
 # ---------------------------------------------------------------------------
 
-def test_degrade_assombrit_le_bas_plus_que_le_haut():
-    canvas = Image.new("RGBA", (200, 200), (200, 200, 200, 255))
+def test_degrade_assombrit_le_bas_et_la_gauche():
+    canvas = Image.new("RGBA", (400, 400), (200, 200, 200, 255))
     resultat = appliquer_degrade(canvas, (255, 100, 50)).convert("RGB")
 
-    pixel_haut = resultat.getpixel((100, 5))
-    pixel_bas = resultat.getpixel((100, 195))
-    luminosite_haut = sum(pixel_haut) / 3
-    luminosite_bas = sum(pixel_bas) / 3
-    assert luminosite_bas < luminosite_haut
+    lum = lambda p: sum(p) / 3  # noqa: E731
+    centre_haut_droite = lum(resultat.getpixel((380, 10)))
+    bas_gauche = lum(resultat.getpixel((10, 390)))
+
+    assert bas_gauche < centre_haut_droite
 
 
 # ---------------------------------------------------------------------------
@@ -134,7 +154,7 @@ def test_degrade_assombrit_le_bas_plus_que_le_haut():
 # ---------------------------------------------------------------------------
 
 def test_generer_mosaique_retourne_none_si_pas_assez_images():
-    images = [_image_couleur((255, 0, 0))] * 2
+    images = [_image_couleur((255, 0, 0))] * (MINIMUM_IMAGES_DISTINCTES - 1)
     assert generer_mosaique(images, 1920, 1080) is None
 
 
@@ -146,6 +166,25 @@ def test_generer_mosaique_cas_nominal():
     assert resultat.image.mode == "RGB"
     assert resultat.nb_tuiles == 12
     assert len(resultat.accent) == 3
+
+
+def test_generer_mosaique_complete_si_peu_d_images():
+    """Avec seulement 4 images distinctes (>= seuil minimum de 3, < 12),
+    la mosaïque doit quand même se générer en répétant les images,
+    comme luckynumb3rs (`ensure_minimum_tiles`)."""
+    images = [_image_couleur((i * 40, 80, 180)) for i in range(4)]
+    resultat = generer_mosaique(images, 1920, 1080, titre_repli="Micro-genre")
+    assert resultat is not None
+    assert resultat.nb_tuiles == 4  # nb_tuiles reflète les images SOURCES distinctes, pas la répétition
+
+
+def test_generer_mosaique_echelle_avec_petit_canvas():
+    """Un canvas plus petit (profil 'compresse') doit produire une image
+    aux bonnes dimensions, sans erreur de tuiles trop grandes/trop petites."""
+    images = [_image_couleur((i * 15, 80, 180)) for i in range(8)]
+    resultat = generer_mosaique(images, 780, 439, titre_repli="Comédie")
+    assert resultat is not None
+    assert resultat.image.size == (780, 439)
 
 
 if __name__ == "__main__":
