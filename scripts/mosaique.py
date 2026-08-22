@@ -99,10 +99,23 @@ def couleur_accent_deterministe(texte: str) -> tuple[int, int, int]:
 # Découpe / arrondi des tuiles
 # ---------------------------------------------------------------------------
 
+def aplatir_transparence(image: Image.Image, couleur_fond: tuple[int, int, int] = (14, 14, 16)) -> Image.Image:
+    """Compose proprement une image avec canal alpha (ex: artworks
+    'clearart' de Fanart, souvent détourés sur fond transparent) sur un
+    fond uni sombre, plutôt que de simplement jeter le canal alpha (ce qui
+    peut révéler des pixels noirs/blancs parasites sous la découpe)."""
+    if image.mode in ("RGBA", "LA") or (image.mode == "P" and "transparency" in image.info):
+        image = image.convert("RGBA")
+        fond = Image.new("RGB", image.size, couleur_fond)
+        fond.paste(image, mask=image.split()[-1])
+        return fond
+    return image.convert("RGB")
+
+
 def recadrer_pour_tuile(image: Image.Image, largeur: int, hauteur: int) -> Image.Image:
     """Recadre (crop centré) + redimensionne une image pour remplir
     exactement (largeur, hauteur), comme un CSS `object-fit: cover`."""
-    image = image.convert("RGB")
+    image = aplatir_transparence(image)
     ratio_cible = largeur / hauteur
     ratio_source = image.width / image.height
 
