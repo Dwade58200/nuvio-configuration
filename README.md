@@ -49,8 +49,7 @@ nuvio-configuration/
 ├── .github/workflows/
 │   └── generer-backdrops.yml               # Automatisation mensuelle (GitHub Actions)
 ├── requirements-dev.txt                    # Dépendances Python nécessaires
-├── BACKDROPS_SETUP.md                      # Documentation technique détaillée du pipeline
-└── APPLIQUER.md                            # Historique d'un correctif appliqué au pipeline
+└── BACKDROPS_SETUP.md                      # Documentation technique détaillée du pipeline
 ```
 
 *(Les dossiers `Collections/Covers/` et `Collections/Logos/` référencés
@@ -177,10 +176,6 @@ pytest tests/ -v
   pipeline (options en ligne de commande, dépannage, logique de
   résilience aux renommages de groupes). À consulter si je dois modifier
   ou déboguer le script.
-- **`APPLIQUER.md`** — trace d'un correctif ponctuel déjà appliqué au
-  pipeline (exclusion des sources françaises en double, correction d'un
-  bug de doublon visuel). Gardé comme historique, pas une action à
-  refaire.
 
 ---
 
