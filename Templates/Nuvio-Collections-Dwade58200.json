@@ -306,7 +306,7 @@
   },
   {
     "id": "Service-Streaming",
-    "title": "🎬Services de Streaming",
+    "title": "🎬 Services de Streaming",
     "folders": [
       {
         "id": "folder-a583f34b",
@@ -328,12 +328,14 @@
           },
           {
             "type": "movie",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.global.mt49lr48"
           },
           {
             "type": "series",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.global_copy.mt49lz6m"
@@ -343,18 +345,17 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔴",
         "focusGifUrl": "https://i.ibb.co/hRjnbqtb/netflix-gif.gif",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/streaming/cover/netflix.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Netflix.jpg?raw=true",
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.netflix.fr.movie"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.netflix.fr.series"
           },
@@ -369,7 +370,8 @@
             "catalogId": "tmdb.discover.movie.global_copy.mt49lz6m"
           }
         ],
-        "focusGifEnabled": true
+        "focusGifEnabled": true,
+        "heroBackdropUrl": ""
       },
       {
         "id": "folder-e07599df",
@@ -391,12 +393,14 @@
           },
           {
             "type": "movie",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.global_v2_copy.mt4eq6av"
           },
           {
             "type": "series",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.global_v2_copy.mt4eqcbi"
@@ -406,18 +410,17 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📦",
         "focusGifUrl": "https://i.ibb.co/DPSHQGdY/youtube-video-gif.gif",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/streaming/cover/prime-video.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Prime_Video.jpg?raw=true",
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.amazon-prime.fr.movie"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.amazon-prime.fr.series"
           },
@@ -432,7 +435,8 @@
             "catalogId": "tmdb.discover.series.global_v2_copy.mt4eqcbi"
           }
         ],
-        "focusGifEnabled": true
+        "focusGifEnabled": true,
+        "heroBackdropUrl": ""
       },
       {
         "id": "folder-df6d88cc",
@@ -454,12 +458,14 @@
           },
           {
             "type": "movie",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.populaire_copy.mt4ey94a"
           },
           {
             "type": "series",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.populaire_copy.mt4eybcy"
@@ -469,18 +475,17 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔘",
         "focusGifUrl": "https://i.ibb.co/TMt4Z3HN/youtube-video-gif-7.gif",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/HBO_Max_Logo.webp?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/HBO_Max.jpeg?raw=true",
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.hbo-max.fr.movie"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.hbo-max.fr.series"
           },
@@ -495,7 +500,8 @@
             "catalogId": "tmdb.discover.series.populaire_copy.mt4eybcy"
           }
         ],
-        "focusGifEnabled": true
+        "focusGifEnabled": true,
+        "heroBackdropUrl": ""
       },
       {
         "id": "folder-50412b35",
@@ -517,12 +523,14 @@
           },
           {
             "type": "movie",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.populaire_copy_copy_copy_copy.mt4ez5cp"
           },
           {
             "type": "series",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezduf"
@@ -532,18 +540,17 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🍎",
         "focusGifUrl": "https://i.ibb.co/Wpx1PFtJ/youtube-video-gif-4.gif",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/apple-tv.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Apple_TV.jpg?raw=true",
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.apple-tv.fr.movie"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.apple-tv.fr.series"
           },
@@ -558,7 +565,8 @@
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezduf"
           }
         ],
-        "focusGifEnabled": true
+        "focusGifEnabled": true,
+        "heroBackdropUrl": ""
       },
       {
         "id": "folder-6308b715",
@@ -580,12 +588,14 @@
           },
           {
             "type": "movie",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.populaire_copy_copy_copy.mt4ez3s3"
           },
           {
             "type": "series",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezf49"
@@ -595,18 +605,17 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏰",
         "focusGifUrl": "https://i.ibb.co/8vXcWzY/youtube-video-gif-8.gif",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/Disney+_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Disney+.jpg?raw=true",
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.disney.fr.movie"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.disney.fr.series"
           },
@@ -621,7 +630,8 @@
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezf49"
           }
         ],
-        "focusGifEnabled": true
+        "focusGifEnabled": true,
+        "heroBackdropUrl": ""
       },
       {
         "id": "folder-2a809268",
@@ -643,12 +653,14 @@
           },
           {
             "type": "movie",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.populaire_copy_copy.mt4ez1l8"
           },
           {
             "type": "series",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezgou"
@@ -658,18 +670,17 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🗻",
         "focusGifUrl": "https://i.ibb.co/yc8v51Zr/youtube-video-gif-3.gif",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/paramount-plus.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Paramount.jpg?raw=true",
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.paramount.fr.movie"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.paramount.fr.series"
           },
@@ -684,7 +695,8 @@
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezgou"
           }
         ],
-        "focusGifEnabled": true
+        "focusGifEnabled": true,
+        "heroBackdropUrl": ""
       },
       {
         "id": "folder-27e8f810",
@@ -706,12 +718,14 @@
           },
           {
             "type": "movie",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.populaire_copy_copy_copy_copy_copy.mt4ez71n"
           },
           {
             "type": "series",
+            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezcjx"
@@ -721,18 +735,17 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📡",
         "focusGifUrl": "https://i.ibb.co/nqJJVy5C/youtube-video-gif-2.gif",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/Canal+_Logo.webp?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Canal+.jpeg?raw=true",
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "custom.uuid_bd44fd8f_topstreaming_flixpatrol.movie.canal_movie_france"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "custom.uuid_bd44fd8f_topstreaming_flixpatrol.series.canal_series_france"
           },
@@ -747,7 +760,8 @@
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezcjx"
           }
         ],
-        "focusGifEnabled": true
+        "focusGifEnabled": true,
+        "heroBackdropUrl": ""
       },
       {
         "id": "folder-71d5bdad",
@@ -771,7 +785,6 @@
         "catalogSources": [
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.m6_et_tf1.mofqqcct"
           }
@@ -801,7 +814,6 @@
         "catalogSources": [
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.m6_et_tf1_copy.mokc55cm"
           }
@@ -818,7 +830,7 @@
   },
   {
     "id": "collection-c6f6b3dd",
-    "title": "🎭Genres",
+    "title": "🎭 Genres",
     "folders": [
       {
         "id": "folder-eb5d2957",
@@ -891,49 +903,41 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123064"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33122883"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_action.global"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.action_copy.mokbfuip"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.action_aventure_copy.mokbk464"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.top_fr.mo2tk0ej"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.fr"
           }
@@ -1005,43 +1009,36 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.top_aventure_copy.mokbpqb8"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.action_copy.mokb176x"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.aventure_copy.mokblxvs"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.action_aventure_copy.mokbk464"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.action_copy.mokb1a8r"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.fr"
           }
@@ -1120,49 +1117,41 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123123"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123136"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_comedie.global"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_comedie.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.com_die_copy.mokbrgql"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.com_die_copy.mokbtxpl"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_comedie.fr"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_comedie.fr"
           }
@@ -1241,49 +1230,41 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123210"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123222"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_drame.global"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_drame.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.drame_copy.mokby75k"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.drame_copy.mokby9kf"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_drame.fr"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_drame.fr"
           }
@@ -1348,37 +1329,31 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.fantastique_copy.molqhtjb"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.popular.fantasy"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.fantastique_copy.molqhipa"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.sci_fi_fantastique_copy.molq1svy"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.fr"
           }
@@ -1443,37 +1418,31 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.guerre_copy.molqt5k7"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.guerre_politique_copy.molqtbz5"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.popular.war"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.popular.war-politics"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.guerre_copy.molqt6j5"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.guerre_politique_copy.molqtcqa"
           }
@@ -1566,61 +1535,51 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.102554"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123250"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123257"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_horreur.global"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.horreur_copy.molpqgh8"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.horreur_copy.molpv36g"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.horreur_copy.molpuols"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_horreur.fr"
           },
           {
             "type": "all",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.28015387"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.59551"
           }
@@ -1699,49 +1658,41 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.myst_re_copy.molqkg0x"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqkmwo"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.myst_re_copy.molqkf1p"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.popular.mystery"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.popular.mystery"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqklz5"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.myst_re_copy_copy.molqksp8"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqkpus"
           }
@@ -1820,49 +1771,41 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.policier_copy.molqb2ec"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.policier_copy.molqdkfo"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.crime_copy.moj3vcnx"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.popular.crime"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.new_policier_copy.molqbo5z"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.policier_copy.molqdlf5"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.policier_copy.molqc8w1"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.policier_copy.molqdmb0"
           }
@@ -1920,31 +1863,26 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33132629"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33132707"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_romance.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.romance_copy.molqzu2d"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_romance.fr"
           }
@@ -2023,49 +1961,41 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123270"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123276"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_science_fiction.global"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.sci_fi_copy.molq0yrp"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.sci_fi_fantastique_copy.molq1svy"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_science_fiction.fr"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.fr"
           }
@@ -2123,31 +2053,26 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123316"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123324"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_thriller.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.thriller_copy.molq4zra"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_thriller.fr"
           }
@@ -2184,13 +2109,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.popular.western"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.popular.western"
           }
@@ -2269,49 +2192,41 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123094"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123092"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_animation.global"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_animation.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.animation_copy.molq6v0q"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.animation_copy.molq7s6h"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_animation.fr"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_animation.fr"
           }
@@ -2390,49 +2305,41 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33122833"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33122848"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_documentaire.global"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_documentaire.global"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.documentaire_copy.molq9500"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.documentaire_copy.molqa38v"
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_documentaire.fr"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_documentaire.fr"
           }
@@ -2480,13 +2387,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.coming-of-age"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.coming-of-age"
           }
@@ -2523,13 +2428,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.martial-arts"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.martial-arts"
           }
@@ -2566,13 +2469,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.treasure-hunt"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.treasure-hunt"
           }
@@ -2609,13 +2510,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.romantic-comedy"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.romantic-comedy"
           }
@@ -2652,13 +2551,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.spy"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.spy"
           }
@@ -2695,13 +2592,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.space"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.space"
           }
@@ -2885,6 +2780,7 @@
           {
             "title": "Inspiré de faits réels",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "voteCountGte": 50,
               "withKeywords": "9672"
@@ -2896,6 +2792,7 @@
           {
             "title": "Inspiré de faits réels",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "voteCountGte": 50,
               "withKeywords": "9672"
@@ -2945,13 +2842,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.magic"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.magic"
           }
@@ -3012,13 +2907,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.superhero"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.superhero"
           }
@@ -3055,13 +2948,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.vampire"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.vampire"
           }
@@ -3098,13 +2989,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.revenge"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.revenge"
           }
@@ -3141,13 +3030,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.time-travel"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.time-travel"
           }
@@ -3159,11 +3046,12 @@
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
+    "backdropImageUrl": "",
     "focusGlowEnabled": true
   },
   {
     "id": "collection-dbf45efa",
-    "title": "🎭Vibe",
+    "title": "🎭 Vibe",
     "folders": [
       {
         "id": "folder-309ce291",
@@ -3172,6 +3060,7 @@
           {
             "title": "Edifiant et Inspirant",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "35,18",
               "voteCountGte": 500
@@ -3183,6 +3072,7 @@
           {
             "title": "Comédie joyeuse",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "35",
               "voteCountGte": 200
@@ -3194,6 +3084,7 @@
           {
             "title": "Histoire vraie Inspirante",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "18",
               "voteCountGte": 300,
@@ -3206,6 +3097,7 @@
           {
             "title": "Comédie Voyage & Potes",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "35",
               "voteCountGte": 100,
@@ -3218,6 +3110,7 @@
           {
             "title": "Top Heureux",
             "sortBy": "vote_average.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "35",
               "voteCountGte": 800,
@@ -3230,6 +3123,7 @@
           {
             "title": "Récent Heureux",
             "sortBy": "primary_release_date.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "35,10751",
               "voteCountGte": 200,
@@ -3258,6 +3152,7 @@
           {
             "title": "Comédies romantiques",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "35,10749",
               "voteCountGte": 500
@@ -3269,6 +3164,7 @@
           {
             "title": "Comédies & Drama chaleureux",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "35,18",
               "voteCountGte": 300
@@ -3280,6 +3176,7 @@
           {
             "title": "Histoires romantiques",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "10749",
               "withKeywords": "800",
@@ -3292,6 +3189,7 @@
           {
             "title": "Classiques réconfortant",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "35,18",
               "voteCountGte": 500,
@@ -3304,6 +3202,7 @@
           {
             "title": "Réconfortant récent",
             "sortBy": "primary_release_date.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "35,10749",
               "voteCountGte": 200,
@@ -3332,6 +3231,7 @@
           {
             "title": "Retournent le cerveau Movies",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "voteCountGte": 50,
               "withKeywords": "275311"
@@ -3343,6 +3243,7 @@
           {
             "title": "Déconcertant Sci-Fi Thrillers",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "878,53",
               "voteCountGte": 500
@@ -3354,6 +3255,7 @@
           {
             "title": "Mystère Psychologique",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "9648",
               "voteCountGte": 300
@@ -3365,6 +3267,7 @@
           {
             "title": "Plot twist et imprévisible",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "53,9648",
               "voteCountGte": 400
@@ -3376,6 +3279,7 @@
           {
             "title": "Boucles Temporelles & Réalités Alternatives",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "voteCountGte": 80,
               "withKeywords": "10854|4565"
@@ -3387,6 +3291,7 @@
           {
             "title": "Top Thrillers Psychologiques",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "53,18",
               "voteCountGte": 1000,
@@ -3399,6 +3304,7 @@
           {
             "title": "Récentes sorties Déconcertants",
             "sortBy": "primary_release_date.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "878",
               "voteCountGte": 200,
@@ -3427,6 +3333,7 @@
           {
             "title": "Tire-Larmes",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withKeywords": "156924"
             },
@@ -3437,6 +3344,7 @@
           {
             "title": "Tire-larme Acclamée",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "18,10749",
               "voteCountGte": 500
@@ -3448,6 +3356,7 @@
           {
             "title": "Emotion",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "18",
               "voteCountGte": 30,
@@ -3460,6 +3369,7 @@
           {
             "title": "Chagrin d'amour",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "10749,18",
               "voteCountGte": 600,
@@ -3472,6 +3382,7 @@
           {
             "title": "Histoire de Perte",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "18",
               "voteCountGte": 100,
@@ -3484,6 +3395,7 @@
           {
             "title": "Top Emotion",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "18",
               "voteCountGte": 2000,
@@ -3496,6 +3408,7 @@
           {
             "title": "Récent Emotion",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "withGenres": "18,10749",
               "voteCountGte": 150,
@@ -3521,6 +3434,7 @@
     "pinToTop": false,
     "viewMode": "TABBED_GRID",
     "showAllTab": true,
+    "backdropImageUrl": "",
     "focusGlowEnabled": false
   },
   {
@@ -4040,7 +3954,7 @@
   },
   {
     "id": "collection-8eyk6r4x-community",
-    "title": "🎞️Franchises",
+    "title": "🎞️ Franchises",
     "folders": [
       {
         "id": "folder-4SRL3EHG",
@@ -4941,6 +4855,7 @@
           {
             "title": "DCEU",
             "sortBy": "primary_release_date.desc",
+            "tmdbId": null,
             "filters": {
               "withKeywords": "229266"
             },
@@ -6325,6 +6240,7 @@
           {
             "title": "MCU",
             "sortBy": "primary_release_date.desc",
+            "tmdbId": null,
             "filters": {
               "withKeywords": "180547"
             },
@@ -8412,7 +8328,7 @@
   },
   {
     "id": "collection-2a7025d6-community",
-    "title": "🏃‍♂️Sports",
+    "title": "🏃‍♂️ Sports",
     "folders": [
       {
         "id": "folder-b5d15050",
@@ -8443,13 +8359,11 @@
         "catalogSources": [
           {
             "type": "sport",
-            "genre": "",
             "addonId": "community.sports.fly",
             "catalogId": "sports_live"
           },
           {
             "type": "sport",
-            "genre": "",
             "addonId": "community.sports.fly",
             "catalogId": "sports_today"
           }
@@ -8486,7 +8400,6 @@
         "catalogSources": [
           {
             "type": "sport",
-            "genre": "",
             "addonId": "community.sports.fly",
             "catalogId": "sports_football"
           },
@@ -8529,7 +8442,6 @@
         "catalogSources": [
           {
             "type": "sport",
-            "genre": "",
             "addonId": "community.sports.fly",
             "catalogId": "sports_basketball"
           },
@@ -8609,7 +8521,6 @@
         "catalogSources": [
           {
             "type": "sport",
-            "genre": "",
             "addonId": "community.sports.fly",
             "catalogId": "sports_motor_sports"
           },
@@ -8658,7 +8569,6 @@
         "catalogSources": [
           {
             "type": "sport",
-            "genre": "",
             "addonId": "community.sports.fly",
             "catalogId": "sports_fight"
           },
@@ -8694,7 +8604,6 @@
         "catalogSources": [
           {
             "type": "sport",
-            "genre": "",
             "addonId": "community.sports.fly",
             "catalogId": "sports_american_football"
           }
@@ -8706,6 +8615,7 @@
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
+    "backdropImageUrl": "",
     "focusGlowEnabled": true
   }
 ]
