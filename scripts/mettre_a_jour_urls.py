@@ -35,7 +35,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from generer_backdrops import GROUPE_SLUGS, dossier_actif, slugifier  # noqa: E402
+from generer_backdrops import GROUPE_SLUGS, dossier_actif, normaliser, slugifier  # noqa: E402
 
 
 def construire_url_cdn(depot: str, branche: str, chemin_relatif: Path) -> str:
@@ -54,7 +54,7 @@ def mettre_a_jour(
 
     for groupe in collections:
         titre_groupe = groupe.get("title", "")
-        slug_groupe = GROUPE_SLUGS.get(titre_groupe)
+        slug_groupe = GROUPE_SLUGS.get(normaliser(titre_groupe))
         if not slug_groupe:
             continue  # groupe inconnu du générateur -> on ne touche à rien
 
