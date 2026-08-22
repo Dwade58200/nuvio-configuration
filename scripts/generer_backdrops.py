@@ -393,11 +393,22 @@ def dossier_actif(groupe_titre: str, dossier_titre: str) -> bool:
 # ---------------------------------------------------------------------------
 
 class ClientTMDB:
-    def __init__(self, cle_api: str, session: requests.Session | None = None, langue: str = "fr-FR"):
+    def __init__(
+        self,
+        cle_api: str,
+        session: requests.Session | None = None,
+        langue: str = "fr-FR",
+        limite_appels_images: int = 300,
+    ):
         self.cle_api = cle_api
         self.session = session or requests.Session()
         self.langue = langue
         self._cache_keyword: dict[str, int | None] = {}
+        self._cache_images: dict[tuple[int, str], dict[str, Any]] = {}
+        self._cache_tvdb_id: dict[int, int | None] = {}
+        self.limite_appels_images = limite_appels_images
+        self.compteur_appels_images = 0
+        self.budget_images_epuise = False  # exposé pour le résumé final (log utilisateur)
 
     def _get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         params = dict(params or {})
@@ -431,23 +442,50 @@ class ClientTMDB:
 
     def recuperer_tvdb_id(self, tmdb_id: int) -> int | None:
         """Fanart.tv indexe les séries par TheTVDB, pas par TMDB -- il faut
-        d'abord résoudre l'identifiant externe."""
+        d'abord résoudre l'identifiant externe. Mis en cache (le même titre
+        revient souvent dans plusieurs dossiers/groupes)."""
+        if tmdb_id in self._cache_tvdb_id:
+            return self._cache_tvdb_id[tmdb_id]
         try:
             data = self._get(f"/tv/{tmdb_id}/external_ids")
-            return data.get("tvdb_id")
+            resultat = data.get("tvdb_id")
         except requests.RequestException:
-            return None
+            resultat = None
+        self._cache_tvdb_id[tmdb_id] = resultat
+        return resultat
 
     def recuperer_images(self, tmdb_id: int, media_type: str) -> dict[str, Any]:
         """Backdrops TMDB avec leur langue taguée (`iso_639_1`) -- certains
         titres ont des backdrops spécifiquement envoyés pour un marché
         (ex: France), qui incluent parfois un titre local incrusté. On ne
-        demande que les langues qui nous intéressent pour rester léger."""
+        demande que les langues qui nous intéressent pour rester léger.
+
+        Mis en cache par (tmdb_id, media_type) -- le même titre populaire
+        revient souvent dans plusieurs dossiers/groupes durant une même
+        exécution, inutile de le redemander à chaque fois.
+
+        Au-delà de `limite_appels_images` appels réussis sur CETTE
+        exécution, on arrête d'interroger TMDB pour cet enrichissement et
+        on bascule directement sur Fanart pour tous les candidats restants
+        -- protection contre la limitation de débit TMDB sur de gros runs.
+        """
+        cle_cache = (tmdb_id, media_type)
+        if cle_cache in self._cache_images:
+            return self._cache_images[cle_cache]
+
+        if self.compteur_appels_images >= self.limite_appels_images:
+            self.budget_images_epuise = True
+            return {}
+
         chemin = "movie" if media_type != "tv" else "tv"
         try:
-            return self._get(f"/{chemin}/{tmdb_id}/images", {"include_image_language": "fr,en,null"})
+            resultat = self._get(f"/{chemin}/{tmdb_id}/images", {"include_image_language": "fr,en,null"})
         except requests.RequestException:
-            return {}
+            resultat = {}
+
+        self.compteur_appels_images += 1
+        self._cache_images[cle_cache] = resultat
+        return resultat
 
     def resoudre_backdrop(self, requete: RequeteTMDB) -> tuple[str | None, int | None, str | None]:
         """Retourne (backdrop_path, tmdb_id_du_resultat, media_type) ou (None, None, None)."""
@@ -555,14 +593,26 @@ class ClientFanart:
     def __init__(self, cle_api: str | None, session: requests.Session | None = None):
         self.cle_api = cle_api
         self.session = session or requests.Session()
+        self._cache_donnees: dict[tuple[int, str], dict[str, Any] | None] = {}
 
     def _normaliser_langue(self, valeur: Any) -> str | None:
+        """Normalise en minuscule/strip. IMPORTANT : ceci ne fusionne PAS
+        les variantes régionales entre elles -- "fr-ca" reste "fr-ca" et
+        ne correspondra JAMAIS à "fr" (comparaison stricte ailleurs). On ne
+        veut que le français de France, pas le français canadien/belge/etc."""
         if valeur is None:
             return None
         valeur = str(valeur).strip().lower()
         return None if valeur in ("", "00", "none", "null") else valeur
 
     def donnees(self, tmdb_ou_tvdb_id: int, media_type: str) -> dict[str, Any] | None:
+        """Mis en cache par (id, media_type) -- le même titre populaire
+        revient souvent dans plusieurs dossiers/groupes durant une même
+        exécution, inutile de le redemander à chaque fois à Fanart."""
+        cle_cache = (tmdb_ou_tvdb_id, media_type)
+        if cle_cache in self._cache_donnees:
+            return self._cache_donnees[cle_cache]
+
         chemin = "movies" if media_type == "movie" else "tv"
         try:
             r = self.session.get(
@@ -570,11 +620,12 @@ class ClientFanart:
                 params={"api_key": self.cle_api},
                 timeout=15,
             )
-            if r.status_code != 200:
-                return None
-            return r.json()
+            resultat = r.json() if r.status_code == 200 else None
         except requests.RequestException:
-            return None
+            resultat = None
+
+        self._cache_donnees[cle_cache] = resultat
+        return resultat
 
     def _candidats_par_type(self, data: dict[str, Any], media_type: str, type_nom: str) -> list[dict[str, Any]]:
         """Pas de 'banner' volontairement (hors format pour nos tuiles paysage)."""
@@ -685,9 +736,10 @@ class GenerateurBackdrops:
         dry_run: bool = False,
         mosaique: bool = False,
         langue_preferee: str = "fr",
+        limite_appels_tmdb_images: int = 300,
     ):
         self.session = requests.Session()
-        self.tmdb = ClientTMDB(cle_tmdb, session=self.session)
+        self.tmdb = ClientTMDB(cle_tmdb, session=self.session, limite_appels_images=limite_appels_tmdb_images)
         self.fanart = ClientFanart(cle_fanart, session=self.session)
         self.repertoire_sortie = repertoire_sortie
         self.profil = profil
@@ -1011,6 +1063,7 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="Simule sans appeler TMDB ni écrire d'image")
     parser.add_argument("--mosaique", action="store_true", help="Génère une mosaïque multi-titres + couleur d'accent au lieu d'un seul backdrop (repli automatique si pas assez d'images)")
     parser.add_argument("--langue-preferee", default="fr", help="Code langue Fanart.tv préféré pour les artworks avec titre incrusté (défaut: fr)")
+    parser.add_argument("--limite-appels-tmdb-images", type=int, default=300, help="Au-delà de ce nombre d'appels TMDB /images sur l'exécution, bascule sur Fanart uniquement (défaut: 300)")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -1032,11 +1085,18 @@ def main() -> int:
         dry_run=args.dry_run,
         mosaique=args.mosaique,
         langue_preferee=args.langue_preferee,
+        limite_appels_tmdb_images=args.limite_appels_tmdb_images,
     )
     resultats = generateur.generer_tout(
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
     )
     afficher_resume(resultats)
+    if generateur.tmdb.budget_images_epuise:
+        print(
+            f"\n⚠️  Budget d'appels TMDB /images atteint ({generateur.tmdb.limite_appels_images}) : "
+            "les derniers titres traités sont passés directement en résolution Fanart uniquement "
+            "(--limite-appels-tmdb-images pour ajuster)."
+        )
     return 0
 
 
