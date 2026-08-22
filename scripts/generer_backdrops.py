@@ -73,15 +73,22 @@ TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p"
 FANART_API_BASE = "https://webservice.fanart.tv/v3"
 
 # Titres EXACTS des groupes tels qu'ils existent réellement dans le JSON.
-# (le bug initial venait d'un mauvais mapping ici -> corrigé)
-GROUPE_DECOUVRIR = "🔭 Découvrir"
-GROUPE_STREAMING = "🎬 Services de Streaming"
-GROUPE_GENRES = "🎭 Genres"
-GROUPE_THEMATIQUES = "🎨 Thématiques"
-GROUPE_VIBES = "🎭 Vibe"
-GROUPE_ANNEES = "📅 Années"
-GROUPE_FRANCHISES = "🎞️ Franchises"
-GROUPE_SPORTS = "🏃‍♂️ Sports"
+# (le bug initial venait d'un mauvais mapping ici -> corrigé, puis reproduit
+# une seconde fois quand Nuvio a ajouté/changé des emojis sur les groupes)
+#
+# Pour ne PLUS jamais casser sur un simple changement d'emoji, d'espace ou
+# d'accent, ces constantes sont des clés CANONIQUES et NORMALISÉES (voir
+# `normaliser()` plus bas) : le titre réel du groupe, tel qu'il apparaît
+# dans le JSON, est toujours normalisé avant comparaison. Exemple :
+# "🎭Genres", "🎭 Genres" et "🎭  Genres " normalisent tous en "genres".
+GROUPE_DECOUVRIR = "decouvrir"
+GROUPE_STREAMING = "services de streaming"
+GROUPE_GENRES = "genres"
+GROUPE_THEMATIQUES = "thematiques"
+GROUPE_VIBES = "vibe"
+GROUPE_ANNEES = "annees"
+GROUPE_FRANCHISES = "franchises"
+GROUPE_SPORTS = "sports"
 
 # Certains dossiers ont, en plus d'une source TMDB "globale" (withOriginalLanguage
 # absent), une source dupliquée filtrée sur une langue précise (ex: catalogues
@@ -359,7 +366,7 @@ def construire_requetes(
     # Repli final si AUCUNE source n'a donné de requête exploitable :
     # pour les groupes Genres / Thématiques, on tente de deviner à partir
     # du TITRE du dossier lui-même (ex: dossier "Action" -> genre Action).
-    if not requetes and groupe_titre in (GROUPE_GENRES,):
+    if not requetes and normaliser(groupe_titre) in (GROUPE_GENRES,):
         genre = _resoudre_genre_depuis_texte(dossier.get("title", ""))
         if genre:
             for media_type, genre_id in (("movie", genre[0]), ("tv", genre[1])):
@@ -378,7 +385,7 @@ def construire_requetes(
 
 
 def dossier_actif(groupe_titre: str, dossier_titre: str) -> bool:
-    critere = CRITERES_GROUPES.get(groupe_titre)
+    critere = CRITERES_GROUPES.get(normaliser(groupe_titre))
     if critere is None or not critere.actif:
         return False
     if critere.inclure and not any(mot.lower() in dossier_titre.lower() for mot in critere.inclure):
@@ -946,7 +953,7 @@ class GenerateurBackdrops:
             raison = "; ".join(raisons) or "aucune source exploitable"
             return ResultatDossier(groupe_titre, dossier_titre, "ignore", raison)
 
-        chemin_relatif = Path(GROUPE_SLUGS.get(groupe_titre, slugifier(groupe_titre))) / "backdrop" / f"{slugifier(dossier_titre)}.jpg"
+        chemin_relatif = Path(GROUPE_SLUGS.get(normaliser(groupe_titre), slugifier(groupe_titre))) / "backdrop" / f"{slugifier(dossier_titre)}.jpg"
         chemin_sortie = self.repertoire_sortie / chemin_relatif
 
         if self.dry_run:
@@ -994,12 +1001,32 @@ class GenerateurBackdrops:
         filtre_groupe: str | None = None, limite: int | None = None,
     ) -> list[ResultatDossier]:
         taches: list[tuple[str, dict[str, Any]]] = []
+        groupes_connus = set(CRITERES_GROUPES.keys())
+        groupes_vus: set[str] = set()
+
         for groupe in collections:
             titre_groupe = groupe.get("title", "")
-            if filtre_groupe and normaliser(filtre_groupe) not in normaliser(titre_groupe):
+            cle_normalisee = normaliser(titre_groupe)
+            groupes_vus.add(cle_normalisee)
+
+            if cle_normalisee not in groupes_connus:
+                print(
+                    f"⚠️  Groupe non reconnu dans le JSON : {titre_groupe!r} (normalisé: {cle_normalisee!r}) "
+                    "-- aucun mapping connu, ce groupe entier sera ignoré. "
+                    "Si ce groupe existe bien dans Nuvio, il faut l'ajouter au script (CRITERES_GROUPES / GROUPE_SLUGS)."
+                )
+
+            if filtre_groupe and normaliser(filtre_groupe) not in cle_normalisee:
                 continue
             for dossier in groupe.get("folders", []):
                 taches.append((titre_groupe, dossier))
+
+        groupes_manquants = groupes_connus - groupes_vus
+        if groupes_manquants and not filtre_groupe:
+            print(
+                f"⚠️  Groupe(s) attendu(s) mais absent(s) du JSON : {sorted(groupes_manquants)} "
+                "-- a peut-être été renommé au-delà d'un simple emoji/espace."
+            )
 
         if limite:
             taches = taches[:limite]
