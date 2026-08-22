@@ -75,13 +75,13 @@ FANART_API_BASE = "https://webservice.fanart.tv/v3"
 # Titres EXACTS des groupes tels qu'ils existent réellement dans le JSON.
 # (le bug initial venait d'un mauvais mapping ici -> corrigé)
 GROUPE_DECOUVRIR = "🔭 Découvrir"
-GROUPE_STREAMING = "🎬Services de Streaming"
-GROUPE_GENRES = "🎭Genres"
+GROUPE_STREAMING = "🎬 Services de Streaming"
+GROUPE_GENRES = "🎭 Genres"
 GROUPE_THEMATIQUES = "🎨 Thématiques"
-GROUPE_VIBES = "🎭Vibe"
+GROUPE_VIBES = "🎭 Vibe"
 GROUPE_ANNEES = "📅 Années"
-GROUPE_FRANCHISES = "Franchises"
-GROUPE_SPORTS = "Sports"
+GROUPE_FRANCHISES = "🎞️ Franchises"
+GROUPE_SPORTS = "🏃‍♂️ Sports"
 
 # Certains dossiers ont, en plus d'une source TMDB "globale" (withOriginalLanguage
 # absent), une source dupliquée filtrée sur une langue précise (ex: catalogues
