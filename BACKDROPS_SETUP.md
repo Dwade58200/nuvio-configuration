@@ -48,11 +48,24 @@ Pour avoir les titres :
 1. Crée un compte sur https://fanart.tv/profile/api-access/ et récupère une clé
 2. Ajoute-la comme secret GitHub `FANART_API_KEY` (voir section suivante)
 
-Priorité de langue pour le choix de l'artwork (comme luckynumb3rs) :
-langue préférée (`--langue-preferee`, `fr` par défaut) → langue originale du
-titre → version sans texte → n'importe quelle autre langue disponible.
-Toutes les fiches Fanart n'ont pas forcément de version dans chaque langue ;
-le script prend le meilleur disponible.
+Le script cherche parmi plusieurs types d'artworks Fanart (par ordre de
+préférence de type) : **thumb** (image complète avec titre incrusté),
+**banner** (bannière large, contient souvent aussi un logo), **background**
+(image de fond pure), **clearart/hdclearart** (artwork détouré, souvent sur
+fond transparent -- recomposé proprement sur un fond sombre au moment du
+recadrage, pour éviter tout artefact noir/blanc).
+
+Priorité de LANGUE pour le choix de l'artwork (dans cet ordre) :
+1. langue préférée (`--langue-preferee`, `fr` par défaut)
+2. langue originale du titre
+3. **n'importe quelle autre langue disponible, du moment qu'il y a un titre incrusté**
+4. version sans texte -- seulement en tout dernier recours, si aucune
+   langue n'a de version avec titre
+
+Ce dernier point est volontaire : un titre dans une langue "inattendue"
+reste préférable à une tuile sans aucun titre. Toutes les fiches Fanart
+n'ont pas de version dans chaque langue ; le script prend le meilleur
+disponible selon cet ordre.
 
 C'est le comportement **par défaut** (`--mosaique`, activé aussi dans le
 workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
