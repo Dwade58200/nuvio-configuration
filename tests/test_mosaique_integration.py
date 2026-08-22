@@ -275,6 +275,37 @@ def test_sans_texte_seulement_si_ni_francais_ni_anglais():
     assert generateur._resoudre_image_tuile(CANDIDAT_FILM) is not None
 
 
+def test_fr_ca_jamais_confondu_avec_fr():
+    """Un backdrop TMDB ou artwork Fanart tagué 'fr-CA' (français canadien)
+    ne doit JAMAIS être choisi pour le palier 'fr' -- seul le tag exact
+    'fr' est accepté."""
+    generateur = _generateur()
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            # aucun backdrop taggé "fr" strict, seulement une variante fr-CA
+            return FausseReponse({"backdrops": [{"file_path": "/quebec.jpg", "iso_639_1": "fr-CA", "vote_average": 9}]})
+        if "webservice.fanart.tv/v3/movies/42" in url:
+            return FausseReponse({
+                "moviethumb": [
+                    {"url": "https://fanart.example/thumb_fr_ca.jpg", "lang": "fr-CA", "likes": "999"},
+                    {"url": "https://fanart.example/thumb_en.jpg", "lang": "en", "likes": "1"},
+                ]
+            })
+        if "quebec.jpg" in url:
+            raise AssertionError("un backdrop tagué fr-CA ne doit jamais être choisi pour le palier français")
+        if "thumb_fr_ca.jpg" in url:
+            raise AssertionError("un artwork Fanart tagué fr-CA ne doit jamais être choisi pour le palier français")
+        if "thumb_en.jpg" in url:
+            # normal : comme rien n'existe en fr strict, on bascule sur le palier anglais
+            return FausseReponse(content=_image_bytes((50, 50, 50)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    image = generateur._resoudre_image_tuile(CANDIDAT_FILM)
+    assert image is not None  # résolu via le palier anglais, pas via fr-CA
+
+
 def test_repli_final_sur_backdrop_path_brut_sans_cle_fanart():
     generateur = _generateur(cle_fanart=None)
 
@@ -451,6 +482,103 @@ def test_deduplique_un_film_present_via_collection_et_discover(tmp_path):
 
     ids_films = [c[1] for c in candidats]
     assert ids_films.count(1) == 1, f"le film id=1 apparaît {ids_films.count(1)} fois, devrait être 1"
+
+
+# ---------------------------------------------------------------------------
+# Cache TMDB/Fanart (le même titre revient dans plusieurs dossiers)
+# ---------------------------------------------------------------------------
+
+def test_recuperer_images_est_mis_en_cache():
+    generateur = _generateur(cle_fanart=None)
+    compteur_appels = {"n": 0}
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            compteur_appels["n"] += 1
+            return FausseReponse({"backdrops": [{"file_path": "/x.jpg", "iso_639_1": "fr", "vote_average": 5}]})
+        if "x.jpg" in url:
+            return FausseReponse(content=_image_bytes((1, 1, 1)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    generateur._resoudre_image_tuile(CANDIDAT_FILM)
+    generateur._resoudre_image_tuile(CANDIDAT_FILM)  # même film, ex: présent dans un 2e dossier
+    generateur._resoudre_image_tuile(CANDIDAT_FILM)
+
+    assert compteur_appels["n"] == 1, "recuperer_images aurait dû être appelé une seule fois (mis en cache)"
+
+
+def test_fanart_donnees_est_mis_en_cache():
+    generateur = _generateur()
+    compteur_appels = {"n": 0}
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "webservice.fanart.tv/v3/movies/42" in url:
+            compteur_appels["n"] += 1
+            return FausseReponse({"moviethumb": [{"url": "https://fanart.example/thumb.jpg", "lang": "fr", "likes": "1"}]})
+        if "thumb.jpg" in url:
+            return FausseReponse(content=_image_bytes((1, 1, 1)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    generateur._resoudre_image_tuile(CANDIDAT_FILM)
+    generateur._resoudre_image_tuile(CANDIDAT_FILM)
+
+    assert compteur_appels["n"] == 1, "Fanart aurait dû être interrogé une seule fois (mis en cache)"
+
+
+# ---------------------------------------------------------------------------
+# Budget d'appels TMDB /images -> bascule Fanart uniquement
+# ---------------------------------------------------------------------------
+
+def test_budget_tmdb_images_epuise_bascule_sur_fanart():
+    generateur = _generateur(langue_preferee="fr")
+    generateur.tmdb.limite_appels_images = 1  # budget volontairement minuscule pour le test
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/images" in url:
+            return FausseReponse({"backdrops": [{"file_path": "/depuis_tmdb.jpg", "iso_639_1": "fr", "vote_average": 5}]})
+        if "depuis_tmdb.jpg" in url:
+            return FausseReponse(content=_image_bytes((1, 1, 1)))
+        if "webservice.fanart.tv/v3/movies/2" in url:
+            return FausseReponse({"moviethumb": [{"url": "https://fanart.example/thumb2.jpg", "lang": "fr", "likes": "1"}]})
+        if "thumb2.jpg" in url:
+            return FausseReponse(content=_image_bytes((2, 2, 2)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+
+    # 1er candidat : le budget (1) permet encore l'appel /images -> consommé ici
+    assert generateur._resoudre_image_tuile(("/brut1.jpg", 1, "movie", "en")) is not None
+    assert generateur.tmdb.budget_images_epuise is False
+    assert generateur.tmdb.compteur_appels_images == 1
+
+    # 2e candidat : budget épuisé -> /images ne doit PLUS être appelé, bascule Fanart directe
+    image = generateur._resoudre_image_tuile(("/brut2.jpg", 2, "movie", "en"))
+    assert image is not None
+    assert generateur.tmdb.budget_images_epuise is True
+    assert generateur.tmdb.compteur_appels_images == 1  # inchangé : pas de second appel /images
+
+
+def test_recuperer_images_sans_reseau_une_fois_budget_epuise():
+    """Vérifie qu'aucun appel réseau n'est fait du tout une fois le budget
+    atteint (pas juste ignoré après coup)."""
+    from generer_backdrops import ClientTMDB
+
+    client = ClientTMDB(cle_api="x", limite_appels_images=0)
+    appelé = {"valeur": False}
+
+    def fausse_get(*args, **kwargs):
+        appelé["valeur"] = True
+        raise AssertionError("ne devrait jamais être appelé, budget déjà à 0")
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    resultat = client.recuperer_images(123, "movie")
+    assert resultat == {}
+    assert appelé["valeur"] is False
+    assert client.budget_images_epuise is True
 
 
 if __name__ == "__main__":
