@@ -103,13 +103,38 @@ def aplatir_transparence(image: Image.Image, couleur_fond: tuple[int, int, int] 
     """Compose proprement une image avec canal alpha (ex: artworks
     'clearart' de Fanart, souvent détourés sur fond transparent) sur un
     fond uni sombre, plutôt que de simplement jeter le canal alpha (ce qui
-    peut révéler des pixels noirs/blancs parasites sous la découpe)."""
+    peut révéler des pixels noirs/blancs parasites sous la découpe).
+    Filet de sécurité si aucun vrai fond n'a pu être composé en amont
+    (voir `composer_sur_fond` pour le cas nominal avec un fond réel)."""
     if image.mode in ("RGBA", "LA") or (image.mode == "P" and "transparency" in image.info):
         image = image.convert("RGBA")
         fond = Image.new("RGB", image.size, couleur_fond)
         fond.paste(image, mask=image.split()[-1])
         return fond
     return image.convert("RGB")
+
+
+def composer_sur_fond(image_transparente: Image.Image, image_fond: Image.Image, proportion_max: float = 0.8) -> Image.Image:
+    """Compose un artwork détouré (ex: 'clearart' Fanart) sur une VRAIE
+    image de fond, plutôt que sur une couleur plate -- l'artwork est
+    redimensionné pour tenir dans `proportion_max` du fond (en conservant
+    son ratio) et centré."""
+    image_fond = image_fond.convert("RGBA")
+    image_transparente = image_transparente.convert("RGBA")
+
+    ratio = min(
+        (image_fond.width * proportion_max) / max(1, image_transparente.width),
+        (image_fond.height * proportion_max) / max(1, image_transparente.height),
+        1.0,  # ne jamais agrandir l'artwork au-delà de sa taille d'origine
+    )
+    nouvelle_taille = (max(1, int(image_transparente.width * ratio)), max(1, int(image_transparente.height * ratio)))
+    artwork_redim = image_transparente.resize(nouvelle_taille, Image.LANCZOS)
+
+    x = (image_fond.width - artwork_redim.width) // 2
+    y = (image_fond.height - artwork_redim.height) // 2
+    resultat = image_fond.copy()
+    resultat.alpha_composite(artwork_redim, (x, y))
+    return resultat.convert("RGB")
 
 
 def recadrer_pour_tuile(image: Image.Image, largeur: int, hauteur: int) -> Image.Image:
