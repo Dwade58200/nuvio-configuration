@@ -32,13 +32,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.recommendations.movies"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "trakt.recommendations.shows"
           }
@@ -75,13 +73,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.trending_movie"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.trending_series"
           }
@@ -110,6 +106,7 @@
           {
             "title": "🔥 Populaire - 🇫🇷",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "voteCountGte": 200,
               "withOriginalLanguage": "fr"
@@ -121,6 +118,7 @@
           {
             "title": "🔥 Populaire - 🇫🇷",
             "sortBy": "popularity.desc",
+            "tmdbId": null,
             "filters": {
               "voteCountGte": 100,
               "withOriginalLanguage": "fr"
@@ -140,13 +138,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.top_movie"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.top_series"
           }
@@ -175,6 +171,7 @@
           {
             "title": "🏆 Top - 🇫🇷",
             "sortBy": "vote_average.desc",
+            "tmdbId": null,
             "filters": {
               "voteCountGte": 200,
               "withOriginalLanguage": "fr"
@@ -186,6 +183,7 @@
           {
             "title": "🏆 Top - 🇫🇷",
             "sortBy": "vote_average.desc",
+            "tmdbId": null,
             "filters": {
               "voteCountGte": 100,
               "withOriginalLanguage": "fr"
@@ -229,13 +227,11 @@
         "catalogSources": [
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.top_rated_movie"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.top_rated_series"
           }
@@ -253,20 +249,6 @@
             "addonId": "com.tvmio.iptv",
             "provider": "addon",
             "catalogId": "tvmio-fr"
-          },
-          {
-            "type": "tv",
-            "genre": "",
-            "addonId": "com.watchio.tv",
-            "provider": "addon",
-            "catalogId": "watchio-tv"
-          },
-          {
-            "type": "tv",
-            "genre": "",
-            "addonId": "com.watchio.tv",
-            "provider": "addon",
-            "catalogId": "watchio-tv"
           }
         ],
         "hideTitle": false,
@@ -279,21 +261,8 @@
         "catalogSources": [
           {
             "type": "tv",
-            "genre": "",
             "addonId": "com.tvmio.iptv",
             "catalogId": "tvmio-fr"
-          },
-          {
-            "type": "tv",
-            "genre": "",
-            "addonId": "com.watchio.tv",
-            "catalogId": "watchio-tv"
-          },
-          {
-            "type": "tv",
-            "genre": "",
-            "addonId": "com.watchio.tv",
-            "catalogId": "watchio-tv"
           }
         ],
         "focusGifEnabled": true,
@@ -306,9 +275,9 @@
           {
             "type": "other",
             "genre": "",
-            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "addonId": "community.stremio.intell-debrid-search",
             "provider": "addon",
-            "catalogId": "717c7bf.st:store:ad"
+            "catalogId": "IntellDebridSearch"
           }
         ],
         "hideTitle": false,
@@ -321,9 +290,8 @@
         "catalogSources": [
           {
             "type": "other",
-            "genre": "",
-            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
-            "catalogId": "717c7bf.st:store:ad"
+            "addonId": "community.stremio.intell-debrid-search",
+            "catalogId": "IntellDebridSearch"
           }
         ],
         "focusGifEnabled": false,
@@ -360,24 +328,21 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.nfx_movie"
+            "catalogId": "tmdb.discover.movie.global.mt49lr48"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.nfx_series"
+            "catalogId": "tmdb.discover.movie.global_copy.mt49lz6m"
           }
         ],
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔴",
         "focusGifUrl": "https://i.ibb.co/hRjnbqtb/netflix-gif.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/streaming/cover/netflix.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Netflix.jpg?raw=true",
         "catalogSources": [
@@ -395,19 +360,16 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.nfx_movie"
+            "catalogId": "tmdb.discover.movie.global.mt49lr48"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.nfx_series"
+            "catalogId": "tmdb.discover.movie.global_copy.mt49lz6m"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": ""
+        "focusGifEnabled": true
       },
       {
         "id": "folder-e07599df",
@@ -429,24 +391,21 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.amp_movie"
+            "catalogId": "tmdb.discover.movie.global_v2_copy.mt4eq6av"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.amp_series"
+            "catalogId": "tmdb.discover.series.global_v2_copy.mt4eqcbi"
           }
         ],
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📦",
         "focusGifUrl": "https://i.ibb.co/DPSHQGdY/youtube-video-gif.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/streaming/cover/prime-video.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Prime_Video.jpg?raw=true",
         "catalogSources": [
@@ -464,19 +423,16 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.amp_movie"
+            "catalogId": "tmdb.discover.movie.global_v2_copy.mt4eq6av"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.amp_series"
+            "catalogId": "tmdb.discover.series.global_v2_copy.mt4eqcbi"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": ""
+        "focusGifEnabled": true
       },
       {
         "id": "folder-df6d88cc",
@@ -498,24 +454,21 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.hbm_movie"
+            "catalogId": "tmdb.discover.movie.populaire_copy.mt4ey94a"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.hbm_series"
+            "catalogId": "tmdb.discover.series.populaire_copy.mt4eybcy"
           }
         ],
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔘",
         "focusGifUrl": "https://i.ibb.co/TMt4Z3HN/youtube-video-gif-7.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/HBO_Max_Logo.webp?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/HBO_Max.jpeg?raw=true",
         "catalogSources": [
@@ -533,19 +486,16 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.hbm_movie"
+            "catalogId": "tmdb.discover.movie.populaire_copy.mt4ey94a"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.hbm_series"
+            "catalogId": "tmdb.discover.series.populaire_copy.mt4eybcy"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": ""
+        "focusGifEnabled": true
       },
       {
         "id": "folder-50412b35",
@@ -567,24 +517,21 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.atp_movie"
+            "catalogId": "tmdb.discover.movie.populaire_copy_copy_copy_copy.mt4ez5cp"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.atp_series"
+            "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezduf"
           }
         ],
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🍎",
         "focusGifUrl": "https://i.ibb.co/Wpx1PFtJ/youtube-video-gif-4.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/apple-tv.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Apple_TV.jpg?raw=true",
         "catalogSources": [
@@ -602,19 +549,16 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.atp_movie"
+            "catalogId": "tmdb.discover.movie.populaire_copy_copy_copy_copy.mt4ez5cp"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.atp_series"
+            "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezduf"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": ""
+        "focusGifEnabled": true
       },
       {
         "id": "folder-6308b715",
@@ -636,24 +580,21 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.dnp_movie"
+            "catalogId": "tmdb.discover.movie.populaire_copy_copy_copy.mt4ez3s3"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "streaming.dnp_series"
+            "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezf49"
           }
         ],
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏰",
         "focusGifUrl": "https://i.ibb.co/8vXcWzY/youtube-video-gif-8.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/Disney+_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Disney+.jpg?raw=true",
         "catalogSources": [
@@ -671,19 +612,16 @@
           },
           {
             "type": "movie",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.dnp_movie"
+            "catalogId": "tmdb.discover.movie.populaire_copy_copy_copy.mt4ez3s3"
           },
           {
             "type": "series",
-            "genre": "",
             "addonId": "aio-metadata",
-            "catalogId": "streaming.dnp_series"
+            "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezf49"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": ""
+        "focusGifEnabled": true
       },
       {
         "id": "folder-2a809268",
@@ -702,13 +640,24 @@
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "flixpatrol.paramount.fr.series"
+          },
+          {
+            "type": "movie",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "tmdb.discover.movie.populaire_copy_copy.mt4ez1l8"
+          },
+          {
+            "type": "series",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezgou"
           }
         ],
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🗻",
         "focusGifUrl": "https://i.ibb.co/yc8v51Zr/youtube-video-gif-3.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/paramount-plus.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Paramount.jpg?raw=true",
         "catalogSources": [
@@ -723,10 +672,19 @@
             "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "flixpatrol.paramount.fr.series"
+          },
+          {
+            "type": "movie",
+            "addonId": "aio-metadata",
+            "catalogId": "tmdb.discover.movie.populaire_copy_copy.mt4ez1l8"
+          },
+          {
+            "type": "series",
+            "addonId": "aio-metadata",
+            "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezgou"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": ""
+        "focusGifEnabled": true
       },
       {
         "id": "folder-27e8f810",
@@ -745,13 +703,24 @@
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "custom.uuid_bd44fd8f_topstreaming_flixpatrol.series.canal_series_france"
+          },
+          {
+            "type": "movie",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "tmdb.discover.movie.populaire_copy_copy_copy_copy_copy.mt4ez71n"
+          },
+          {
+            "type": "series",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezcjx"
           }
         ],
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📡",
         "focusGifUrl": "https://i.ibb.co/nqJJVy5C/youtube-video-gif-2.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/Canal+_Logo.webp?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Canal+.jpeg?raw=true",
         "catalogSources": [
@@ -766,10 +735,19 @@
             "genre": "",
             "addonId": "aio-metadata",
             "catalogId": "custom.uuid_bd44fd8f_topstreaming_flixpatrol.series.canal_series_france"
+          },
+          {
+            "type": "movie",
+            "addonId": "aio-metadata",
+            "catalogId": "tmdb.discover.movie.populaire_copy_copy_copy_copy_copy.mt4ez71n"
+          },
+          {
+            "type": "series",
+            "addonId": "aio-metadata",
+            "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezcjx"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": ""
+        "focusGifEnabled": true
       },
       {
         "id": "folder-71d5bdad",
@@ -3188,6 +3166,166 @@
     "title": "🎭Vibe",
     "folders": [
       {
+        "id": "folder-309ce291",
+        "title": "Joyeux",
+        "sources": [
+          {
+            "title": "Edifiant et Inspirant",
+            "sortBy": "popularity.desc",
+            "filters": {
+              "withGenres": "35,18",
+              "voteCountGte": 500
+            },
+            "provider": "tmdb",
+            "mediaType": "MOVIE",
+            "tmdbSourceType": "DISCOVER"
+          },
+          {
+            "title": "Comédie joyeuse",
+            "sortBy": "popularity.desc",
+            "filters": {
+              "withGenres": "35",
+              "voteCountGte": 200
+            },
+            "provider": "tmdb",
+            "mediaType": "TV",
+            "tmdbSourceType": "DISCOVER"
+          },
+          {
+            "title": "Histoire vraie Inspirante",
+            "sortBy": "popularity.desc",
+            "filters": {
+              "withGenres": "18",
+              "voteCountGte": 300,
+              "withKeywords": "5565"
+            },
+            "provider": "tmdb",
+            "mediaType": "MOVIE",
+            "tmdbSourceType": "DISCOVER"
+          },
+          {
+            "title": "Comédie Voyage & Potes",
+            "sortBy": "popularity.desc",
+            "filters": {
+              "withGenres": "35",
+              "voteCountGte": 100,
+              "withKeywords": "7312"
+            },
+            "provider": "tmdb",
+            "mediaType": "MOVIE",
+            "tmdbSourceType": "DISCOVER"
+          },
+          {
+            "title": "Top Heureux",
+            "sortBy": "vote_average.desc",
+            "filters": {
+              "withGenres": "35",
+              "voteCountGte": 800,
+              "voteAverageGte": 7.8
+            },
+            "provider": "tmdb",
+            "mediaType": "MOVIE",
+            "tmdbSourceType": "DISCOVER"
+          },
+          {
+            "title": "Récent Heureux",
+            "sortBy": "primary_release_date.desc",
+            "filters": {
+              "withGenres": "35,10751",
+              "voteCountGte": 200,
+              "releaseDateGte": "2023-01-01"
+            },
+            "provider": "tmdb",
+            "mediaType": "MOVIE",
+            "tmdbSourceType": "DISCOVER"
+          }
+        ],
+        "hideTitle": false,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "🌞",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Joyeux_Logo.png?raw=true",
+        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Joyeux.png?raw=true",
+        "catalogSources": [],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": ""
+      },
+      {
+        "id": "folder-4144a892",
+        "title": "Réconfort",
+        "sources": [
+          {
+            "title": "Comédies romantiques",
+            "sortBy": "popularity.desc",
+            "filters": {
+              "withGenres": "35,10749",
+              "voteCountGte": 500
+            },
+            "provider": "tmdb",
+            "mediaType": "MOVIE",
+            "tmdbSourceType": "DISCOVER"
+          },
+          {
+            "title": "Comédies & Drama chaleureux",
+            "sortBy": "popularity.desc",
+            "filters": {
+              "withGenres": "35,18",
+              "voteCountGte": 300
+            },
+            "provider": "tmdb",
+            "mediaType": "TV",
+            "tmdbSourceType": "DISCOVER"
+          },
+          {
+            "title": "Histoires romantiques",
+            "sortBy": "popularity.desc",
+            "filters": {
+              "withGenres": "10749",
+              "withKeywords": "800",
+              "voteAverageGte": 7.2
+            },
+            "provider": "tmdb",
+            "mediaType": "MOVIE",
+            "tmdbSourceType": "DISCOVER"
+          },
+          {
+            "title": "Classiques réconfortant",
+            "sortBy": "popularity.desc",
+            "filters": {
+              "withGenres": "35,18",
+              "voteCountGte": 500,
+              "voteAverageGte": 7.8
+            },
+            "provider": "tmdb",
+            "mediaType": "MOVIE",
+            "tmdbSourceType": "DISCOVER"
+          },
+          {
+            "title": "Réconfortant récent",
+            "sortBy": "primary_release_date.desc",
+            "filters": {
+              "withGenres": "35,10749",
+              "voteCountGte": 200,
+              "releaseDateGte": "2023-01-01"
+            },
+            "provider": "tmdb",
+            "mediaType": "MOVIE",
+            "tmdbSourceType": "DISCOVER"
+          }
+        ],
+        "hideTitle": false,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "😌",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Reconfort_Logo.png?raw=true",
+        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Reconfort.png?raw=true",
+        "catalogSources": [],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": ""
+      },
+      {
         "id": "folder-22235ff2",
         "title": "Retournent le cerveau",
         "sources": [
@@ -3378,172 +3516,11 @@
         "catalogSources": [],
         "focusGifEnabled": false,
         "heroBackdropUrl": ""
-      },
-      {
-        "id": "folder-4144a892",
-        "title": "Réconfort",
-        "sources": [
-          {
-            "title": "Comédies romantiques",
-            "sortBy": "popularity.desc",
-            "filters": {
-              "withGenres": "35,10749",
-              "voteCountGte": 500
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Comédies & Drama chaleureux",
-            "sortBy": "popularity.desc",
-            "filters": {
-              "withGenres": "35,18",
-              "voteCountGte": 300
-            },
-            "provider": "tmdb",
-            "mediaType": "TV",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Histoires romantiques",
-            "sortBy": "popularity.desc",
-            "filters": {
-              "withGenres": "10749",
-              "withKeywords": "800",
-              "voteAverageGte": 7.2
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Classiques réconfortant",
-            "sortBy": "popularity.desc",
-            "filters": {
-              "withGenres": "35,18",
-              "voteCountGte": 500,
-              "voteAverageGte": 7.8
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Réconfortant récent",
-            "sortBy": "primary_release_date.desc",
-            "filters": {
-              "withGenres": "35,10749",
-              "voteCountGte": 200,
-              "releaseDateGte": "2023-01-01"
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          }
-        ],
-        "hideTitle": false,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "😌",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Reconfort_Logo.png?raw=true",
-        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Reconfort.png?raw=true",
-        "catalogSources": [],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": ""
-      },
-      {
-        "id": "folder-309ce291",
-        "title": "Joyeux",
-        "sources": [
-          {
-            "title": "Edifiant et Inspirant",
-            "sortBy": "popularity.desc",
-            "filters": {
-              "withGenres": "35,18",
-              "voteCountGte": 500
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Comédie joyeuse",
-            "sortBy": "popularity.desc",
-            "filters": {
-              "withGenres": "35",
-              "voteCountGte": 200
-            },
-            "provider": "tmdb",
-            "mediaType": "TV",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Histoire vraie Inspirante",
-            "sortBy": "popularity.desc",
-            "filters": {
-              "withGenres": "18",
-              "voteCountGte": 300,
-              "withKeywords": "5565"
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Comédie Voyage & Potes",
-            "sortBy": "popularity.desc",
-            "filters": {
-              "withGenres": "35",
-              "voteCountGte": 100,
-              "withKeywords": "7312"
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Top Heureux",
-            "sortBy": "vote_average.desc",
-            "filters": {
-              "withGenres": "35",
-              "voteCountGte": 800,
-              "voteAverageGte": 7.8
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Récent Heureux",
-            "sortBy": "primary_release_date.desc",
-            "filters": {
-              "withGenres": "35,10751",
-              "voteCountGte": 200,
-              "releaseDateGte": "2023-01-01"
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          }
-        ],
-        "hideTitle": false,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "🌞",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Joyeux_Logo.png?raw=true",
-        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Joyeux.png?raw=true",
-        "catalogSources": [],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": ""
       }
     ],
     "pinToTop": false,
     "viewMode": "TABBED_GRID",
     "showAllTab": true,
-    "backdropImageUrl": "",
     "focusGlowEnabled": false
   },
   {
