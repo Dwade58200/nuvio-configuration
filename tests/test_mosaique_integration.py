@@ -97,6 +97,83 @@ def test_mosaique_bout_en_bout_repli_tmdb_sans_fanart(tmp_path):
         assert img.format == "JPEG"
 
 
+def test_fanart_priorite_langue_francais_devant_original():
+    from generer_backdrops import ClientFanart
+
+    client = ClientFanart(cle_api="x")
+    data = {
+        "moviethumb": [
+            {"url": "https://example/original.jpg", "lang": "en", "likes": "50"},
+            {"url": "https://example/fr.jpg", "lang": "fr", "likes": "1"},
+        ]
+    }
+    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
+    assert bucket == "preferee"
+    assert url == "https://example/fr.jpg"  # le français gagne même avec moins de likes
+
+
+def test_fanart_autre_langue_avec_texte_prime_sur_sans_texte():
+    """Priorité demandée : Français -> original -> N'IMPORTE QUELLE AUTRE
+    langue avec titre -> sans texte SEULEMENT en tout dernier recours."""
+    from generer_backdrops import ClientFanart
+
+    client = ClientFanart(cle_api="x")
+    data = {
+        "moviethumb": [
+            {"url": "https://example/allemand.jpg", "lang": "de", "likes": "10"},
+            {"url": "https://example/sans_texte.jpg", "lang": None, "likes": "999"},
+        ]
+    }
+    # ni fr ni en (original) disponibles -> doit prendre l'allemand (a du texte)
+    # plutôt que la version sans texte, même beaucoup plus populaire
+    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
+    assert bucket == "autre"
+    assert url == "https://example/allemand.jpg"
+
+
+def test_fanart_sans_texte_seulement_en_dernier_recours():
+    from generer_backdrops import ClientFanart
+
+    client = ClientFanart(cle_api="x")
+    data = {"moviebackground": [{"url": "https://example/fond.jpg", "lang": None, "likes": "5"}]}
+    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
+    assert bucket == "sans_texte"
+    assert url == "https://example/fond.jpg"
+
+
+def test_fanart_thumb_prime_sur_banner_a_langue_egale():
+    from generer_backdrops import ClientFanart
+
+    client = ClientFanart(cle_api="x")
+    data = {
+        "moviebanner": [{"url": "https://example/banner_fr.jpg", "lang": "fr", "likes": "100"}],
+        "moviethumb": [{"url": "https://example/thumb_fr.jpg", "lang": "fr", "likes": "1"}],
+    }
+    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
+    assert bucket == "preferee"
+    assert url == "https://example/thumb_fr.jpg"  # thumb préféré au banner, même moins populaire
+
+
+def test_fanart_banner_utilise_si_pas_de_thumb_disponible():
+    from generer_backdrops import ClientFanart
+
+    client = ClientFanart(cle_api="x")
+    data = {"moviebanner": [{"url": "https://example/banner_fr.jpg", "lang": "fr", "likes": "10"}]}
+    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
+    assert bucket == "preferee"
+    assert url == "https://example/banner_fr.jpg"
+
+
+def test_fanart_clearart_utilise_en_repli_pour_serie():
+    from generer_backdrops import ClientFanart
+
+    client = ClientFanart(cle_api="x")
+    data = {"hdclearart": [{"url": "https://example/clearart.png", "lang": None, "likes": "3"}]}
+    url, bucket = client.choisir_url(data, "tv", langue_preferee="fr", langue_originale="ja")
+    assert bucket == "sans_texte"
+    assert url == "https://example/clearart.png"
+
+
 def test_mosaique_utilise_fanart_thumb_en_priorite_pour_un_film(tmp_path):
     """Avec une clé Fanart, un film doit utiliser l'image 'moviethumb' (avec
     titre incrusté) plutôt que le backdrop TMDB brut."""
@@ -186,6 +263,64 @@ def test_mosaique_serie_passe_par_external_ids_pour_fanart(tmp_path):
     assert resultat is not None
     assert resultat.statut == "genere"
     assert len(appels_external_ids) == 12  # un appel external_ids par candidat série
+
+
+def test_mosaique_deduplique_un_film_present_via_collection_et_discover(tmp_path):
+    """Bug historique : un film présent à la fois dans une collection et
+    dans les résultats discover était compté deux fois (médias types
+    différents empêchaient la déduplication). Vérifie que le même id de
+    film n'apparaît qu'une seule fois parmi les candidats retenus."""
+    dossier = {
+        "title": "Mixte",
+        "sources": [
+            {"provider": "tmdb", "tmdbSourceType": "COLLECTION", "tmdbId": 999, "mediaType": "MOVIE"},
+            {
+                "provider": "tmdb",
+                "tmdbSourceType": "DISCOVER",
+                "mediaType": "MOVIE",
+                "sortBy": "popularity.desc",
+                "filters": {"withGenres": "28"},
+            },
+        ],
+    }
+
+    generateur = GenerateurBackdrops(cle_tmdb="fausse-cle", cle_fanart=None, repertoire_sortie=tmp_path, mosaique=True)
+
+    # Le film id=1 apparaît DANS LA COLLECTION *ET* dans les résultats discover.
+    reponse_collection = {"parts": [{"id": 1, "backdrop_path": "/collection1.jpg", "popularity": 999}]}
+    reponse_discover = {
+        "results": [{"id": 1, "backdrop_path": "/discover1.jpg", "popularity": 90, "original_language": "en"}]
+        + [{"id": i, "backdrop_path": f"/discover{i}.jpg", "popularity": 90 - i, "original_language": "en"} for i in range(2, 6)]
+    }
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/collection/999" in url:
+            return FausseReponse(reponse_collection)
+        if "discover/movie" in url:
+            return FausseReponse(reponse_discover)
+        if "image.tmdb.org" in url:
+            return FausseReponse(content=_image_bytes((100, 100, 100)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+
+    requetes, _ = construire_requetes(GROUPE_GENRES, dossier)
+
+    candidats: list = []
+    vus: set = set()
+    listes_par_requete = [generateur.tmdb.resoudre_backdrops_multiples(req, limite=12) for req in requetes]
+    max_len = max((len(liste) for liste in listes_par_requete), default=0)
+    for i in range(max_len):
+        for liste in listes_par_requete:
+            if i < len(liste):
+                backdrop_path, tmdb_id, media_type, langue = liste[i]
+                cle = (media_type, tmdb_id)
+                if cle not in vus:
+                    vus.add(cle)
+                    candidats.append((backdrop_path, tmdb_id, media_type, langue))
+
+    ids_films = [c[1] for c in candidats]
+    assert ids_films.count(1) == 1, f"le film id=1 apparaît {ids_films.count(1)} fois, devrait être 1"
 
 
 def test_mosaique_repli_si_pas_assez_de_resultats(tmp_path):
