@@ -565,17 +565,36 @@ class ClientFanart:
         except requests.RequestException:
             return None
 
-    def _groupes_candidats(self, data: dict[str, Any], media_type: str) -> list[list[dict[str, Any]]]:
-        """Ordre de priorité : thumb (avec titre incrusté) puis background."""
+    def _groupes_candidats(self, data: dict[str, Any], media_type: str) -> list[tuple[int, list[dict[str, Any]]]]:
+        """Liste (rang_type, candidats) triée par ordre de préférence de
+        TYPE d'artwork (indépendamment de la langue) :
+        0=thumb (image pleine avec titre incrusté, notre meilleur cas),
+        1=banner (bannière large, contient aussi souvent un logo/titre),
+        2=background (image de fond pure, presque toujours sans texte),
+        3=clearart/hdclearart (artwork détouré, souvent sur fond
+          transparent -- géré proprement au moment du recadrage)."""
         if media_type == "tv":
-            return [data.get("tvthumb") or [], data.get("showbackground") or []]
-        return [data.get("moviethumb") or [], data.get("moviebackground") or []]
+            return [
+                (0, data.get("tvthumb") or []),
+                (1, data.get("tvbanner") or []),
+                (2, data.get("showbackground") or []),
+                (3, (data.get("hdclearart") or []) + (data.get("clearart") or [])),
+            ]
+        return [
+            (0, data.get("moviethumb") or []),
+            (1, data.get("moviebanner") or []),
+            (2, data.get("moviebackground") or []),
+            (3, (data.get("hdmovieclearart") or []) + (data.get("movieart") or [])),
+        ]
 
     def choisir_url(
         self, data: dict[str, Any] | None, media_type: str, langue_preferee: str | None, langue_originale: str | None
     ) -> tuple[str | None, str | None]:
         """Retourne (url, bucket) où bucket indique la raison du choix :
-        'preferee' | 'originale' | 'sans_texte' | 'autre' | None."""
+        'preferee' | 'originale' | 'autre' | 'sans_texte' | None.
+        Priorité : langue préférée -> langue originale -> N'IMPORTE QUELLE
+        AUTRE langue (un titre reste un titre) -> sans texte en tout
+        dernier recours seulement."""
         if not data:
             return None, None
 
@@ -583,22 +602,22 @@ class ClientFanart:
         langue_originale = self._normaliser_langue(langue_originale)
 
         paniers: dict[str, list[tuple[int, dict[str, Any]]]] = {
-            "preferee": [], "originale": [], "sans_texte": [], "autre": []
+            "preferee": [], "originale": [], "autre": [], "sans_texte": []
         }
 
-        for rang_groupe, candidats in enumerate(self._groupes_candidats(data, media_type)):
+        for rang_type, candidats in self._groupes_candidats(data, media_type):
             for candidat in candidats:
                 langue = self._normaliser_langue(candidat.get("lang"))
                 if langue_preferee and langue == langue_preferee:
-                    paniers["preferee"].append((rang_groupe, candidat))
+                    paniers["preferee"].append((rang_type, candidat))
                 elif langue_originale and langue == langue_originale:
-                    paniers["originale"].append((rang_groupe, candidat))
+                    paniers["originale"].append((rang_type, candidat))
                 elif langue is None:
-                    paniers["sans_texte"].append((rang_groupe, candidat))
+                    paniers["sans_texte"].append((rang_type, candidat))
                 elif langue:
-                    paniers["autre"].append((rang_groupe, candidat))
+                    paniers["autre"].append((rang_type, candidat))
 
-        for panier in ("preferee", "originale", "sans_texte", "autre"):
+        for panier in ("preferee", "originale", "autre", "sans_texte"):
             if paniers[panier]:
                 meilleur = sorted(paniers[panier], key=lambda t: (t[0], -int(t[1].get("likes", 0))))[0][1]
                 if meilleur.get("url"):
