@@ -113,6 +113,41 @@ def test_pipeline_bascule_sur_fanart_si_pas_de_backdrop_tmdb():
     assert "requête" in resultat.detail
 
 
+def test_generer_tout_avertit_sur_groupe_du_json_non_reconnu(capsys):
+    """Reproduit le vrai bug rencontré : un groupe renommé dans le JSON
+    (ex: emoji ajouté sur un nom totalement inconnu du script) doit
+    déclencher un avertissement explicite, pas un échec silencieux."""
+    collections = [
+        {"title": "🔥 Groupe Jamais Vu", "folders": [{"title": "Test", "sources": []}]},
+    ]
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"), dry_run=True,
+    )
+    generateur.generer_tout(collections)
+
+    sortie = capsys.readouterr().out
+    assert "non reconnu" in sortie
+    assert "Groupe Jamais Vu" in sortie
+
+
+def test_generer_tout_reconnait_un_groupe_avec_emoji_different(capsys):
+    """Le même groupe 'Genres', mais avec un emoji jamais vu explicitement
+    dans le code, doit être reconnu (normalisation) et NE DOIT PAS déclencher
+    l'avertissement 'non reconnu'."""
+    collections = [
+        {"title": "🆕 Genres", "folders": [{"title": "Action", "sources": []}]},
+    ]
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"), dry_run=True,
+    )
+    generateur.generer_tout(collections)
+
+    sortie = capsys.readouterr().out
+    assert "non reconnu" not in sortie
+
+
 if __name__ == "__main__":
     import pytest
 
