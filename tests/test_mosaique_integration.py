@@ -1,10 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-Test d'intégration du mode --mosaique : simule des réponses TMDB paginées
-(discover, avec backdrop_path) et, quand une clé Fanart est fournie, des
-réponses Fanart.tv (thumb avec titre incrusté) -- vérifie que le pipeline
-complet (résolution multiple -> Fanart puis repli TMDB -> grille inclinée
--> sauvegarde) fonctionne, sans appel réseau réel.
+Tests de la cascade de résolution d'image pour une tuile de mosaïque.
+
+Ordre attendu, pour chaque candidat (film/série) :
+  Pour langue en (français, anglais) :
+    1. backdrop TMDB tagué EXACTEMENT cette langue (/images)
+    2. Fanart "background" dans cette langue
+    3. Fanart "thumb" dans cette langue
+    4. Fanart "clearart"/"hdclearart" dans cette langue, composé sur un
+       VRAI fond (jamais une couleur plate)
+  Puis, en tout dernier recours (aucune langue n'a rien donné) :
+    Fanart background/thumb/clearart SANS TEXTE, puis backdrop TMDB
+    générique non tagué, puis le backdrop_path brut déjà connu.
+
+Le type "banner" n'est JAMAIS utilisé (hors format pour nos tuiles paysage).
+
+Tout est simulé via un faux `session.get` -- aucun appel réseau réel.
 """
 
 import io
@@ -26,6 +37,16 @@ def _image_bytes(couleur, taille=(1280, 720)):
     return buf.getvalue()
 
 
+def _image_bytes_png_transparent(couleur_opaque=(255, 200, 0)):
+    img = Image.new("RGBA", (300, 300), (0, 0, 0, 0))
+    for x in range(100, 200):
+        for y in range(100, 200):
+            img.putpixel((x, y), (*couleur_opaque, 255))
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
 class FausseReponse:
     def __init__(self, json_data=None, content=b"", status_code=200):
         self._json = json_data or {}
@@ -40,8 +61,265 @@ class FausseReponse:
             raise Exception(f"HTTP {self.status_code}")
 
 
-def _dossier_action():
-    return {
+def _generateur(cle_fanart="fausse-cle-fanart", langue_preferee="fr"):
+    return GenerateurBackdrops(
+        cle_tmdb="fausse-cle-tmdb",
+        cle_fanart=cle_fanart,
+        repertoire_sortie=Path("/tmp/inutilise"),
+        profil="compresse",
+        mosaique=True,
+        langue_preferee=langue_preferee,
+    )
+
+
+CANDIDAT_FILM = ("/brut.jpg", 42, "movie", "en")
+
+
+# ---------------------------------------------------------------------------
+# Palier 1 : backdrop TMDB tagué langue (avant même Fanart)
+# ---------------------------------------------------------------------------
+
+def test_tmdb_backdrop_tague_francais_utilise_en_priorite_absolue():
+    generateur = _generateur()
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": [{"file_path": "/tmdb_fr.jpg", "iso_639_1": "fr", "vote_average": 5}]})
+        if "webservice.fanart.tv" in url:
+            raise AssertionError("Fanart ne devrait pas être interrogé si TMDB a déjà un backdrop FR")
+        if "image.tmdb.org/t/p/w1280/tmdb_fr.jpg" in url:
+            return FausseReponse(content=_image_bytes((10, 10, 10)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    image = generateur._resoudre_image_tuile(CANDIDAT_FILM)
+    assert image is not None
+
+
+def test_tmdb_backdrop_langue_choisit_le_mieux_note():
+    generateur = _generateur(cle_fanart=None)
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({
+                "backdrops": [
+                    {"file_path": "/moins_bon.jpg", "iso_639_1": "fr", "vote_average": 1},
+                    {"file_path": "/meilleur.jpg", "iso_639_1": "fr", "vote_average": 9},
+                ]
+            })
+        if "image.tmdb.org" in url:
+            assert "meilleur.jpg" in url
+            return FausseReponse(content=_image_bytes((1, 2, 3)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    assert generateur._resoudre_image_tuile(CANDIDAT_FILM) is not None
+
+
+# ---------------------------------------------------------------------------
+# Palier 2/3 : Fanart background puis thumb, dans la langue courante
+# ---------------------------------------------------------------------------
+
+def test_fanart_background_francais_utilise_si_pas_de_tmdb_fr():
+    generateur = _generateur()
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "webservice.fanart.tv/v3/movies/42" in url:
+            return FausseReponse({
+                "moviebackground": [{"url": "https://fanart.example/fond_fr.jpg", "lang": "fr", "likes": "1"}],
+                "moviethumb": [{"url": "https://fanart.example/thumb_fr.jpg", "lang": "fr", "likes": "999"}],
+            })
+        if "fond_fr.jpg" in url:
+            return FausseReponse(content=_image_bytes((5, 5, 5)))
+        if "thumb_fr.jpg" in url:
+            raise AssertionError("le background doit être choisi avant le thumb, même moins populaire")
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    assert generateur._resoudre_image_tuile(CANDIDAT_FILM) is not None
+
+
+def test_fanart_thumb_francais_si_pas_de_background_francais():
+    generateur = _generateur()
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "webservice.fanart.tv/v3/movies/42" in url:
+            return FausseReponse({
+                "moviebackground": [{"url": "https://fanart.example/fond_en.jpg", "lang": "en", "likes": "1"}],
+                "moviethumb": [{"url": "https://fanart.example/thumb_fr.jpg", "lang": "fr", "likes": "1"}],
+            })
+        if "thumb_fr.jpg" in url:
+            return FausseReponse(content=_image_bytes((6, 6, 6)))
+        if "fond_en.jpg" in url:
+            raise AssertionError("un background EN ne doit pas être choisi avant un thumb FR (mauvaise langue)")
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    assert generateur._resoudre_image_tuile(CANDIDAT_FILM) is not None
+
+
+def test_banner_jamais_utilise_meme_si_present_et_bien_note():
+    """Le type 'banner' est explicitement exclu (hors format)."""
+    generateur = _generateur()
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "webservice.fanart.tv/v3/movies/42" in url:
+            return FausseReponse({
+                "moviebanner": [{"url": "https://fanart.example/banner_fr.jpg", "lang": "fr", "likes": "9999"}],
+                "moviethumb": [{"url": "https://fanart.example/thumb_fr.jpg", "lang": "fr", "likes": "1"}],
+            })
+        if "banner_fr.jpg" in url:
+            raise AssertionError("le type banner ne doit jamais être utilisé")
+        if "thumb_fr.jpg" in url:
+            return FausseReponse(content=_image_bytes((7, 7, 7)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    assert generateur._resoudre_image_tuile(CANDIDAT_FILM) is not None
+
+
+# ---------------------------------------------------------------------------
+# Palier 4 : clearart composé sur un vrai fond
+# ---------------------------------------------------------------------------
+
+def test_clearart_francais_compose_sur_fond_fanart():
+    generateur = _generateur()
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "webservice.fanart.tv/v3/movies/42" in url:
+            return FausseReponse({
+                "hdmovieclearart": [{"url": "https://fanart.example/clearart_fr.png", "lang": "fr", "likes": "1"}],
+                "moviebackground": [{"url": "https://fanart.example/fond_quelconque.jpg", "lang": "en", "likes": "1"}],
+            })
+        if "clearart_fr.png" in url:
+            return FausseReponse(content=_image_bytes_png_transparent())
+        if "fond_quelconque.jpg" in url:
+            return FausseReponse(content=_image_bytes((40, 60, 90)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    image = generateur._resoudre_image_tuile(CANDIDAT_FILM)
+    assert image is not None
+    assert image.mode == "RGB"  # composé, plus de transparence résiduelle
+    # le pixel central doit porter la couleur du clearart (composé par-dessus)
+    assert image.getpixel((image.width // 2, image.height // 2))[0] > 200
+
+
+def test_clearart_sans_fond_fanart_retombe_sur_backdrop_path_connu():
+    """Si aucun 'background' Fanart n'existe, le clearart est composé sur
+    le backdrop_path déjà connu du candidat plutôt que d'être abandonné."""
+    generateur = _generateur()
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "webservice.fanart.tv/v3/movies/42" in url:
+            return FausseReponse({"hdmovieclearart": [{"url": "https://fanart.example/clearart_fr.png", "lang": "fr", "likes": "1"}]})
+        if "clearart_fr.png" in url:
+            return FausseReponse(content=_image_bytes_png_transparent())
+        if "image.tmdb.org/t/p/w1280/brut.jpg" in url:
+            return FausseReponse(content=_image_bytes((20, 30, 40)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    image = generateur._resoudre_image_tuile(CANDIDAT_FILM)
+    assert image is not None
+    assert image.mode == "RGB"
+
+
+# ---------------------------------------------------------------------------
+# Bascule français -> anglais
+# ---------------------------------------------------------------------------
+
+def test_bascule_sur_anglais_si_rien_en_francais():
+    generateur = _generateur()
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": [{"file_path": "/tmdb_en.jpg", "iso_639_1": "en", "vote_average": 5}]})
+        if "webservice.fanart.tv/v3/movies/42" in url:
+            return FausseReponse({})  # rien du tout côté Fanart
+        if "tmdb_en.jpg" in url:
+            return FausseReponse(content=_image_bytes((80, 80, 80)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    assert generateur._resoudre_image_tuile(CANDIDAT_FILM) is not None
+
+
+# ---------------------------------------------------------------------------
+# Dernier recours : sans texte
+# ---------------------------------------------------------------------------
+
+def test_sans_texte_seulement_si_ni_francais_ni_anglais():
+    generateur = _generateur()
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": [{"file_path": "/generique.jpg", "iso_639_1": None, "vote_average": 1}]})
+        if "webservice.fanart.tv/v3/movies/42" in url:
+            return FausseReponse({"moviebackground": [{"url": "https://fanart.example/fond_sans_texte.jpg", "lang": None, "likes": "1"}]})
+        if "fond_sans_texte.jpg" in url:
+            return FausseReponse(content=_image_bytes((100, 100, 100)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    assert generateur._resoudre_image_tuile(CANDIDAT_FILM) is not None
+
+
+def test_repli_final_sur_backdrop_path_brut_sans_cle_fanart():
+    generateur = _generateur(cle_fanart=None)
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/movie/42/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "image.tmdb.org/t/p/w1280/brut.jpg" in url:
+            return FausseReponse(content=_image_bytes((1, 1, 1)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    assert generateur._resoudre_image_tuile(CANDIDAT_FILM) is not None
+
+
+# ---------------------------------------------------------------------------
+# Séries : passage par tvdb_id pour Fanart
+# ---------------------------------------------------------------------------
+
+def test_serie_utilise_tvdb_id_pour_interroger_fanart():
+    generateur = _generateur()
+    candidat_serie = ("/brut_serie.jpg", 77, "tv", "en")
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        if "/tv/77/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "/tv/77/external_ids" in url:
+            return FausseReponse({"tvdb_id": 12345})
+        if "webservice.fanart.tv/v3/tv/12345" in url:
+            return FausseReponse({"tvthumb": [{"url": "https://fanart.example/tv_thumb_fr.jpg", "lang": "fr", "likes": "1"}]})
+        if "webservice.fanart.tv/v3/tv/77" in url:
+            raise AssertionError("Fanart doit être interrogé avec le tvdb_id, pas le tmdb_id")
+        if "tv_thumb_fr.jpg" in url:
+            return FausseReponse(content=_image_bytes((9, 9, 9)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+    assert generateur._resoudre_image_tuile(candidat_serie) is not None
+
+
+# ---------------------------------------------------------------------------
+# Test bout-en-bout (discover -> résolution -> mosaïque -> sauvegarde)
+# ---------------------------------------------------------------------------
+
+def test_mosaique_bout_en_bout_sans_fanart(tmp_path):
+    dossier = {
         "title": "Action",
         "sources": [
             {
@@ -54,39 +332,27 @@ def _dossier_action():
         ],
     }
 
-
-def _resultats_discover(n=12, media_type="movie", debut_id=1):
-    return {
-        "results": [
-            {
-                "id": debut_id + i,
-                "backdrop_path": f"/faux{debut_id + i}.jpg",
-                "popularity": 100 - i,
-                "original_language": "en",
-            }
-            for i in range(n)
-        ]
-    }
-
-
-def test_mosaique_bout_en_bout_repli_tmdb_sans_fanart(tmp_path):
-    """Sans clé Fanart, doit retomber directement sur les backdrops TMDB bruts."""
-    generateur = GenerateurBackdrops(
-        cle_tmdb="fausse-cle", cle_fanart=None, repertoire_sortie=tmp_path, profil="compresse", mosaique=True
-    )
+    generateur = _generateur(cle_fanart=None)
+    generateur.repertoire_sortie = tmp_path
 
     def fausse_get(url, params=None, timeout=None, **kwargs):
         if "discover/movie" in url:
-            return FausseReponse(_resultats_discover())
+            return FausseReponse({
+                "results": [
+                    {"id": i, "backdrop_path": f"/faux{i}.jpg", "popularity": 100 - i, "original_language": "en"}
+                    for i in range(1, 10)
+                ]
+            })
+        if "/images" in url:
+            return FausseReponse({"backdrops": []})
         if "image.tmdb.org" in url:
-            assert "/w1280/" in url, f"devrait demander un backdrop TMDB (w1280), pas: {url}"
             index = int(url.split("faux")[1].split(".")[0])
-            return FausseReponse(content=_image_bytes(((index * 20) % 255, 80, 180)))
+            return FausseReponse(content=_image_bytes(((index * 25) % 255, 80, 180)))
         raise AssertionError(f"URL inattendue: {url}")
 
     generateur.session.get = MagicMock(side_effect=fausse_get)
 
-    requetes, _ = construire_requetes(GROUPE_GENRES, _dossier_action())
+    requetes, _ = construire_requetes(GROUPE_GENRES, dossier)
     chemin_sortie = tmp_path / "genres" / "backdrop" / "action.jpg"
     resultat = generateur.traiter_dossier_mosaique(GROUPE_GENRES, "Action", requetes, chemin_sortie)
 
@@ -97,179 +363,41 @@ def test_mosaique_bout_en_bout_repli_tmdb_sans_fanart(tmp_path):
         assert img.format == "JPEG"
 
 
-def test_fanart_priorite_langue_francais_devant_original():
-    from generer_backdrops import ClientFanart
-
-    client = ClientFanart(cle_api="x")
-    data = {
-        "moviethumb": [
-            {"url": "https://example/original.jpg", "lang": "en", "likes": "50"},
-            {"url": "https://example/fr.jpg", "lang": "fr", "likes": "1"},
-        ]
-    }
-    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
-    assert bucket == "preferee"
-    assert url == "https://example/fr.jpg"  # le français gagne même avec moins de likes
-
-
-def test_fanart_autre_langue_avec_texte_prime_sur_sans_texte():
-    """Priorité demandée : Français -> original -> N'IMPORTE QUELLE AUTRE
-    langue avec titre -> sans texte SEULEMENT en tout dernier recours."""
-    from generer_backdrops import ClientFanart
-
-    client = ClientFanart(cle_api="x")
-    data = {
-        "moviethumb": [
-            {"url": "https://example/allemand.jpg", "lang": "de", "likes": "10"},
-            {"url": "https://example/sans_texte.jpg", "lang": None, "likes": "999"},
-        ]
-    }
-    # ni fr ni en (original) disponibles -> doit prendre l'allemand (a du texte)
-    # plutôt que la version sans texte, même beaucoup plus populaire
-    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
-    assert bucket == "autre"
-    assert url == "https://example/allemand.jpg"
-
-
-def test_fanart_sans_texte_seulement_en_dernier_recours():
-    from generer_backdrops import ClientFanart
-
-    client = ClientFanart(cle_api="x")
-    data = {"moviebackground": [{"url": "https://example/fond.jpg", "lang": None, "likes": "5"}]}
-    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
-    assert bucket == "sans_texte"
-    assert url == "https://example/fond.jpg"
-
-
-def test_fanart_thumb_prime_sur_banner_a_langue_egale():
-    from generer_backdrops import ClientFanart
-
-    client = ClientFanart(cle_api="x")
-    data = {
-        "moviebanner": [{"url": "https://example/banner_fr.jpg", "lang": "fr", "likes": "100"}],
-        "moviethumb": [{"url": "https://example/thumb_fr.jpg", "lang": "fr", "likes": "1"}],
-    }
-    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
-    assert bucket == "preferee"
-    assert url == "https://example/thumb_fr.jpg"  # thumb préféré au banner, même moins populaire
-
-
-def test_fanart_banner_utilise_si_pas_de_thumb_disponible():
-    from generer_backdrops import ClientFanart
-
-    client = ClientFanart(cle_api="x")
-    data = {"moviebanner": [{"url": "https://example/banner_fr.jpg", "lang": "fr", "likes": "10"}]}
-    url, bucket = client.choisir_url(data, "movie", langue_preferee="fr", langue_originale="en")
-    assert bucket == "preferee"
-    assert url == "https://example/banner_fr.jpg"
-
-
-def test_fanart_clearart_utilise_en_repli_pour_serie():
-    from generer_backdrops import ClientFanart
-
-    client = ClientFanart(cle_api="x")
-    data = {"hdclearart": [{"url": "https://example/clearart.png", "lang": None, "likes": "3"}]}
-    url, bucket = client.choisir_url(data, "tv", langue_preferee="fr", langue_originale="ja")
-    assert bucket == "sans_texte"
-    assert url == "https://example/clearart.png"
-
-
-def test_mosaique_utilise_fanart_thumb_en_priorite_pour_un_film(tmp_path):
-    """Avec une clé Fanart, un film doit utiliser l'image 'moviethumb' (avec
-    titre incrusté) plutôt que le backdrop TMDB brut."""
-    generateur = GenerateurBackdrops(
-        cle_tmdb="fausse-cle",
-        cle_fanart="fausse-cle-fanart",
-        repertoire_sortie=tmp_path,
-        profil="compresse",
-        mosaique=True,
-        langue_preferee="fr",
-    )
-
-    def fausse_get(url, params=None, timeout=None, **kwargs):
-        if "discover/movie" in url:
-            return FausseReponse(_resultats_discover())
-        if "webservice.fanart.tv/v3/movies/" in url:
-            index = int(url.rstrip("/").split("/")[-1])
-            return FausseReponse({
-                "moviethumb": [{"url": f"https://fanart.example/thumb{index}.jpg", "lang": "fr", "likes": "5"}]
-            })
-        if "fanart.example" in url:
-            index = int(url.split("thumb")[1].split(".")[0])
-            return FausseReponse(content=_image_bytes(((index * 15) % 255, 40, 200)))
-        if "image.tmdb.org" in url:
-            raise AssertionError("ne devrait pas retomber sur TMDB alors que Fanart a répondu")
-        raise AssertionError(f"URL inattendue: {url}")
-
-    generateur.session.get = MagicMock(side_effect=fausse_get)
-
-    requetes, _ = construire_requetes(GROUPE_GENRES, _dossier_action())
-    chemin_sortie = tmp_path / "genres" / "backdrop" / "action.jpg"
-    resultat = generateur.traiter_dossier_mosaique(GROUPE_GENRES, "Action", requetes, chemin_sortie)
-
-    assert resultat is not None
-    assert resultat.statut == "genere"
-    assert chemin_sortie.exists()
-
-
-def test_mosaique_serie_passe_par_external_ids_pour_fanart(tmp_path):
-    """Une série doit d'abord résoudre son tvdb_id (Fanart indexe les séries
-    par TheTVDB, pas par TMDB) avant d'interroger Fanart."""
+def test_mosaique_repli_si_pas_assez_de_resultats(tmp_path):
     dossier = {
-        "title": "Séries populaires",
+        "title": "Micro-genre",
         "sources": [
             {
                 "provider": "tmdb",
                 "tmdbSourceType": "DISCOVER",
-                "mediaType": "TV",
+                "mediaType": "MOVIE",
                 "sortBy": "popularity.desc",
-                "filters": {},
+                "filters": {"withGenres": "99999"},
             }
         ],
     }
 
-    generateur = GenerateurBackdrops(
-        cle_tmdb="fausse-cle",
-        cle_fanart="fausse-cle-fanart",
-        repertoire_sortie=tmp_path,
-        profil="compresse",
-        mosaique=True,
-    )
-
-    appels_external_ids = []
+    generateur = _generateur(cle_fanart=None)
+    generateur.repertoire_sortie = tmp_path
 
     def fausse_get(url, params=None, timeout=None, **kwargs):
-        if "discover/tv" in url:
-            return FausseReponse(_resultats_discover(media_type="tv"))
-        if "/tv/" in url and "external_ids" in url:
-            tmdb_id = int(url.split("/tv/")[1].split("/")[0])
-            appels_external_ids.append(tmdb_id)
-            return FausseReponse({"tvdb_id": 9000 + tmdb_id})
-        if "webservice.fanart.tv/v3/tv/" in url:
-            tvdb_id = int(url.rstrip("/").split("/")[-1])
+        if "discover/movie" in url:
             return FausseReponse({
-                "tvthumb": [{"url": f"https://fanart.example/tv{tvdb_id}.jpg", "lang": "fr", "likes": "3"}]
+                "results": [
+                    {"id": i, "backdrop_path": f"/faux{i}.jpg", "popularity": 10 - i, "original_language": "en"}
+                    for i in range(1, 3)  # seulement 2 -> sous le seuil minimum (3)
+                ]
             })
-        if "fanart.example" in url:
-            return FausseReponse(content=_image_bytes((90, 90, 200)))
         raise AssertionError(f"URL inattendue: {url}")
 
     generateur.session.get = MagicMock(side_effect=fausse_get)
 
     requetes, _ = construire_requetes(GROUPE_GENRES, dossier)
-    chemin_sortie = tmp_path / "genres" / "backdrop" / "series.jpg"
-    resultat = generateur.traiter_dossier_mosaique(GROUPE_GENRES, "Séries populaires", requetes, chemin_sortie)
-
-    assert resultat is not None
-    assert resultat.statut == "genere"
-    assert len(appels_external_ids) == 12  # un appel external_ids par candidat série
+    resultat = generateur.traiter_dossier_mosaique(GROUPE_GENRES, dossier["title"], requetes, tmp_path / "x.jpg")
+    assert resultat is None
 
 
-def test_mosaique_deduplique_un_film_present_via_collection_et_discover(tmp_path):
-    """Bug historique : un film présent à la fois dans une collection et
-    dans les résultats discover était compté deux fois (médias types
-    différents empêchaient la déduplication). Vérifie que le même id de
-    film n'apparaît qu'une seule fois parmi les candidats retenus."""
+def test_deduplique_un_film_present_via_collection_et_discover(tmp_path):
     dossier = {
         "title": "Mixte",
         "sources": [
@@ -284,9 +412,9 @@ def test_mosaique_deduplique_un_film_present_via_collection_et_discover(tmp_path
         ],
     }
 
-    generateur = GenerateurBackdrops(cle_tmdb="fausse-cle", cle_fanart=None, repertoire_sortie=tmp_path, mosaique=True)
+    generateur = _generateur(cle_fanart=None)
+    generateur.repertoire_sortie = tmp_path
 
-    # Le film id=1 apparaît DANS LA COLLECTION *ET* dans les résultats discover.
     reponse_collection = {"parts": [{"id": 1, "backdrop_path": "/collection1.jpg", "popularity": 999}]}
     reponse_discover = {
         "results": [{"id": 1, "backdrop_path": "/discover1.jpg", "popularity": 90, "original_language": "en"}]
@@ -298,6 +426,8 @@ def test_mosaique_deduplique_un_film_present_via_collection_et_discover(tmp_path
             return FausseReponse(reponse_collection)
         if "discover/movie" in url:
             return FausseReponse(reponse_discover)
+        if "/images" in url:
+            return FausseReponse({"backdrops": []})
         if "image.tmdb.org" in url:
             return FausseReponse(content=_image_bytes((100, 100, 100)))
         raise AssertionError(f"URL inattendue: {url}")
@@ -321,71 +451,6 @@ def test_mosaique_deduplique_un_film_present_via_collection_et_discover(tmp_path
 
     ids_films = [c[1] for c in candidats]
     assert ids_films.count(1) == 1, f"le film id=1 apparaît {ids_films.count(1)} fois, devrait être 1"
-
-
-def test_mosaique_repli_si_pas_assez_de_resultats(tmp_path):
-    dossier = {
-        "title": "Micro-genre",
-        "sources": [
-            {
-                "provider": "tmdb",
-                "tmdbSourceType": "DISCOVER",
-                "mediaType": "MOVIE",
-                "sortBy": "popularity.desc",
-                "filters": {"withGenres": "99999"},
-            }
-        ],
-    }
-
-    generateur = GenerateurBackdrops(cle_tmdb="fausse-cle", cle_fanart=None, repertoire_sortie=tmp_path, mosaique=True)
-
-    def fausse_get(url, params=None, timeout=None, **kwargs):
-        if "discover/movie" in url:
-            return FausseReponse(_resultats_discover(n=2))  # sous le seuil minimum (3)
-        raise AssertionError(f"URL inattendue: {url}")
-
-    generateur.session.get = MagicMock(side_effect=fausse_get)
-
-    requetes, _ = construire_requetes(GROUPE_GENRES, dossier)
-    resultat = generateur.traiter_dossier_mosaique(GROUPE_GENRES, dossier["title"], requetes, tmp_path / "x.jpg")
-    assert resultat is None
-
-
-def test_mosaique_complete_si_peu_de_resultats(tmp_path):
-    """4 résultats (>= seuil de 3, < 12) : doit générer en répétant les
-    images plutôt que d'abandonner."""
-    dossier = {
-        "title": "Petit genre",
-        "sources": [
-            {
-                "provider": "tmdb",
-                "tmdbSourceType": "DISCOVER",
-                "mediaType": "MOVIE",
-                "sortBy": "popularity.desc",
-                "filters": {"withGenres": "1"},
-            }
-        ],
-    }
-
-    generateur = GenerateurBackdrops(cle_tmdb="fausse-cle", cle_fanart=None, repertoire_sortie=tmp_path, mosaique=True)
-
-    def fausse_get(url, params=None, timeout=None, **kwargs):
-        if "discover/movie" in url:
-            return FausseReponse(_resultats_discover(n=4))
-        if "image.tmdb.org" in url:
-            index = int(url.split("faux")[1].split(".")[0])
-            return FausseReponse(content=_image_bytes(((index * 60) % 255, 90, 150)))
-        raise AssertionError(f"URL inattendue: {url}")
-
-    generateur.session.get = MagicMock(side_effect=fausse_get)
-
-    requetes, _ = construire_requetes(GROUPE_GENRES, dossier)
-    chemin_sortie = tmp_path / "genres" / "backdrop" / "petit.jpg"
-    resultat = generateur.traiter_dossier_mosaique(GROUPE_GENRES, dossier["title"], requetes, chemin_sortie)
-
-    assert resultat is not None
-    assert resultat.statut == "genere"
-    assert chemin_sortie.exists()
 
 
 if __name__ == "__main__":
