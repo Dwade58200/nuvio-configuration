@@ -19,7 +19,7 @@ et pour **chaque dossier de chaque groupe actif**, il :
 2. Si aucune source directe n'est exploitable, tente un repli heuristique
    (ex : dossier "Action" dans le groupe Genres → genre TMDB "Action" ;
    thématique "Arts martiaux" → recherche par mot-clé TMDB "martial arts") ;
-3. Récupère jusqu'à 12 titres (films/séries) correspondants -- dédupliqués
+3. Récupère jusqu'à ~70 titres (films/séries) correspondants -- dédupliqués
    même si un même film provient à la fois d'une collection et d'un
    catalogue discover -- et compose une **mosaïque** avec dégradé +
    couleur d'accent extraite automatiquement (voir section dédiée
@@ -69,7 +69,7 @@ régionale n'est JAMAIS considéré comme "français" -- seul le tag exact
 
 ### Volume de requêtes : cache + budget de repli
 
-Avec 12 titres par dossier sur 43 dossiers, le nombre d'appels TMDB peut
+Avec ~70 titres par dossier sur des dizaines de dossiers, le nombre d'appels TMDB peut
 vite grimper. Deux protections en place :
 
 - **Cache** : un même titre (souvent présent dans plusieurs dossiers --
@@ -88,9 +88,11 @@ workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
 de 3 titres distincts résolus, le script repasse automatiquement sur
 l'ancien mode "1 seul backdrop TMDB/Fanart", sans erreur.
 
-**Pas de doublon visible** : la grille inclinée contient 12 cases (quelle
-que soit la résolution de sortie). Le script récupère donc jusqu'à 12
-titres distincts par dossier (pagination TMDB automatique) pour remplir
+**Pas de doublon visible** : la grille inclinée contient environ 72 cases
+(9 colonnes × 8 lignes, quel que soit le profil de qualité -- les trois
+profils actuels partagent le même canvas ≥1280px de large). Le script
+récupère donc jusqu'à ~70 titres distincts par dossier (pagination TMDB
+automatique) pour remplir
 toute la grille sans répéter la même affiche. Si un dossier a réellement
 moins de titres disponibles que de cases (catalogue restreint), les
 images sont répétées (cycle) en dernier recours pour compléter, comme le
@@ -108,14 +110,15 @@ Sur les collections actuelles, la couverture est :
 
 | Groupe | Dossiers résolus | Notes |
 |---|---|---|
-| 🔭 Découvrir | 3 / 6 | "Recommandation" nécessite Trakt (non géré) |
-| 🎬 Streaming | 0 / 9 | volontairement désactivé (sources FlixPatrol, non-TMDB) |
+| 🔭 Découvrir | 3 / 6 | "Recommandation" nécessite l'OAuth Trakt personnalisé (non géré, voir plus bas) |
+| 🎬 Streaming | 9 / 9 | ✅ (résolu via TMDB, plus besoin de FlixPatrol) |
 | 🎭 Genres | 15 / 15 | ✅ |
-| 🎨 Thématiques | 13 / 14 | 1 dossier nécessite Trakt |
+| 🎨 Thématiques | 14 / 14 | ✅ (dernier dossier résolu via une liste Trakt publique) |
 | Vibe | 4 / 4 | ✅ |
 | 📅 Années | 8 / 8 | ✅ |
 | Franchises | 0 / 158 | volontairement désactivé (à la demande de l'utilisateur) |
-| Sports | 0 / 8 | volontairement désactivé (pas pertinent pour un backdrop) |
+| Sports | 0 / 7 | volontairement désactivé (pas pertinent pour un backdrop) |
+| **Total** | **53 / 221** | vérifié via `--dry-run --mosaique --groupe <X>` sur chaque groupe |
 
 Les dossiers non résolus sont **journalisés avec la raison** (jamais échoués
 en silence) — voir le résumé affiché à la fin de chaque exécution.
@@ -337,11 +340,12 @@ espaces réduits) plutôt qu'en texte exact. Concrètement :
 
 ## 🗺️ Idées pour plus tard (non planifiées)
 
-Le projet s'arrête ici pour l'instant (mosaïque + accent color = dernière
-phase prévue). Pistes possibles si tu veux reprendre un jour :
+Le projet s'arrête ici pour l'instant (mosaïque + accent color + Trakt
+listes publiques = dernières phases prévues). Pistes possibles si tu veux
+reprendre un jour :
 
-- Intégrer l'API Trakt pour résoudre les ~28 dossiers restants
-  ("Recommandation", quelques Franchises/Thématiques)
+- Authentification OAuth Trakt complète, pour débloquer le dernier
+  dossier restant (Découvrir/Recommandation, voir "Non couvert" plus haut)
 - Génération de variantes `.webp` en plus du `.jpg`
 
 ---
