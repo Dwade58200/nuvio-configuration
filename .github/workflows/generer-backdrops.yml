@@ -54,6 +54,7 @@ jobs:
           PYTHONDONTWRITEBYTECODE: "1"
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
+          TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
           DRY_RUN: ${{ inputs.dry_run }}
           GROUPE: ${{ inputs.groupe }}
           LIMITE: ${{ inputs.limite }}
@@ -64,6 +65,7 @@ jobs:
           if [ -n "$GROUPE" ]; then ARGS+=(--groupe "$GROUPE"); fi
           if [ -n "$LIMITE" ]; then ARGS+=(--limite "$LIMITE"); fi
           if [ "$DESACTIVER_MOSAIQUE" != "true" ]; then ARGS+=(--mosaique); fi
+          if [ -f "Templates/aiometadata-setup.json" ]; then ARGS+=(--aiometadata "Templates/aiometadata-setup.json"); fi
           python3 -B scripts/generer_backdrops.py "${ARGS[@]}"
 
       - name: Mettre à jour heroBackdropUrl vers les images générées
