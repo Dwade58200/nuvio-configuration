@@ -52,9 +52,11 @@ nuvio-configuration/
 └── BACKDROPS_SETUP.md                      # Documentation technique détaillée du pipeline
 ```
 
-*(Les dossiers `Collections/Covers/` et `Collections/Logos/` référencés
-dans le JSON contiennent mes visuels de couverture et logos ; ils vivent
-ailleurs dans le dépôt complet et ne sont pas détaillés ici.)*
+*(Les dossiers `Collections/Covers/` et `Collections/Logos/` — avec
+majuscule, à ne pas confondre avec `collections/` ci-dessus — contiennent
+mes visuels de couverture et logos gérés manuellement. Depuis la fusion
+des branches, ils vivent dans ce même dépôt/branche, à la racine, et ne
+sont pas détaillés ici.)*
 
 ---
 
@@ -104,7 +106,7 @@ titres qu'il contient réellement.
 
 1. **`generer_backdrops.py`** lit le JSON de collections et, pour chaque
    dossier actif, identifie ses sources (genre TMDB, discover, mot-clé…).
-2. Il récupère jusqu'à ~70 titres correspondants via l'API TMDB, en
+2. Il récupère jusqu'à 12 titres correspondants via l'API TMDB, en
    excluant les catalogues filtrés sur une langue spécifique (ex :
    variantes "France" en double d'un catalogue global) pour éviter les
    doublons.
