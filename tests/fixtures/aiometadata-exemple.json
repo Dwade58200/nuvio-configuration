@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "exportedAt": "2026-08-23T07:47:28.769Z",
+  "catalogs": [
+    {
+      "id": "tmdb.discover.movie.global.mt49lr48",
+      "type": "movie",
+      "name": "🔴 Populaire",
+      "enabled": true,
+      "source": "tmdb",
+      "metadata": {
+        "discover": {
+          "version": 2,
+          "source": "tmdb",
+          "mediaType": "movie",
+          "params": {
+            "sort_by": "popularity.desc",
+            "include_adult": true,
+            "watch_region": "FR",
+            "with_watch_providers": "8",
+            "with_watch_monetization_types": "flatrate|free|ads|rent|buy"
+          }
+        }
+      }
+    },
+    {
+      "id": "tmdb.discover.movie.global_copy.mt49lz6m",
+      "type": "series",
+      "name": "🔴 Populaire",
+      "enabled": true,
+      "source": "tmdb",
+      "metadata": {
+        "discover": {
+          "version": 2,
+          "source": "tmdb",
+          "mediaType": "tv",
+          "params": {
+            "sort_by": "popularity.desc",
+            "include_adult": true,
+            "watch_region": "FR",
+            "with_watch_providers": "8",
+            "with_watch_monetization_types": "flatrate|free|ads|rent|buy"
+          }
+        }
+      }
+    },
+    {
+      "id": "tmdb.discover.series.m6_et_tf1.mofqqcct",
+      "type": "series",
+      "name": "TF1",
+      "enabled": true,
+      "source": "tmdb",
+      "metadata": {
+        "discover": {
+          "version": 2,
+          "source": "tmdb",
+          "mediaType": "tv",
+          "params": {
+            "sort_by": "popularity.desc",
+            "include_adult": true,
+            "with_genres": "10764",
+            "watch_region": "FR",
+            "with_watch_providers": "1754",
+            "with_watch_monetization_types": "flatrate|free|ads|rent|buy"
+          }
+        }
+      }
+    },
+    {
+      "id": "tmdb.discover.movie.genre_action.global",
+      "type": "movie",
+      "name": "⚔️ Action — 🌍",
+      "enabled": true,
+      "source": "tmdb",
+      "metadata": {
+        "discover": {
+          "version": 2,
+          "source": "tmdb",
+          "mediaType": "movie",
+          "params": {
+            "sort_by": "popularity.desc",
+            "include_adult": false,
+            "with_genres": "28",
+            "with_release_type": "4|5|6",
+            "release_date.lte": "__tmdb_date__:today:to"
+          }
+        }
+      }
+    },
+    {
+      "id": "trakt.watchlist",
+      "type": "all",
+      "name": "👁️ Trakt liste",
+      "enabled": true,
+      "source": "trakt"
+    },
+    {
+      "id": "tmdb.top",
+      "name": "🔥 Populaire",
+      "type": "movie",
+      "source": "tmdb",
+      "enabled": true
+    },
+    {
+      "id": "mdblist.102554",
+      "type": "movie",
+      "name": "Must-See Modern Horror",
+      "enabled": true,
+      "source": "mdblist"
+    }
+  ]
+}
