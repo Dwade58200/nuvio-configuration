@@ -83,7 +83,7 @@
       "groupId": "language",
       "name": "VFQ",
       "pattern": "(?i)^(?!.*(?:\\bVFF\\b|\\bTRUEFRENCH\\b|\\bVFI\\b)).*?(?:\\bVFQ\\b|\\bCANADA\\b|\\bCAN\\b|\\bFRENCH[._\\-\\s]?CA\\b|(?<=[._\\-\\s])CA(?=[._\\-\\s]|$))",
-      "imageURL": "https://i.ibb.co/B2KMrWQr/CA.png",
+      "imageURL": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Badges/VFQ.png?raw=true",
       "tagColor": "#00000000",
       "borderColor": "rgba(0,0,0,0)",
       "textColor": "#00000000",
