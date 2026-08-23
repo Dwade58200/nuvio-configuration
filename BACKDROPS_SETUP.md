@@ -69,7 +69,7 @@ régionale n'est JAMAIS considéré comme "français" -- seul le tag exact
 
 ### Volume de requêtes : cache + budget de repli
 
-Avec ~70 titres par dossier sur 43 dossiers, le nombre d'appels TMDB peut
+Avec 12 titres par dossier sur 43 dossiers, le nombre d'appels TMDB peut
 vite grimper. Deux protections en place :
 
 - **Cache** : un même titre (souvent présent dans plusieurs dossiers --
@@ -88,9 +88,9 @@ workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
 de 3 titres distincts résolus, le script repasse automatiquement sur
 l'ancien mode "1 seul backdrop TMDB/Fanart", sans erreur.
 
-**Pas de doublon visible** : la grille inclinée contient environ 70 cases
-(quelle que soit la résolution de sortie). Le script récupère donc jusqu'à
-~70 titres distincts par dossier (pagination TMDB automatique) pour remplir
+**Pas de doublon visible** : la grille inclinée contient 12 cases (quelle
+que soit la résolution de sortie). Le script récupère donc jusqu'à 12
+titres distincts par dossier (pagination TMDB automatique) pour remplir
 toute la grille sans répéter la même affiche. Si un dossier a réellement
 moins de titres disponibles que de cases (catalogue restreint), les
 images sont répétées (cycle) en dernier recours pour compléter, comme le
@@ -116,7 +116,6 @@ Sur les collections actuelles, la couverture est :
 | 📅 Années | 8 / 8 | ✅ |
 | Franchises | 0 / 158 | volontairement désactivé (à la demande de l'utilisateur) |
 | Sports | 0 / 8 | volontairement désactivé (pas pertinent pour un backdrop) |
-| **Total** | **43 / 221** | vérifié via `--dry-run --mosaique` |
 
 Les dossiers non résolus sont **journalisés avec la raison** (jamais échoués
 en silence) — voir le résumé affiché à la fin de chaque exécution.
@@ -131,24 +130,6 @@ dossier), qui ne change pas d'un mois à l'autre — seule l'image derrière
 cette URL est remplacée. Il suffit donc de le lancer une fois pour les
 dossiers déjà résolus, puis de le relancer uniquement quand de *nouveaux*
 dossiers deviennent résolvables (ex : après l'intégration de Trakt).
-
-> **⚠️ Attention si tu lances ce script (ou `purger_cache.py`) à la
-> main**, sans passer `--depot`/`--branche` : leurs valeurs par défaut
-> pointent vers `Dwade58200/nuvio-configuration` sur la branche
-> `feature/backdrops-automation`, pas `main`. Depuis GitHub Actions ce
-> n'est pas un problème (le workflow passe la branche réelle
-> automatiquement), mais en local il faut préciser ces options si tu
-> travailles sur une autre branche, sous peine de générer des URLs qui
-> pointent au mauvais endroit.
-
-> **📌 Note sur `Collections/` vs `collections/`** : les champs
-> `titleLogoUrl` et `coverImageUrl` du JSON pointent vers un dossier
-> `Collections/` (majuscule) sur la branche `main` — c'est là que logos
-> et covers sont gérés manuellement. Les backdrops générés par ce
-> pipeline vivent eux dans `collections/` (minuscule), sur cette branche
-> `feature/backdrops-automation`. Ce sont deux emplacements distincts et
-> volontairement séparés : ne pas les confondre en cas de réorganisation
-> future.
 
 ## ✅ Configuration requise
 
@@ -165,6 +146,7 @@ dossiers deviennent résolvables (ex : après l'intégration de Trakt).
 Dans **Settings → Secrets and variables → Actions** du dépôt, créez :
 - `TMDB_API_KEY`
 - `FANART_API_KEY` (recommandé -- sans lui, les mosaïques n'ont pas de titre visible)
+- `TRAKT_CLIENT_ID` (optionnel -- résout les Franchises/Thématiques basées sur une liste Trakt publique)
 
 ## 📝 Utilisation
 
@@ -192,8 +174,9 @@ Options utiles de `generer_backdrops.py` :
 | Option | Effet |
 |---|---|
 | `--dry-run` | Ne fait aucun appel réseau, affiche juste ce qui serait généré |
-| `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 6 titres) |
+| `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 3 titres) |
 | `--limite-appels-tmdb-images` | Budget d'appels TMDB `/images` avant repli Fanart seul (défaut 300) |
+| `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues avec leurs vrais filtres TMDB |
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
 | `--profil {standard,haute,compresse}` | Taille/qualité de sortie |
@@ -222,7 +205,8 @@ nuvio-configuration/
 ├── .github/workflows/
 │   └── generer-backdrops.yml        # Workflow d'automatisation
 ├── Templates/
-│   └── Nuvio-Collections-Dwade58200.json  # Source de vérité des collections
+│   ├── Nuvio-Collections-Dwade58200.json  # Source de vérité des collections
+│   └── aiometadata-setup.json       # (Optionnel) export AIOMetadata, voir section dédiée
 ├── collections/
 │   └── <groupe>/backdrop/*.jpg      # Images générées (ex: genres/backdrop/action.jpg)
 ├── scripts/
@@ -267,6 +251,74 @@ méconnaissable, ou supprimé.
 
 **Un nom de groupe a juste changé d'emoji/espace/accent** → rien à faire,
 c'est géré automatiquement (voir "Résilience aux renommages" ci-dessous).
+
+## 📺 Export AIOMetadata (résolution exacte des catalogues)
+
+Les catalogId "addon/aio-metadata" opaques (ex : `tmdb.discover.movie.global.mt49lr48`
+pour Netflix) ne portent, par eux-mêmes, aucune information exploitable
+sur le vrai filtre TMDB derrière -- juste un label libre et un hash.
+
+**Solution** : exporte la configuration de ton addon AIOMetadata (dans
+l'addon : Réglages → Export) et place le fichier JSON obtenu à
+`Templates/aiometadata-setup.json` dans ce dépôt. Le script le charge
+automatiquement s'il est présent (aucune configuration supplémentaire) et
+construit une table exacte `catalogId -> vrais filtres TMDB`
+(`with_watch_providers`, `with_genres`, dates, etc., directement extraits
+de l'export). Cette correspondance est utilisée en **priorité absolue**
+avant toute heuristique.
+
+Concrètement, pour Netflix/Prime/HBO/Disney+/Paramount+/Apple TV+/Canal+,
+ça permet d'obtenir le VRAI filtre `with_watch_providers` de la
+plateforme (ex: `8` pour Netflix, `337` pour Disney+) au lieu d'un simple
+contenu populaire générique. Pour TF1/M6, ça récupère aussi leur filtre
+genre spécifique ("Reality"), pas juste le fournisseur.
+
+**Si l'export n'est pas fourni**, ou si un catalogue en est absent
+(nouveau catalogue ajouté depuis dans Nuvio), le script utilise
+automatiquement les replis habituels dans cet ordre :
+1. Réseau TV connu (TF1/M6, via `with_networks`) ;
+2. Popularité globale générique, sans filtre plateforme.
+
+⚠️ **Pense à ré-exporter et remplacer `Templates/aiometadata-setup.json`
+si tu ajoutes/modifies des catalogues dans AIOMetadata** -- sinon le
+script utilisera les replis génériques pour les nouveaux catalogues, ou
+une config obsolète pour les anciens.
+
+Les catalogues FlixPatrol/`streaming.*`/`custom.*` (non-TMDB, ex: Top 10
+France) restent non résolus -- ils n'ont pas d'équivalent TMDB direct.
+
+## 🎬 Trakt (listes publiques uniquement)
+
+Certaines Franchises et Thématiques référencent une liste Trakt
+(`traktListId`) plutôt qu'un catalogue TMDB direct. Avec une clé Trakt
+configurée, ces listes sont désormais résolues (à condition d'être
+**publiques** sur Trakt).
+
+### Configuration (optionnelle)
+
+1. Crée un compte sur https://trakt.tv, puis une application sur
+   https://trakt.tv/oauth/applications ("New Application") -- Redirect
+   URI : `urn:ietf:wg:oauth:2.0:oob` suffit pour cet usage.
+2. Récupère le **Client ID** (pas besoin du Client Secret, ni de connexion
+   OAuth complète -- les listes publiques ne demandent que ça).
+3. Secret GitHub `TRAKT_CLIENT_ID` (Settings → Secrets and variables → Actions).
+
+Sans cette clé, les sources Trakt restent simplement ignorées (comportement
+identique à avant), aucune erreur.
+
+### ⚠️ Non couvert : "Recommandation" (trakt.recommendations.*)
+
+Le dossier Découvrir/Recommandation utilise un catalogue
+`trakt.recommendations.movies/shows` -- ce ne sont pas des listes
+publiques mais de **vraies recommandations personnalisées**, qui
+nécessitent un jeton OAuth utilisateur Trakt complet (connexion avec ton
+compte, pas juste une clé). C'est un chantier significativement plus lourd
+(flux d'autorisation, stockage/renouvellement de token) que je n'ai pas
+implémenté ici. Si tu veux ce dossier résolu, il faudra soit :
+- accepter un contenu de repli (ex: tendances Trakt publiques, pas
+  vraiment "recommandé") à la place ;
+- soit mettre en place l'authentification OAuth complète (à envisager
+  comme un chantier séparé).
 
 ## 🛡️ Résilience aux renommages de groupes
 
