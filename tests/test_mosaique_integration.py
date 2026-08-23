@@ -581,6 +581,151 @@ def test_recuperer_images_sans_reseau_une_fois_budget_epuise():
     assert client.budget_images_epuise is True
 
 
+# ---------------------------------------------------------------------------
+# ClientTrakt : listes publiques
+# ---------------------------------------------------------------------------
+
+def test_trakt_recupere_les_items_d_une_liste_publique():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="fausse-cle-trakt")
+
+    def fausse_get(url, headers=None, params=None, timeout=None, **kwargs):
+        assert "/lists/11754060/items" in url
+        assert headers["trakt-api-key"] == "fausse-cle-trakt"
+        assert headers["trakt-api-version"] == "2"
+        return FausseReponse([
+            {"type": "movie", "movie": {"ids": {"tmdb": 100, "trakt": 1}}},
+            {"type": "show", "show": {"ids": {"tmdb": 200, "trakt": 2}}},
+            {"type": "movie", "movie": {"ids": {"trakt": 3}}},  # pas de tmdb id -> ignoré
+        ])
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    items = client.recuperer_items_liste(11754060)
+
+    assert items == [(100, "movie"), (200, "tv")]
+
+
+def test_trakt_sans_cle_retourne_liste_vide_sans_appel_reseau():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id=None)
+
+    def fausse_get(*args, **kwargs):
+        raise AssertionError("ne devrait jamais être appelé sans clé Trakt")
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    assert client.recuperer_items_liste(11754060) == []
+
+
+def test_trakt_liste_privee_ou_erreur_retourne_liste_vide():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="fausse-cle-trakt")
+    client.session.get = MagicMock(return_value=FausseReponse(status_code=404))  # liste privée/inexistante
+    assert client.recuperer_items_liste(11754060) == []
+
+
+def test_trakt_resultats_mis_en_cache():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="fausse-cle-trakt")
+    compteur = {"n": 0}
+
+    def fausse_get(*args, **kwargs):
+        compteur["n"] += 1
+        return FausseReponse([{"type": "movie", "movie": {"ids": {"tmdb": 1}}}])
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    client.recuperer_items_liste(11754060)
+    client.recuperer_items_liste(11754060)
+    assert compteur["n"] == 1
+
+
+def test_mosaique_bout_en_bout_avec_liste_trakt_sans_fanart_repli_attendu(tmp_path):
+    """Sans clé Fanart et sans backdrop_path connu (cas des candidats
+    trakt), la cascade ne trouve rien -> repli propre (None), pas de crash."""
+    dossier = {
+        "title": "007",
+        "sources": [{"provider": "trakt", "traktListId": 11754060, "mediaType": "MOVIE"}],
+    }
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle-tmdb",
+        cle_fanart=None,
+        repertoire_sortie=tmp_path,
+        profil="compresse",
+        mosaique=True,
+        cle_trakt="fausse-cle-trakt",
+    )
+
+    items_trakt = [{"type": "movie", "movie": {"ids": {"tmdb": i}}} for i in range(1, 10)]
+
+    def fausse_get(url, headers=None, params=None, timeout=None, **kwargs):
+        if "/lists/11754060/items" in url:
+            return FausseReponse(items_trakt)
+        if "/images" in url:
+            return FausseReponse({"backdrops": []})
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+
+    from generer_backdrops import construire_requetes, GROUPE_FRANCHISES
+
+    requetes, _ = construire_requetes(GROUPE_FRANCHISES, dossier)
+    resultat = generateur.traiter_dossier_mosaique(
+        GROUPE_FRANCHISES, "007", requetes, tmp_path / "franchises" / "backdrop" / "007.jpg"
+    )
+    assert resultat is None
+
+
+def test_mosaique_bout_en_bout_avec_liste_trakt_et_fanart_produit_une_image(tmp_path):
+    """Cas positif complet : liste Trakt -> tmdb_id -> Fanart thumb FR ->
+    image téléchargée -> mosaïque générée."""
+    dossier = {
+        "title": "007",
+        "sources": [{"provider": "trakt", "traktListId": 11754060, "mediaType": "MOVIE"}],
+    }
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle-tmdb",
+        cle_fanart="fausse-cle-fanart",
+        repertoire_sortie=tmp_path,
+        profil="compresse",
+        mosaique=True,
+        cle_trakt="fausse-cle-trakt",
+    )
+
+    items_trakt = [{"type": "movie", "movie": {"ids": {"tmdb": i}}} for i in range(1, 10)]
+
+    def fausse_get(url, headers=None, params=None, timeout=None, **kwargs):
+        if "/lists/11754060/items" in url:
+            return FausseReponse(items_trakt)
+        if "/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "webservice.fanart.tv/v3/movies/" in url:
+            tmdb_id = int(url.rstrip("/").split("/")[-1])
+            return FausseReponse({
+                "moviethumb": [{"url": f"https://fanart.example/thumb{tmdb_id}.jpg", "lang": "fr", "likes": "1"}]
+            })
+        if "fanart.example" in url:
+            index = int(url.split("thumb")[1].split(".")[0])
+            return FausseReponse(content=_image_bytes(((index * 25) % 255, 60, 150)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+
+    from generer_backdrops import construire_requetes, GROUPE_FRANCHISES
+
+    requetes, _ = construire_requetes(GROUPE_FRANCHISES, dossier)
+    chemin_sortie = tmp_path / "franchises" / "backdrop" / "007.jpg"
+    resultat = generateur.traiter_dossier_mosaique(GROUPE_FRANCHISES, "007", requetes, chemin_sortie)
+
+    assert resultat is not None
+    assert resultat.statut == "genere"
+    assert chemin_sortie.exists()
+
+
 if __name__ == "__main__":
     import pytest
 
