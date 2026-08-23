@@ -45,6 +45,7 @@ import re
 import sys
 import time
 import unicodedata
+from datetime import date as _date
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
@@ -71,6 +72,7 @@ import mosaique as mosaique_module  # module compagnon, scripts/mosaique.py
 TMDB_API_BASE = "https://api.themoviedb.org/3"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p"
 FANART_API_BASE = "https://webservice.fanart.tv/v3"
+TRAKT_API_BASE = "https://api.trakt.tv"
 
 # Titres EXACTS des groupes tels qu'ils existent réellement dans le JSON.
 # (le bug initial venait d'un mauvais mapping ici -> corrigé, puis reproduit
@@ -125,7 +127,7 @@ CRITERES_GROUPES: dict[str, CritereGroupe] = {
         inclure=("Recommandation", "Tendance", "Populaire", "Top"),
         exclure=("TV", "Magnet"),
     ),
-    GROUPE_STREAMING: CritereGroupe(actif=False),  # sources non-TMDB (FlixPatrol)
+    GROUPE_STREAMING: CritereGroupe(actif=True),  # certains catalogues sont désormais résolubles via TMDB
     GROUPE_GENRES: CritereGroupe(actif=True),
     GROUPE_THEMATIQUES: CritereGroupe(actif=True),
     GROUPE_VIBES: CritereGroupe(actif=True),
@@ -183,6 +185,27 @@ GENRE_TMDB_IDS: dict[str, tuple[int, int | None]] = {
     "war": (10752, 10768),
     "western": (37, 37),
 }
+
+# Chaînes TV françaises connues (pour les catalogues "Streaming" liés à un
+# diffuseur plutôt qu'à une plateforme SVOD) -> id de réseau TMDB.
+# Vérifiés manuellement sur themoviedb.org/network/{id}.
+NETWORK_TMDB_IDS: dict[str, int] = {
+    "tf1": 290,
+    "m6": 712,
+}
+
+
+def _resoudre_reseaux_depuis_texte(texte: str) -> list[int]:
+    """Détecte les chaînes connues mentionnées dans un texte (ex: un
+    catalogId comme 'tmdb.discover.series.m6_et_tf1...') et retourne la
+    liste (dédupliquée, dans l'ordre de détection) des id de réseau TMDB
+    correspondants."""
+    trouves: list[int] = []
+    for token in normaliser(texte).split():
+        id_reseau = NETWORK_TMDB_IDS.get(token)
+        if id_reseau and id_reseau not in trouves:
+            trouves.append(id_reseau)
+    return trouves
 
 # Correspondance des filtres "camelCase" du JSON Nuvio vers les paramètres
 # TMDB /discover (certains dépendent du media_type movie/tv).
@@ -277,8 +300,50 @@ def _extraire_slug_thematique(catalog_id: str) -> str | None:
     return m.group(1).replace("-", " ").replace("_", " ").strip()
 
 
+# ---------------------------------------------------------------------------
+# Export AIOMetadata (optionnel) : mapping catalogId -> VRAIS filtres TMDB
+# ---------------------------------------------------------------------------
+
+def _resoudre_placeholder_date(valeur: Any) -> Any:
+    """AIOMetadata encode certaines dates comme '__tmdb_date__:today:to'
+    (résolu côté addon au moment de l'appel) -- on le remplace par la date
+    du jour, calculée à l'exécution du script (pas celle figée dans
+    l'export, qui serait obsolète)."""
+    if isinstance(valeur, str) and valeur.startswith("__tmdb_date__:today"):
+        return _date.today().isoformat()
+    return valeur
+
+
+def charger_catalogues_aiometadata(chemin: "Path | None") -> dict[str, dict[str, Any]]:
+    """Charge un export AIOMetadata (Réglages -> Export dans l'addon) et
+    construit un index {catalogId: {"media_type", "params"}} pour les
+    catalogues de type "discover" qui ont une config TMDB exacte exportée
+    -- permet de résoudre un catalogue (ex: Streaming, Genres...) avec les
+    VRAIS filtres plutôt qu'une heuristique de repli à partir du nom.
+    Retourne un dict vide si le fichier est absent/invalide (aucune erreur)."""
+    if not chemin:
+        return {}
+    try:
+        with open(chemin, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    index: dict[str, dict[str, Any]] = {}
+    for entree in data.get("catalogs", []) or []:
+        discover = ((entree.get("metadata") or {}).get("discover")) or {}
+        params = discover.get("params")
+        media_type_brut = discover.get("mediaType")
+        catalog_id = entree.get("id")
+        if not (catalog_id and params and media_type_brut):
+            continue
+        media_type = "tv" if media_type_brut in ("tv", "series") else "movie"
+        index[catalog_id] = {"media_type": media_type, "params": dict(params)}
+    return index
+
+
 def construire_requetes(
-    groupe_titre: str, dossier: dict[str, Any]
+    groupe_titre: str, dossier: dict[str, Any], catalogues_aiometadata: dict[str, dict[str, Any]] | None = None
 ) -> tuple[list[RequeteTMDB], list[str]]:
     """
     Retourne (requetes_resolues, raisons_ignorees).
@@ -325,6 +390,20 @@ def construire_requetes(
             catalog_id = source.get("catalogId") or ""
             media_type = "movie" if source.get("type") == "movie" else "tv"
 
+            # Priorité absolue : si un export AIOMetadata a été fourni et
+            # connaît ce catalogue exact, on utilise ses VRAIS filtres TMDB
+            # plutôt qu'une heuristique de repli à partir du nom/hash.
+            info_aiometadata = (catalogues_aiometadata or {}).get(catalog_id)
+            if info_aiometadata:
+                params_reels = {
+                    cle: _resoudre_placeholder_date(valeur) for cle, valeur in info_aiometadata["params"].items()
+                }
+                params_reels.setdefault("sort_by", "popularity.desc")
+                requetes.append(
+                    RequeteTMDB(kind="discover", media_type=info_aiometadata["media_type"], params=params_reels)
+                )
+                continue
+
             if catalog_id in CATALOGID_VERS_ENDPOINT:
                 mt, endpoint = CATALOGID_VERS_ENDPOINT[catalog_id]
                 requetes.append(RequeteTMDB(kind="endpoint", media_type=mt, endpoint=endpoint))
@@ -356,10 +435,41 @@ def construire_requetes(
                     )
                     continue
 
+            # Repli chaînes TV françaises (ex: catalogues "Streaming" liés à
+            # TF1/M6 plutôt qu'à une vraie plateforme SVOD)
+            reseaux = _resoudre_reseaux_depuis_texte(catalog_id)
+            if reseaux and media_type == "tv":
+                requetes.append(
+                    RequeteTMDB(
+                        kind="discover",
+                        media_type="tv",
+                        params={"with_networks": ",".join(str(r) for r in reseaux), "sort_by": "popularity.desc"},
+                    )
+                )
+                continue
+
+            # Dernier repli : un catalogue clairement rattaché à TMDB (préfixe
+            # "tmdb.discover.") mais dont on n'arrive à déduire ni genre, ni
+            # thématique, ni chaîne -> popularité globale, sans filtre. C'est
+            # le cas de plusieurs catalogues "Streaming" (Netflix, Prime,
+            # HBO...) dont le nom ("global", "populaire_copy...") ne porte
+            # plus l'info de plateforme d'origine -- mieux vaut un contenu
+            # populaire générique que rien du tout.
+            if catalog_id.startswith("tmdb.discover."):
+                requetes.append(
+                    RequeteTMDB(kind="discover", media_type=media_type, params={"sort_by": "popularity.desc"})
+                )
+                continue
+
             ignorees.append(f"addon/aio-metadata catalogId non résolu ({catalog_id})")
 
         elif provider == "trakt":
-            ignorees.append("trakt (nécessite une clé API Trakt — phase ultérieure)")
+            trakt_list_id = source.get("traktListId")
+            if trakt_list_id:
+                media_type_trakt = "movie" if source.get("mediaType") == "MOVIE" else "tv"
+                requetes.append(RequeteTMDB(kind="trakt_liste", media_type=media_type_trakt, tmdb_id=trakt_list_id))
+            else:
+                ignorees.append("trakt sans traktListId exploitable")
         else:
             ignorees.append(f"provider non géré ({provider})")
 
@@ -676,6 +786,59 @@ class ClientFanart:
         return meilleur.get("url")
 
 
+class ClientTrakt:
+    """Accès en lecture seule aux LISTES PUBLIQUES Trakt (traktListId).
+
+    Une simple clé "Client ID" (gratuite, https://trakt.tv/oauth/applications)
+    suffit pour ça -- pas besoin d'authentification OAuth complète.
+
+    ATTENTION : ceci ne couvre PAS les catalogues "trakt.recommendations.*"
+    (recommandations personnalisées), qui nécessitent un vrai jeton OAuth
+    utilisateur -- hors scope ici, voir BACKDROPS_SETUP.md.
+    """
+
+    def __init__(self, client_id: str | None, session: requests.Session | None = None):
+        self.client_id = client_id
+        self.session = session or requests.Session()
+        self._cache_liste: dict[int, list[tuple[int, str]]] = {}
+
+    def _headers(self) -> dict[str, str]:
+        return {
+            "Content-Type": "application/json",
+            "trakt-api-key": self.client_id or "",
+            "trakt-api-version": "2",
+        }
+
+    def recuperer_items_liste(self, trakt_list_id: int, limite: int = 50) -> list[tuple[int, str]]:
+        """Retourne une liste de (tmdb_id, media_type) pour les items d'une
+        liste Trakt PUBLIQUE. Liste vide si pas de clé, liste privée, ou
+        erreur réseau -- jamais d'exception."""
+        if trakt_list_id in self._cache_liste:
+            return self._cache_liste[trakt_list_id]
+
+        resultat: list[tuple[int, str]] = []
+        if self.client_id:
+            try:
+                r = self.session.get(
+                    f"{TRAKT_API_BASE}/lists/{trakt_list_id}/items",
+                    headers=self._headers(),
+                    params={"limit": limite},
+                    timeout=15,
+                )
+                if r.status_code == 200:
+                    for item in r.json() or []:
+                        type_item = item.get("type")  # "movie" ou "show"
+                        bloc = item.get(type_item) or {}
+                        tmdb_id = (bloc.get("ids") or {}).get("tmdb")
+                        if tmdb_id:
+                            resultat.append((tmdb_id, "movie" if type_item == "movie" else "tv"))
+            except requests.RequestException:
+                pass
+
+        self._cache_liste[trakt_list_id] = resultat
+        return resultat
+
+
 # ---------------------------------------------------------------------------
 # Résolution TMDB /images (backdrops tagués par langue)
 # ---------------------------------------------------------------------------
@@ -744,15 +907,19 @@ class GenerateurBackdrops:
         mosaique: bool = False,
         langue_preferee: str = "fr",
         limite_appels_tmdb_images: int = 300,
+        cle_trakt: str | None = None,
+        catalogues_aiometadata: dict[str, dict[str, Any]] | None = None,
     ):
         self.session = requests.Session()
         self.tmdb = ClientTMDB(cle_tmdb, session=self.session, limite_appels_images=limite_appels_tmdb_images)
         self.fanart = ClientFanart(cle_fanart, session=self.session)
+        self.trakt = ClientTrakt(cle_trakt, session=self.session)
         self.repertoire_sortie = repertoire_sortie
         self.profil = profil
         self.dry_run = dry_run
         self.mosaique = mosaique
         self.langue_preferee = langue_preferee
+        self.catalogues_aiometadata = catalogues_aiometadata or {}
 
     def _dimensions_canvas(self) -> tuple[int, int]:
         largeur = PROFILS_QUALITE.get(self.profil, PROFILS_QUALITE["standard"])["largeur"]
@@ -894,6 +1061,18 @@ class GenerateurBackdrops:
 
         return [images[i] for i in sorted(images)]
 
+    def _resoudre_liste_candidats(self, requete: RequeteTMDB, cible: int, pages: int) -> list[tuple[str, int, str, str | None]]:
+        """Résout une requête en liste de candidats (backdrop_path, tmdb_id,
+        media_type, langue_originale) -- gère aussi bien les requêtes TMDB
+        classiques que les listes Trakt publiques (`kind == "trakt_liste"`)."""
+        if requete.kind == "trakt_liste":
+            items = self.trakt.recuperer_items_liste(requete.tmdb_id, limite=cible)
+            # backdrop_path/langue inconnus à ce stade -- la cascade de
+            # résolution de tuile (TMDB /images -> Fanart) n'en a pas besoin,
+            # ils ne servent que de tout dernier repli.
+            return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
+        return self.tmdb.resoudre_backdrops_multiples(requete, limite=cible, pages=pages)
+
     def traiter_dossier_mosaique(
         self, groupe_titre: str, dossier_titre: str, requetes: list[RequeteTMDB], chemin_sortie: Path
     ) -> ResultatDossier | None:
@@ -911,7 +1090,7 @@ class GenerateurBackdrops:
 
         # on interleave les requêtes pour ne pas être dominé par la première
         listes_par_requete = [
-            self.tmdb.resoudre_backdrops_multiples(req, limite=cible, pages=pages_necessaires) for req in requetes
+            self._resoudre_liste_candidats(req, cible, pages_necessaires) for req in requetes
         ]
         max_len = max((len(liste) for liste in listes_par_requete), default=0)
         for i in range(max_len):
@@ -948,7 +1127,7 @@ class GenerateurBackdrops:
         if not dossier_actif(groupe_titre, dossier_titre):
             return ResultatDossier(groupe_titre, dossier_titre, "ignore", "groupe/dossier non ciblé en phase 1")
 
-        requetes, raisons = construire_requetes(groupe_titre, dossier)
+        requetes, raisons = construire_requetes(groupe_titre, dossier, self.catalogues_aiometadata)
         if not requetes:
             raison = "; ".join(raisons) or "aucune source exploitable"
             return ResultatDossier(groupe_titre, dossier_titre, "ignore", raison)
@@ -1081,6 +1260,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Génère les backdrops des collections Nuvio.")
     parser.add_argument("--cle-tmdb", default=None, help="Clé API TMDB (ou variable TMDB_API_KEY)")
     parser.add_argument("--cle-fanart", default=None, help="Clé API Fanart.tv (optionnel)")
+    parser.add_argument("--cle-trakt", default=None, help="Client ID Trakt.tv, pour résoudre les traktListId publiques (optionnel)")
+    parser.add_argument("--aiometadata", default=None, help="Chemin vers un export AIOMetadata (JSON) pour résoudre les catalogues avec leurs vrais filtres TMDB (optionnel)")
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
     parser.add_argument("--sortie", default="collections")
     parser.add_argument("--profil", choices=list(PROFILS_QUALITE), default="standard")
@@ -1113,6 +1294,8 @@ def main() -> int:
         mosaique=args.mosaique,
         langue_preferee=args.langue_preferee,
         limite_appels_tmdb_images=args.limite_appels_tmdb_images,
+        cle_trakt=args.cle_trakt or __import__("os").environ.get("TRAKT_CLIENT_ID"),
+        catalogues_aiometadata=charger_catalogues_aiometadata(Path(args.aiometadata) if args.aiometadata else None),
     )
     resultats = generateur.generer_tout(
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
