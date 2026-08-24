@@ -21,8 +21,10 @@ Usage :
     python3 scripts/mettre_a_jour_urls.py \
         --collections Templates/Nuvio-Collections-Dwade58200.json \
         --sortie collections \
-        --depot Dwade58200/nuvio-configuration \
-        --branche main
+        --depot Dwade58200/nuvio-configuration
+        # --branche est optionnel : auto-détectée depuis la branche Git
+        # courante si absente. Ne la préciser que pour forcer une valeur
+        # différente (ex: tester sur une autre branche que celle extraite).
 """
 
 from __future__ import annotations
@@ -35,7 +37,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from generer_backdrops import GROUPE_SLUGS, dossier_actif, normaliser, slugifier  # noqa: E402
+from generer_backdrops import GROUPE_SLUGS, detecter_branche_courante, dossier_actif, normaliser, slugifier  # noqa: E402
 
 
 def construire_url_cdn(depot: str, branche: str, chemin_relatif: Path) -> str:
@@ -86,15 +88,20 @@ def main() -> int:
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
     parser.add_argument("--sortie", default="collections")
     parser.add_argument("--depot", default="Dwade58200/nuvio-configuration")
-    parser.add_argument("--branche", default="main")
+    parser.add_argument(
+        "--branche", default=None,
+        help="Branche cible pour les URLs CDN. Par défaut : la branche Git actuellement extraite (auto-détectée).",
+    )
     parser.add_argument("--dry-run", action="store_true", help="N'écrit rien, affiche juste ce qui changerait")
     args = parser.parse_args()
+    branche = args.branche or detecter_branche_courante()
 
     chemin_json = Path(args.collections)
     with chemin_json.open(encoding="utf-8") as f:
         collections = json.load(f)
 
-    mis_a_jour, inchanges = mettre_a_jour(collections, Path(args.sortie), args.depot, args.branche)
+    print(f"Branche cible : {branche}" + (" (auto-détectée)" if not args.branche else ""))
+    mis_a_jour, inchanges = mettre_a_jour(collections, Path(args.sortie), args.depot, branche)
 
     print(f"heroBackdropUrl mis à jour : {mis_a_jour}")
     print(f"heroBackdropUrl inchangés  : {inchanges}")
