@@ -43,6 +43,7 @@ import logging
 import math
 import re
 import sys
+import threading
 import time
 import unicodedata
 from datetime import date as _date
@@ -73,6 +74,25 @@ TMDB_API_BASE = "https://api.themoviedb.org/3"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p"
 FANART_API_BASE = "https://webservice.fanart.tv/v3"
 TRAKT_API_BASE = "https://api.trakt.tv"
+
+# Le pipeline traite plusieurs dossiers en parallèle (--parallelisme), et
+# chacun télécharge en plus ses tuiles en parallèle (jusqu'à 12 threads) --
+# soit potentiellement plusieurs dizaines de requêtes HTTP simultanées vers
+# les mêmes hôtes (TMDB, Fanart, Trakt). Le pool de connexions par défaut de
+# `requests`/urllib3 (10 par hôte) est trop petit pour ça et produit un flot
+# d'avertissements "Connection pool is full, discarding connection" -- sans
+# gravité (les connexions sont juste recréées au lieu d'être réutilisées),
+# mais évitable en élargissant le pool une bonne fois pour toutes ici.
+
+
+def creer_session_http() -> requests.Session:
+    """Session HTTP partagée entre threads, avec un pool de connexions assez
+    large pour la concurrence réelle du pipeline (voir commentaire ci-dessus)."""
+    session = requests.Session()
+    adaptateur = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=50)
+    session.mount("https://", adaptateur)
+    session.mount("http://", adaptateur)
+    return session
 
 # Titres EXACTS des groupes tels qu'ils existent réellement dans le JSON.
 # (le bug initial venait d'un mauvais mapping ici -> corrigé, puis reproduit
@@ -404,6 +424,11 @@ def construire_requetes(
                 )
                 continue
 
+            if catalog_id in ("trakt.recommendations.movies", "trakt.recommendations.shows"):
+                media_type_reco = "movie" if catalog_id.endswith("movies") else "tv"
+                requetes.append(RequeteTMDB(kind="trakt_recommandations", media_type=media_type_reco))
+                continue
+
             if catalog_id in CATALOGID_VERS_ENDPOINT:
                 mt, endpoint = CATALOGID_VERS_ENDPOINT[catalog_id]
                 requetes.append(RequeteTMDB(kind="endpoint", media_type=mt, endpoint=endpoint))
@@ -518,7 +543,7 @@ class ClientTMDB:
         limite_appels_images: int = 300,
     ):
         self.cle_api = cle_api
-        self.session = session or requests.Session()
+        self.session = session or creer_session_http()
         self.langue = langue
         self._cache_keyword: dict[str, int | None] = {}
         self._cache_images: dict[tuple[int, str], dict[str, Any]] = {}
@@ -526,6 +551,12 @@ class ClientTMDB:
         self.limite_appels_images = limite_appels_images
         self.compteur_appels_images = 0
         self.budget_images_epuise = False  # exposé pour le résumé final (log utilisateur)
+        # Ce client est partagé entre plusieurs threads (traitement de dossiers
+        # en parallèle, chacun téléchargeant lui-même ses tuiles en parallèle) :
+        # sans verrou, le compteur de budget peut être légèrement dépassé avant
+        # que la limite soit détectée, et deux threads peuvent rater le cache
+        # au même instant et refaire le même appel en double.
+        self._verrou = threading.Lock()
 
     def _get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         params = dict(params or {})
@@ -546,29 +577,33 @@ class ClientTMDB:
         return {}
 
     def rechercher_mot_cle(self, mot: str) -> int | None:
-        if mot in self._cache_keyword:
-            return self._cache_keyword[mot]
+        with self._verrou:
+            if mot in self._cache_keyword:
+                return self._cache_keyword[mot]
         try:
             data = self._get("/search/keyword", {"query": mot})
             resultats = data.get("results") or []
             keyword_id = resultats[0]["id"] if resultats else None
         except requests.RequestException:
             keyword_id = None
-        self._cache_keyword[mot] = keyword_id
+        with self._verrou:
+            self._cache_keyword[mot] = keyword_id
         return keyword_id
 
     def recuperer_tvdb_id(self, tmdb_id: int) -> int | None:
         """Fanart.tv indexe les séries par TheTVDB, pas par TMDB -- il faut
         d'abord résoudre l'identifiant externe. Mis en cache (le même titre
         revient souvent dans plusieurs dossiers/groupes)."""
-        if tmdb_id in self._cache_tvdb_id:
-            return self._cache_tvdb_id[tmdb_id]
+        with self._verrou:
+            if tmdb_id in self._cache_tvdb_id:
+                return self._cache_tvdb_id[tmdb_id]
         try:
             data = self._get(f"/tv/{tmdb_id}/external_ids")
             resultat = data.get("tvdb_id")
         except requests.RequestException:
             resultat = None
-        self._cache_tvdb_id[tmdb_id] = resultat
+        with self._verrou:
+            self._cache_tvdb_id[tmdb_id] = resultat
         return resultat
 
     def recuperer_images(self, tmdb_id: int, media_type: str) -> dict[str, Any]:
@@ -587,12 +622,17 @@ class ClientTMDB:
         -- protection contre la limitation de débit TMDB sur de gros runs.
         """
         cle_cache = (tmdb_id, media_type)
-        if cle_cache in self._cache_images:
-            return self._cache_images[cle_cache]
-
-        if self.compteur_appels_images >= self.limite_appels_images:
-            self.budget_images_epuise = True
-            return {}
+        with self._verrou:
+            if cle_cache in self._cache_images:
+                return self._cache_images[cle_cache]
+            if self.compteur_appels_images >= self.limite_appels_images:
+                self.budget_images_epuise = True
+                return {}
+            # Réservé tout de suite, sous verrou : avec des dizaines de
+            # threads concurrents, incrémenter APRÈS l'appel laisserait
+            # passer plusieurs threads au-delà de la limite avant que
+            # celle-ci ne soit détectée.
+            self.compteur_appels_images += 1
 
         chemin = "movie" if media_type != "tv" else "tv"
         try:
@@ -600,8 +640,8 @@ class ClientTMDB:
         except requests.RequestException:
             resultat = {}
 
-        self.compteur_appels_images += 1
-        self._cache_images[cle_cache] = resultat
+        with self._verrou:
+            self._cache_images[cle_cache] = resultat
         return resultat
 
     def resoudre_backdrop(self, requete: RequeteTMDB) -> tuple[str | None, int | None, str | None]:
@@ -709,8 +749,9 @@ class ClientTMDB:
 class ClientFanart:
     def __init__(self, cle_api: str | None, session: requests.Session | None = None):
         self.cle_api = cle_api
-        self.session = session or requests.Session()
+        self.session = session or creer_session_http()
         self._cache_donnees: dict[tuple[int, str], dict[str, Any] | None] = {}
+        self._verrou = threading.Lock()  # ce client est partagé entre threads (voir ClientTMDB)
 
     def _normaliser_langue(self, valeur: Any) -> str | None:
         """Normalise en minuscule/strip. IMPORTANT : ceci ne fusionne PAS
@@ -727,8 +768,9 @@ class ClientFanart:
         revient souvent dans plusieurs dossiers/groupes durant une même
         exécution, inutile de le redemander à chaque fois à Fanart."""
         cle_cache = (tmdb_ou_tvdb_id, media_type)
-        if cle_cache in self._cache_donnees:
-            return self._cache_donnees[cle_cache]
+        with self._verrou:
+            if cle_cache in self._cache_donnees:
+                return self._cache_donnees[cle_cache]
 
         chemin = "movies" if media_type == "movie" else "tv"
         try:
@@ -741,7 +783,8 @@ class ClientFanart:
         except requests.RequestException:
             resultat = None
 
-        self._cache_donnees[cle_cache] = resultat
+        with self._verrou:
+            self._cache_donnees[cle_cache] = resultat
         return resultat
 
     def _candidats_par_type(self, data: dict[str, Any], media_type: str, type_nom: str) -> list[dict[str, Any]]:
@@ -787,34 +830,92 @@ class ClientFanart:
 
 
 class ClientTrakt:
-    """Accès en lecture seule aux LISTES PUBLIQUES Trakt (traktListId).
+    """Accès aux listes Trakt (publiques via Client ID seul, privées et
+    recommandations personnalisées via authentification OAuth complète).
 
-    Une simple clé "Client ID" (gratuite, https://trakt.tv/oauth/applications)
-    suffit pour ça -- pas besoin d'authentification OAuth complète.
+    - Sans access_token : seules les listes PUBLIQUES (traktListId) fonctionnent.
+    - Avec access_token (+ refresh_token + client_secret) : accès aux listes
+      privées du compte authentifié, et à `/recommendations/movies|shows`
+      (catalogues "trakt.recommendations.*").
 
-    ATTENTION : ceci ne couvre PAS les catalogues "trakt.recommendations.*"
-    (recommandations personnalisées), qui nécessitent un vrai jeton OAuth
-    utilisateur -- hors scope ici, voir BACKDROPS_SETUP.md.
+    Voir scripts/trakt_auth.py pour obtenir un access_token/refresh_token
+    (flux "device code" OAuth, à faire une fois en local).
     """
 
-    def __init__(self, client_id: str | None, session: requests.Session | None = None):
+    def __init__(
+        self,
+        client_id: str | None,
+        session: requests.Session | None = None,
+        client_secret: str | None = None,
+        access_token: str | None = None,
+        refresh_token: str | None = None,
+    ):
         self.client_id = client_id
-        self.session = session or requests.Session()
+        self.client_secret = client_secret
+        self.access_token = access_token
+        self.refresh_token = refresh_token
+        self.session = session or creer_session_http()
         self._cache_liste: dict[int, list[tuple[int, str]]] = {}
+        self._cache_recommandations: dict[str, list[tuple[int, str]]] = {}
+        self._verrou = threading.Lock()  # ce client est partagé entre threads (voir ClientTMDB)
+        self.tokens_ont_change = False  # True si rafraichir_token() a produit de nouveaux tokens
 
     def _headers(self) -> dict[str, str]:
-        return {
+        entetes = {
             "Content-Type": "application/json",
             "trakt-api-key": self.client_id or "",
             "trakt-api-version": "2",
         }
+        if self.access_token:
+            entetes["Authorization"] = f"Bearer {self.access_token}"
+        return entetes
+
+    def rafraichir_token(self) -> bool:
+        """Échange le refresh_token contre un nouvel access_token (+ un
+        NOUVEAU refresh_token -- celui-ci est à usage unique côté Trakt).
+        À appeler une fois en début d'exécution : les access_token Trakt
+        ne durent que 7 jours, donc un cron mensuel/hebdomadaire doit
+        quasi systématiquement rafraîchir. Met à jour self.access_token/
+        self.refresh_token et positionne self.tokens_ont_change=True en
+        cas de succès (pour que l'appelant sache qu'il faut les
+        re-sauvegarder, ex: en secret GitHub)."""
+        if not (self.refresh_token and self.client_id and self.client_secret):
+            return False
+        try:
+            r = self.session.post(
+                f"{TRAKT_API_BASE}/oauth/token",
+                json={
+                    "refresh_token": self.refresh_token,
+                    "client_id": self.client_id,
+                    "client_secret": self.client_secret,
+                    "grant_type": "refresh_token",
+                },
+                timeout=15,
+            )
+            if r.status_code != 200:
+                return False
+            data = r.json()
+            nouvel_access = data.get("access_token")
+            nouveau_refresh = data.get("refresh_token")
+            if not (nouvel_access and nouveau_refresh):
+                return False
+            self.access_token = nouvel_access
+            self.refresh_token = nouveau_refresh
+            self.tokens_ont_change = True
+            return True
+        except requests.RequestException:
+            return False
 
     def recuperer_items_liste(self, trakt_list_id: int, limite: int = 50) -> list[tuple[int, str]]:
         """Retourne une liste de (tmdb_id, media_type) pour les items d'une
-        liste Trakt PUBLIQUE. Liste vide si pas de clé, liste privée, ou
-        erreur réseau -- jamais d'exception."""
-        if trakt_list_id in self._cache_liste:
-            return self._cache_liste[trakt_list_id]
+        liste Trakt. Fonctionne pour une liste PUBLIQUE avec juste un
+        Client ID ; pour une liste PRIVÉE, il faut un access_token valide
+        pour le compte propriétaire (ou collaborateur) de la liste.
+        Liste vide si pas de clé, liste inaccessible, ou erreur réseau --
+        jamais d'exception."""
+        with self._verrou:
+            if trakt_list_id in self._cache_liste:
+                return self._cache_liste[trakt_list_id]
 
         resultat: list[tuple[int, str]] = []
         if self.client_id:
@@ -835,7 +936,47 @@ class ClientTrakt:
             except requests.RequestException:
                 pass
 
-        self._cache_liste[trakt_list_id] = resultat
+        with self._verrou:
+            self._cache_liste[trakt_list_id] = resultat
+        return resultat
+
+    def recuperer_recommandations(self, media_type: str, limite: int = 50) -> list[tuple[int, str]]:
+        """Recommandations personnalisées pour le compte authentifié.
+        Nécessite un access_token valide -- retourne une liste vide sinon
+        (pas d'exception), ex: si l'authentification n'a pas été configurée
+        ou a expiré sans pouvoir être rafraîchie."""
+        cle_cache = media_type
+        with self._verrou:
+            if cle_cache in self._cache_recommandations:
+                return self._cache_recommandations[cle_cache]
+
+        resultat: list[tuple[int, str]] = []
+        if self.access_token:
+            chemin = "movies" if media_type == "movie" else "shows"
+            try:
+                r = self.session.get(
+                    f"{TRAKT_API_BASE}/recommendations/{chemin}",
+                    headers=self._headers(),
+                    params={"limit": limite},
+                    timeout=15,
+                )
+                if r.status_code == 200:
+                    for item in r.json() or []:
+                        # Deux formats possibles selon l'endpoint Trakt :
+                        # objet média direct ({"ids": {...}}) ou enveloppé
+                        # ({"movie"/"show": {"ids": {...}}}) -- on gère les deux.
+                        ids = item.get("ids")
+                        if ids is None:
+                            bloc = item.get("movie") or item.get("show") or {}
+                            ids = bloc.get("ids") or {}
+                        tmdb_id = ids.get("tmdb")
+                        if tmdb_id:
+                            resultat.append((tmdb_id, media_type))
+            except requests.RequestException:
+                pass
+
+        with self._verrou:
+            self._cache_recommandations[cle_cache] = resultat
         return resultat
 
 
@@ -909,11 +1050,20 @@ class GenerateurBackdrops:
         limite_appels_tmdb_images: int = 300,
         cle_trakt: str | None = None,
         catalogues_aiometadata: dict[str, dict[str, Any]] | None = None,
+        trakt_client_secret: str | None = None,
+        trakt_access_token: str | None = None,
+        trakt_refresh_token: str | None = None,
     ):
-        self.session = requests.Session()
+        self.session = creer_session_http()
         self.tmdb = ClientTMDB(cle_tmdb, session=self.session, limite_appels_images=limite_appels_tmdb_images)
         self.fanart = ClientFanart(cle_fanart, session=self.session)
-        self.trakt = ClientTrakt(cle_trakt, session=self.session)
+        self.trakt = ClientTrakt(
+            cle_trakt,
+            session=self.session,
+            client_secret=trakt_client_secret,
+            access_token=trakt_access_token,
+            refresh_token=trakt_refresh_token,
+        )
         self.repertoire_sortie = repertoire_sortie
         self.profil = profil
         self.dry_run = dry_run
@@ -1063,13 +1213,17 @@ class GenerateurBackdrops:
 
     def _resoudre_liste_candidats(self, requete: RequeteTMDB, cible: int, pages: int) -> list[tuple[str, int, str, str | None]]:
         """Résout une requête en liste de candidats (backdrop_path, tmdb_id,
-        media_type, langue_originale) -- gère aussi bien les requêtes TMDB
-        classiques que les listes Trakt publiques (`kind == "trakt_liste"`)."""
+        media_type, langue_originale) -- gère les requêtes TMDB classiques,
+        les listes Trakt (`kind == "trakt_liste"`), et les recommandations
+        Trakt personnalisées (`kind == "trakt_recommandations"`)."""
         if requete.kind == "trakt_liste":
             items = self.trakt.recuperer_items_liste(requete.tmdb_id, limite=cible)
             # backdrop_path/langue inconnus à ce stade -- la cascade de
             # résolution de tuile (TMDB /images -> Fanart) n'en a pas besoin,
             # ils ne servent que de tout dernier repli.
+            return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
+        if requete.kind == "trakt_recommandations":
+            items = self.trakt.recuperer_recommandations(requete.media_type, limite=cible)
             return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
         return self.tmdb.resoudre_backdrops_multiples(requete, limite=cible, pages=pages)
 
@@ -1217,7 +1371,16 @@ class GenerateurBackdrops:
                 for titre_groupe, dossier in taches
             }
             for futur in concurrent.futures.as_completed(futurs):
-                resultats.append(futur.result())
+                titre_groupe, dossier = futurs[futur]
+                dossier_titre = dossier.get("title", "sans-titre")
+                try:
+                    resultats.append(futur.result())
+                except Exception as exc:  # noqa: BLE001 -- une erreur inattendue sur UN dossier
+                    # ne doit jamais faire perdre les résultats déjà obtenus pour les autres.
+                    logging.debug("Erreur inattendue sur [%s] %s : %s", titre_groupe, dossier_titre, exc)
+                    resultats.append(
+                        ResultatDossier(titre_groupe, dossier_titre, "erreur", f"exception inattendue : {exc}")
+                    )
 
         return resultats
 
@@ -1261,6 +1424,9 @@ def main() -> int:
     parser.add_argument("--cle-tmdb", default=None, help="Clé API TMDB (ou variable TMDB_API_KEY)")
     parser.add_argument("--cle-fanart", default=None, help="Clé API Fanart.tv (optionnel)")
     parser.add_argument("--cle-trakt", default=None, help="Client ID Trakt.tv, pour résoudre les traktListId publiques (optionnel)")
+    parser.add_argument("--trakt-client-secret", default=None, help="Client Secret Trakt.tv (nécessaire pour l'auth OAuth complète, optionnel)")
+    parser.add_argument("--trakt-access-token", default=None, help="Access token OAuth Trakt.tv (optionnel, voir scripts/trakt_auth.py)")
+    parser.add_argument("--trakt-refresh-token", default=None, help="Refresh token OAuth Trakt.tv (optionnel, voir scripts/trakt_auth.py)")
     parser.add_argument("--aiometadata", default=None, help="Chemin vers un export AIOMetadata (JSON) pour résoudre les catalogues avec leurs vrais filtres TMDB (optionnel)")
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
     parser.add_argument("--sortie", default="collections")
@@ -1272,6 +1438,7 @@ def main() -> int:
     parser.add_argument("--mosaique", action="store_true", help="Génère une mosaïque multi-titres + couleur d'accent au lieu d'un seul backdrop (repli automatique si pas assez d'images)")
     parser.add_argument("--langue-preferee", default="fr", help="Code langue Fanart.tv préféré pour les artworks avec titre incrusté (défaut: fr)")
     parser.add_argument("--limite-appels-tmdb-images", type=int, default=300, help="Au-delà de ce nombre d'appels TMDB /images sur l'exécution, bascule sur Fanart uniquement (défaut: 300)")
+    parser.add_argument("--fichier-tokens-trakt", default=None, help="Si fourni, écrit ici les tokens Trakt actualisés après rafraîchissement (JSON), pour qu'un step CI puisse les re-sauvegarder en secrets")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -1287,16 +1454,35 @@ def main() -> int:
     collections = charger_collections(Path(args.collections))
     generateur = GenerateurBackdrops(
         cle_tmdb=cle_tmdb or "dry-run",
-        cle_fanart=args.cle_fanart or __import__("os").environ.get("FANART_API_KEY"),
+        cle_fanart=args.cle_fanart or os.environ.get("FANART_API_KEY"),
         repertoire_sortie=Path(args.sortie),
         profil=args.profil,
         dry_run=args.dry_run,
         mosaique=args.mosaique,
         langue_preferee=args.langue_preferee,
         limite_appels_tmdb_images=args.limite_appels_tmdb_images,
-        cle_trakt=args.cle_trakt or __import__("os").environ.get("TRAKT_CLIENT_ID"),
+        cle_trakt=args.cle_trakt or os.environ.get("TRAKT_CLIENT_ID"),
         catalogues_aiometadata=charger_catalogues_aiometadata(Path(args.aiometadata) if args.aiometadata else None),
+        trakt_client_secret=args.trakt_client_secret or os.environ.get("TRAKT_CLIENT_SECRET"),
+        trakt_access_token=args.trakt_access_token or os.environ.get("TRAKT_ACCESS_TOKEN"),
+        trakt_refresh_token=args.trakt_refresh_token or os.environ.get("TRAKT_REFRESH_TOKEN"),
     )
+
+    # Les access_token Trakt ne durent que 7 jours : sur un cron peu
+    # fréquent, on a quasi toujours besoin de rafraîchir. On le fait une
+    # fois ici (pas par thread/dossier) pour éviter des rafraîchissements
+    # concurrents (le refresh_token est à usage unique côté Trakt).
+    if not args.dry_run and generateur.trakt.refresh_token:
+        rafraichi = generateur.trakt.rafraichir_token()
+        if rafraichi:
+            print("🔑 Token Trakt rafraîchi.")
+        else:
+            print(
+                "⚠️  Échec du rafraîchissement du token Trakt -- les recommandations/listes "
+                "privées ne seront pas disponibles cette fois. Refaire l'authentification "
+                "avec scripts/trakt_auth.py si besoin."
+            )
+
     resultats = generateur.generer_tout(
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
     )
@@ -1307,6 +1493,22 @@ def main() -> int:
             "les derniers titres traités sont passés directement en résolution Fanart uniquement "
             "(--limite-appels-tmdb-images pour ajuster)."
         )
+
+    if generateur.trakt.tokens_ont_change:
+        print("\n🔑 Nouveaux tokens Trakt générés (le refresh_token précédent est maintenant invalide).")
+        if args.fichier_tokens_trakt:
+            with open(args.fichier_tokens_trakt, "w", encoding="utf-8") as f:
+                json.dump(
+                    {
+                        "access_token": generateur.trakt.access_token,
+                        "refresh_token": generateur.trakt.refresh_token,
+                    },
+                    f,
+                )
+            print(f"   -> écrits dans {args.fichier_tokens_trakt} pour sauvegarde en secrets GitHub.")
+        else:
+            print("   Pense à les re-sauvegarder (TRAKT_ACCESS_TOKEN / TRAKT_REFRESH_TOKEN) si tu veux que ça continue de fonctionner au prochain run.")
+
     return 0
 
 
