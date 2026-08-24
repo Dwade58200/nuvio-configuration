@@ -42,6 +42,7 @@ import json
 import logging
 import math
 import re
+import subprocess
 import sys
 import threading
 import time
@@ -93,6 +94,29 @@ def creer_session_http() -> requests.Session:
     session.mount("https://", adaptateur)
     session.mount("http://", adaptateur)
     return session
+
+
+def detecter_branche_courante() -> str:
+    """Détecte la branche Git actuellement extraite (checkout) là où le
+    script est lancé, pour servir de valeur par défaut à --branche sans
+    avoir à la coder en dur (et donc sans avoir à la changer à chaque fois
+    qu'on renomme/fusionne une branche -- voir le souci qu'on a eu avec
+    "feature/backdrops-automation" resté en dur après la fusion vers main).
+    Retombe sur "main" si la détection échoue (pas un dépôt Git, HEAD
+    détaché, `git` absent du PATH...) -- jamais d'exception ici, c'est
+    juste une valeur par défaut, pas une vérité absolue : --branche reste
+    disponible pour forcer une autre valeur si besoin."""
+    try:
+        resultat = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True, text=True, timeout=5, check=True,
+        )
+        branche = resultat.stdout.strip()
+        if branche and branche != "HEAD":  # "HEAD" = HEAD détaché, pas une vraie branche
+            return branche
+    except (subprocess.SubprocessError, OSError):
+        pass
+    return "main"
 
 # Titres EXACTS des groupes tels qu'ils existent réellement dans le JSON.
 # (le bug initial venait d'un mauvais mapping ici -> corrigé, puis reproduit
