@@ -55,6 +55,9 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
           TRAKT_CLIENT_ID: ${{ secrets.TRAKT_CLIENT_ID }}
+          TRAKT_CLIENT_SECRET: ${{ secrets.TRAKT_CLIENT_SECRET }}
+          TRAKT_ACCESS_TOKEN: ${{ secrets.TRAKT_ACCESS_TOKEN }}
+          TRAKT_REFRESH_TOKEN: ${{ secrets.TRAKT_REFRESH_TOKEN }}
           DRY_RUN: ${{ inputs.dry_run }}
           GROUPE: ${{ inputs.groupe }}
           LIMITE: ${{ inputs.limite }}
@@ -66,7 +69,29 @@ jobs:
           if [ -n "$LIMITE" ]; then ARGS+=(--limite "$LIMITE"); fi
           if [ "$DESACTIVER_MOSAIQUE" != "true" ]; then ARGS+=(--mosaique); fi
           if [ -f "Templates/aiometadata-setup.json" ]; then ARGS+=(--aiometadata "Templates/aiometadata-setup.json"); fi
+          ARGS+=(--fichier-tokens-trakt /tmp/trakt-tokens.json)
           python3 -B scripts/generer_backdrops.py "${ARGS[@]}"
+
+      - name: Sauvegarder les tokens Trakt renouvelés (si un PAT est configuré)
+        if: ${{ inputs.dry_run != true }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT_SECRETS }}
+        run: |
+          if [ ! -f /tmp/trakt-tokens.json ]; then
+            echo "Aucun token Trakt renouvelé cette fois, rien à sauvegarder."
+            exit 0
+          fi
+          if [ -z "$GH_TOKEN" ]; then
+            echo "⚠️  Le refresh_token Trakt a changé mais GH_PAT_SECRETS n'est pas configuré :"
+            echo "    les secrets ne peuvent pas être mis à jour automatiquement."
+            echo "    Il faudra relancer scripts/trakt_auth.py en local si l'authentification finit par expirer."
+            exit 0
+          fi
+          ACCESS=$(python3 -c "import json; print(json.load(open('/tmp/trakt-tokens.json'))['access_token'])")
+          REFRESH=$(python3 -c "import json; print(json.load(open('/tmp/trakt-tokens.json'))['refresh_token'])")
+          echo "$ACCESS" | gh secret set TRAKT_ACCESS_TOKEN --repo "${{ github.repository }}"
+          echo "$REFRESH" | gh secret set TRAKT_REFRESH_TOKEN --repo "${{ github.repository }}"
+          echo "✅ Secrets TRAKT_ACCESS_TOKEN / TRAKT_REFRESH_TOKEN mis à jour."
 
       - name: Mettre à jour heroBackdropUrl vers les images générées
         if: ${{ inputs.dry_run != true && inputs.mettre_a_jour_urls == true }}
