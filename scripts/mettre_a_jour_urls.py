@@ -22,7 +22,7 @@ Usage :
         --collections Templates/Nuvio-Collections-Dwade58200.json \
         --sortie collections \
         --depot Dwade58200/nuvio-configuration \
-        --branche feature/backdrops-automation
+        --branche main
 """
 
 from __future__ import annotations
@@ -86,7 +86,7 @@ def main() -> int:
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
     parser.add_argument("--sortie", default="collections")
     parser.add_argument("--depot", default="Dwade58200/nuvio-configuration")
-    parser.add_argument("--branche", default="feature/backdrops-automation")
+    parser.add_argument("--branche", default="main")
     parser.add_argument("--dry-run", action="store_true", help="N'écrit rien, affiche juste ce qui changerait")
     args = parser.parse_args()
 
