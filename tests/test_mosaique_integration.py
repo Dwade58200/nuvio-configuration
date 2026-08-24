@@ -642,6 +642,196 @@ def test_trakt_resultats_mis_en_cache():
     assert compteur["n"] == 1
 
 
+# ---------------------------------------------------------------------------
+# ClientTrakt : authentification OAuth (device flow) et recommandations
+# ---------------------------------------------------------------------------
+
+def test_trakt_headers_incluent_bearer_si_access_token():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="x", access_token="mon-jeton")
+    assert client._headers()["Authorization"] == "Bearer mon-jeton"
+
+
+def test_trakt_headers_sans_access_token_pas_de_bearer():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="x")
+    assert "Authorization" not in client._headers()
+
+
+def test_trakt_rafraichir_token_reussite_met_a_jour_et_signale_changement():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="id", client_secret="secret", refresh_token="ancien-refresh")
+
+    def fausse_post(url, json=None, timeout=None, **kwargs):
+        assert url.endswith("/oauth/token")
+        assert json["refresh_token"] == "ancien-refresh"
+        assert json["grant_type"] == "refresh_token"
+        return FausseReponse({"access_token": "nouveau-access", "refresh_token": "nouveau-refresh"})
+
+    client.session.post = MagicMock(side_effect=fausse_post)
+    reussite = client.rafraichir_token()
+
+    assert reussite is True
+    assert client.access_token == "nouveau-access"
+    assert client.refresh_token == "nouveau-refresh"
+    assert client.tokens_ont_change is True
+
+
+def test_trakt_rafraichir_token_echec_ne_plante_pas():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="id", client_secret="secret", refresh_token="refresh-expire")
+    client.session.post = MagicMock(return_value=FausseReponse(status_code=401))
+
+    reussite = client.rafraichir_token()
+    assert reussite is False
+    assert client.tokens_ont_change is False
+    assert client.access_token is None  # inchangé
+
+
+def test_trakt_rafraichir_token_sans_infos_retourne_false_sans_appel():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="id")  # pas de refresh_token ni de client_secret
+
+    def fausse_post(*args, **kwargs):
+        raise AssertionError("ne devrait jamais appeler l'API sans refresh_token/client_secret")
+
+    client.session.post = MagicMock(side_effect=fausse_post)
+    assert client.rafraichir_token() is False
+
+
+def test_trakt_recommandations_sans_access_token_liste_vide():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="id")  # pas de access_token
+
+    def fausse_get(*args, **kwargs):
+        raise AssertionError("ne devrait jamais appeler l'API sans access_token")
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    assert client.recuperer_recommandations("movie") == []
+
+
+def test_trakt_recommandations_format_direct_ids():
+    """Format possible n°1 : objets média directs avec 'ids' au premier niveau."""
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="id", access_token="mon-jeton")
+
+    def fausse_get(url, headers=None, params=None, timeout=None, **kwargs):
+        assert "/recommendations/movies" in url
+        assert headers["Authorization"] == "Bearer mon-jeton"
+        return FausseReponse([
+            {"title": "Film A", "ids": {"trakt": 1, "tmdb": 100}},
+            {"title": "Film B", "ids": {"trakt": 2, "tmdb": 200}},
+        ])
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    resultats = client.recuperer_recommandations("movie")
+    assert resultats == [(100, "movie"), (200, "movie")]
+
+
+def test_trakt_recommandations_format_enveloppe():
+    """Format possible n°2 : enveloppé comme les autres endpoints Trakt
+    ({"movie": {"ids": {...}}}) -- les deux formats doivent être gérés."""
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="id", access_token="mon-jeton")
+
+    def fausse_get(url, headers=None, params=None, timeout=None, **kwargs):
+        assert "/recommendations/shows" in url
+        return FausseReponse([{"show": {"title": "Série A", "ids": {"trakt": 5, "tmdb": 500}}}])
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    resultats = client.recuperer_recommandations("tv")
+    assert resultats == [(500, "tv")]
+
+
+def test_trakt_recommandations_mises_en_cache():
+    from generer_backdrops import ClientTrakt
+
+    client = ClientTrakt(client_id="id", access_token="mon-jeton")
+    compteur = {"n": 0}
+
+    def fausse_get(*args, **kwargs):
+        compteur["n"] += 1
+        return FausseReponse([{"ids": {"tmdb": 1}}])
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    client.recuperer_recommandations("movie")
+    client.recuperer_recommandations("movie")
+    assert compteur["n"] == 1
+
+
+def test_construire_requetes_reconnait_trakt_recommendations():
+    from generer_backdrops import construire_requetes, GROUPE_DECOUVRIR
+
+    dossier = {
+        "title": "Recommandation",
+        "sources": [
+            {"provider": "addon", "addonId": "aio-metadata", "catalogId": "trakt.recommendations.movies", "type": "movie"},
+            {"provider": "addon", "addonId": "aio-metadata", "catalogId": "trakt.recommendations.shows", "type": "series"},
+        ],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_DECOUVRIR, dossier)
+    assert len(requetes) == 2
+    assert {r.kind for r in requetes} == {"trakt_recommandations"}
+    assert {r.media_type for r in requetes} == {"movie", "tv"}
+    assert ignorees == []
+
+
+def test_pipeline_recommandations_bout_en_bout(tmp_path):
+    """Pipeline complet : catalogue trakt.recommendations.movies ->
+    ClientTrakt authentifié -> tmdb_id -> résolution habituelle -> mosaïque."""
+    from generer_backdrops import GenerateurBackdrops, construire_requetes, GROUPE_DECOUVRIR
+
+    dossier = {
+        "title": "Recommandation",
+        "sources": [
+            {"provider": "addon", "addonId": "aio-metadata", "catalogId": "trakt.recommendations.movies", "type": "movie"}
+        ],
+    }
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle-tmdb",
+        cle_fanart="fausse-cle-fanart",
+        repertoire_sortie=tmp_path,
+        profil="compresse",
+        mosaique=True,
+        cle_trakt="fausse-cle-trakt",
+        trakt_access_token="mon-jeton",
+    )
+
+    items_recommandes = [{"ids": {"tmdb": i}} for i in range(1, 10)]
+
+    def fausse_get(url, headers=None, params=None, timeout=None, **kwargs):
+        if "/recommendations/movies" in url:
+            return FausseReponse(items_recommandes)
+        if "/images" in url:
+            return FausseReponse({"backdrops": []})
+        if "webservice.fanart.tv/v3/movies/" in url:
+            tmdb_id = int(url.rstrip("/").split("/")[-1])
+            return FausseReponse({"moviethumb": [{"url": f"https://fanart.example/thumb{tmdb_id}.jpg", "lang": "fr", "likes": "1"}]})
+        if "fanart.example" in url:
+            index = int(url.split("thumb")[1].split(".")[0])
+            return FausseReponse(content=_image_bytes(((index * 25) % 255, 60, 150)))
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+
+    requetes, _ = construire_requetes(GROUPE_DECOUVRIR, dossier)
+    chemin_sortie = tmp_path / "discover" / "backdrop" / "recommandation.jpg"
+    resultat = generateur.traiter_dossier_mosaique(GROUPE_DECOUVRIR, "Recommandation", requetes, chemin_sortie)
+
+    assert resultat is not None
+    assert resultat.statut == "genere"
+    assert chemin_sortie.exists()
+
+
 def test_mosaique_bout_en_bout_avec_liste_trakt_sans_fanart_repli_attendu(tmp_path):
     """Sans clé Fanart et sans backdrop_path connu (cas des candidats
     trakt), la cascade ne trouve rien -> repli propre (None), pas de crash."""
