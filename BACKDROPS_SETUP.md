@@ -88,11 +88,9 @@ workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
 de 3 titres distincts résolus, le script repasse automatiquement sur
 l'ancien mode "1 seul backdrop TMDB/Fanart", sans erreur.
 
-**Pas de doublon visible** : la grille inclinée contient environ 72 cases
-(9 colonnes × 8 lignes, quel que soit le profil de qualité -- les trois
-profils actuels partagent le même canvas ≥1280px de large). Le script
-récupère donc jusqu'à ~70 titres distincts par dossier (pagination TMDB
-automatique) pour remplir
+**Pas de doublon visible** : la grille inclinée contient environ 70 cases
+(quelle que soit la résolution de sortie). Le script récupère donc jusqu'à
+~70 titres distincts par dossier (pagination TMDB automatique) pour remplir
 toute la grille sans répéter la même affiche. Si un dossier a réellement
 moins de titres disponibles que de cases (catalogue restreint), les
 images sont répétées (cycle) en dernier recours pour compléter, comme le
@@ -110,15 +108,21 @@ Sur les collections actuelles, la couverture est :
 
 | Groupe | Dossiers résolus | Notes |
 |---|---|---|
-| 🔭 Découvrir | 3 / 6 | "Recommandation" nécessite l'OAuth Trakt personnalisé (non géré, voir plus bas) |
-| 🎬 Streaming | 9 / 9 | ✅ (résolu via TMDB, plus besoin de FlixPatrol) |
+| 🔭 Découvrir | 4 / 6 | "Recommandation" résolu via l'authentification OAuth Trakt (voir plus bas) ; 2 catalogues (TV, Magnet) volontairement exclus du ciblage |
+| 🎬 Streaming | 9 / 9 | ✅ (résolu via TMDB) |
 | 🎭 Genres | 15 / 15 | ✅ |
-| 🎨 Thématiques | 14 / 14 | ✅ (dernier dossier résolu via une liste Trakt publique) |
+| 🎨 Thématiques | 14 / 14 | ✅ (résolu via une liste Trakt publique) |
 | Vibe | 4 / 4 | ✅ |
 | 📅 Années | 8 / 8 | ✅ |
 | Franchises | 0 / 158 | volontairement désactivé (à la demande de l'utilisateur) |
 | Sports | 0 / 7 | volontairement désactivé (pas pertinent pour un backdrop) |
-| **Total** | **53 / 221** | vérifié via `--dry-run --mosaique --groupe <X>` sur chaque groupe |
+| **Total** | **54 / 221** | vérifié via `--dry-run --mosaique --groupe <X>` sur chaque groupe |
+
+⚠️ Ce tableau reflète ce que le pipeline est capable de *tenter* de
+résoudre (vérifié en `--dry-run`). Le résultat réel de "Découvrir" (4/6)
+dépend en pratique de l'authentification OAuth Trakt configurée et
+toujours valide (voir la section "🎬 Trakt" plus bas) -- sans elle,
+"Recommandation" repasse à l'état non résolu comme avant.
 
 Les dossiers non résolus sont **journalisés avec la raison** (jamais échoués
 en silence) — voir le résumé affiché à la fin de chaque exécution.
@@ -150,6 +154,8 @@ Dans **Settings → Secrets and variables → Actions** du dépôt, créez :
 - `TMDB_API_KEY`
 - `FANART_API_KEY` (recommandé -- sans lui, les mosaïques n'ont pas de titre visible)
 - `TRAKT_CLIENT_ID` (optionnel -- résout les Franchises/Thématiques basées sur une liste Trakt publique)
+- `TRAKT_CLIENT_SECRET`, `TRAKT_ACCESS_TOKEN`, `TRAKT_REFRESH_TOKEN` (optionnels -- pour "Recommandation" et les listes privées, voir section Trakt ci-dessous)
+- `GH_PAT_SECRETS` (optionnel -- permet le renouvellement automatique des tokens Trakt, voir section Trakt ci-dessous)
 
 ## 📝 Utilisation
 
@@ -180,6 +186,7 @@ Options utiles de `generer_backdrops.py` :
 | `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 3 titres) |
 | `--limite-appels-tmdb-images` | Budget d'appels TMDB `/images` avant repli Fanart seul (défaut 300) |
 | `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues avec leurs vrais filtres TMDB |
+| `--fichier-tokens-trakt chemin.json` | Écrit les tokens Trakt renouvelés ici (pour un step CI qui les re-sauvegarde) |
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
 | `--profil {standard,haute,compresse}` | Taille/qualité de sortie |
@@ -216,12 +223,15 @@ nuvio-configuration/
 │   ├── generer_backdrops.py         # Script principal
 │   ├── mosaique.py                  # Composition de la grille + couleur d'accent
 │   ├── mettre_a_jour_urls.py        # Met à jour heroBackdropUrl vers le CDN du repo
+│   ├── trakt_auth.py                # Authentification OAuth Trakt (à lancer 1x en local)
 │   └── purger_cache.py              # Purge du cache CDN jsDelivr
 ├── tests/
 │   ├── test_generer_backdrops.py    # Tests de la logique de résolution
 │   ├── test_mosaique.py             # Tests du module de mosaïque (hors-ligne)
 │   ├── test_mosaique_integration.py # Test bout-en-bout du mode mosaïque
 │   ├── test_mettre_a_jour_urls.py   # Tests de la mise à jour des URLs
+│   ├── test_trakt_auth.py           # Tests du script d'authentification Trakt
+│   ├── fixtures/aiometadata-exemple.json  # Fixture pour les tests AIOMetadata
 │   └── test_pipeline_integration.py # Test bout-en-bout (HTTP simulé)
 └── BACKDROPS_SETUP.md               # Ce fichier
 ```
@@ -290,12 +300,15 @@ une config obsolète pour les anciens.
 Les catalogues FlixPatrol/`streaming.*`/`custom.*` (non-TMDB, ex: Top 10
 France) restent non résolus -- ils n'ont pas d'équivalent TMDB direct.
 
-## 🎬 Trakt (listes publiques uniquement)
+## 🎬 Trakt (listes publiques, et OAuth pour les listes privées/recommandations)
 
 Certaines Franchises et Thématiques référencent une liste Trakt
-(`traktListId`) plutôt qu'un catalogue TMDB direct. Avec une clé Trakt
-configurée, ces listes sont désormais résolues (à condition d'être
-**publiques** sur Trakt).
+(`traktListId`) plutôt qu'un catalogue TMDB direct. Avec un Client ID Trakt
+configuré, ces listes sont résolues (à condition d'être **publiques** sur
+Trakt) -- voir "Configuration" ci-dessous. Pour les listes privées et pour
+le dossier "Recommandation" (recommandations personnalisées), il faut en
+plus l'authentification OAuth complète -- voir la sous-section dédiée plus
+bas.
 
 ### Configuration (optionnelle)
 
@@ -309,19 +322,71 @@ configurée, ces listes sont désormais résolues (à condition d'être
 Sans cette clé, les sources Trakt restent simplement ignorées (comportement
 identique à avant), aucune erreur.
 
-### ⚠️ Non couvert : "Recommandation" (trakt.recommendations.*)
+### ✅ "Recommandation" (trakt.recommendations.*) -- authentification OAuth
 
-Le dossier Découvrir/Recommandation utilise un catalogue
-`trakt.recommendations.movies/shows` -- ce ne sont pas des listes
-publiques mais de **vraies recommandations personnalisées**, qui
-nécessitent un jeton OAuth utilisateur Trakt complet (connexion avec ton
-compte, pas juste une clé). C'est un chantier significativement plus lourd
-(flux d'autorisation, stockage/renouvellement de token) que je n'ai pas
-implémenté ici. Si tu veux ce dossier résolu, il faudra soit :
-- accepter un contenu de repli (ex: tendances Trakt publiques, pas
-  vraiment "recommandé") à la place ;
-- soit mettre en place l'authentification OAuth complète (à envisager
-  comme un chantier séparé).
+Contrairement aux listes publiques (Client ID seul), le dossier
+Découvrir/Recommandation et l'accès aux **listes privées** d'un compte
+nécessitent un vrai jeton OAuth Trakt (access_token + refresh_token) --
+c'est maintenant pris en charge, moyennant une configuration en 2 étapes.
+
+#### Étape 1 -- Créer une application Trakt
+
+1. Connecte-toi sur https://trakt.tv avec le compte que tu veux utiliser
+   pour ce pipeline (ex: un second compte dédié, pour ne pas mélanger tes
+   listes/recommandations personnelles avec celles de l'automatisation).
+2. Crée une application sur https://trakt.tv/oauth/applications
+   ("New Application"). Redirect URI : `urn:ietf:wg:oauth:2.0:oob`.
+3. Note le **Client ID** et le **Client Secret**.
+
+#### Étape 2 -- Authentification (une fois, en LOCAL, pas dans GitHub Actions)
+
+```bash
+pip install requests
+python3 scripts/trakt_auth.py --client-id TON_CLIENT_ID --client-secret TON_CLIENT_SECRET
+```
+
+Le script affiche un code à saisir sur https://trakt.tv/activate --
+connecte-toi avec le compte concerné dans le navigateur avant de saisir
+le code. Une fois autorisé, il affiche 4 valeurs à ajouter comme secrets
+GitHub (Settings → Secrets and variables → Actions) :
+
+- `TRAKT_CLIENT_ID`
+- `TRAKT_CLIENT_SECRET`
+- `TRAKT_ACCESS_TOKEN`
+- `TRAKT_REFRESH_TOKEN`
+
+#### ⚠️ Le point important : le renouvellement automatique
+
+L'access_token Trakt n'est valide que **7 jours**. Le pipeline le
+rafraîchit automatiquement à chaque exécution -- mais le refresh_token
+Trakt est à **usage unique** : chaque rafraîchissement en génère un
+nouveau et invalide l'ancien. Il faut donc que le nouveau soit sauvegardé
+quelque part, sinon l'exécution suivante échouera à se rafraîchir.
+
+Deux façons de gérer ça :
+
+**Option A (recommandée) -- laisser le workflow mettre à jour les secrets automatiquement**
+
+Crée un Personal Access Token GitHub avec le droit d'écrire les secrets
+du repo :
+1. https://github.com/settings/tokens?type=beta → "Generate new token"
+2. Restreins-le à CE repo, permission "Secrets" en **Read and write**
+3. Ajoute-le comme secret : `GH_PAT_SECRETS`
+
+Avec ça configuré, le workflow met à jour `TRAKT_ACCESS_TOKEN` et
+`TRAKT_REFRESH_TOKEN` tout seul après chaque exécution où un
+rafraîchissement a eu lieu -- rien d'autre à faire ensuite.
+
+**Option B -- sans PAT, renouvellement manuel occasionnel**
+
+Sans `GH_PAT_SECRETS`, le rafraîchissement fonctionne toujours PENDANT
+une exécution (en mémoire), mais le nouveau refresh_token n'est jamais
+re-sauvegardé -- l'exécution suivante réutilisera l'ancien, déjà
+invalidé, et l'authentification échouera (le reste du pipeline continue
+de fonctionner normalement, seuls Recommandation/listes privées seront
+ignorés à nouveau). Il faudra alors relancer `scripts/trakt_auth.py` en
+local pour renouveler l'accès. Un message clair s'affiche dans les logs
+du workflow si ça arrive.
 
 ## 🛡️ Résilience aux renommages de groupes
 
@@ -341,12 +406,12 @@ espaces réduits) plutôt qu'en texte exact. Concrètement :
 ## 🗺️ Idées pour plus tard (non planifiées)
 
 Le projet s'arrête ici pour l'instant (mosaïque + accent color + Trakt
-listes publiques = dernières phases prévues). Pistes possibles si tu veux
-reprendre un jour :
+OAuth = dernières phases prévues). Pistes possibles si tu veux reprendre
+un jour :
 
-- Authentification OAuth Trakt complète, pour débloquer le dernier
-  dossier restant (Découvrir/Recommandation, voir "Non couvert" plus haut)
 - Génération de variantes `.webp` en plus du `.jpg`
+- Activer Franchises/Sports si un jour ils deviennent pertinents pour toi
+  (actuellement désactivés volontairement, pas par contrainte technique)
 
 ---
 
