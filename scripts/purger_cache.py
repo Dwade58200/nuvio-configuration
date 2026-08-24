@@ -10,7 +10,7 @@ fichiers pendant ~7 jours).
 
 Usage :
     python3 scripts/purger_cache.py --depot Dwade58200/nuvio-configuration \
-        --branche feature/backdrops-automation --sortie collections
+        --branche main --sortie collections
 """
 
 from __future__ import annotations
@@ -55,7 +55,7 @@ def purger_cdn(depot: str, branche: str, repertoire_sortie: Path, delai: float =
 def main() -> int:
     parser = argparse.ArgumentParser(description="Purge le cache jsDelivr pour les backdrops générés.")
     parser.add_argument("--depot", default="Dwade58200/nuvio-configuration", help="owner/repo GitHub")
-    parser.add_argument("--branche", default="feature/backdrops-automation")
+    parser.add_argument("--branche", default="main")
     parser.add_argument("--sortie", default="collections", help="Répertoire contenant les backdrops générés")
     parser.add_argument("--delai", type=float, default=0.3, help="Délai (s) entre chaque requête de purge")
     args = parser.parse_args()
