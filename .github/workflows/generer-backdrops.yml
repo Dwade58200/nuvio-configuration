@@ -49,6 +49,14 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pillow requests
 
+      - name: Nettoyer l'ancienne arborescence (collections/ -> Collections/)
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          if [ -d "collections" ]; then
+            git rm -r --quiet collections/ 2>/dev/null || rm -rf collections/
+            echo "Ancienne arborescence 'collections/' supprimée (remplacée par 'Collections/')."
+          fi
+
       - name: Générer les backdrops
         env:
           PYTHONDONTWRITEBYTECODE: "1"
@@ -63,7 +71,7 @@ jobs:
           LIMITE: ${{ inputs.limite }}
           DESACTIVER_MOSAIQUE: ${{ inputs.desactiver_mosaique }}
         run: |
-          ARGS=(--collections Templates/Nuvio-Collections-Dwade58200.json --sortie collections --profil compresse --parallelisme 3)
+          ARGS=(--collections Templates/Nuvio-Collections-Dwade58200.json --sortie Collections --profil compresse --parallelisme 3)
           if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run); fi
           if [ -n "$GROUPE" ]; then ARGS+=(--groupe "$GROUPE"); fi
           if [ -n "$LIMITE" ]; then ARGS+=(--limite "$LIMITE"); fi
@@ -98,7 +106,7 @@ jobs:
         run: |
           python3 -B scripts/mettre_a_jour_urls.py \
             --collections Templates/Nuvio-Collections-Dwade58200.json \
-            --sortie collections \
+            --sortie Collections \
             --depot "${{ github.repository }}" \
             --branche "${{ github.ref_name }}"
 
@@ -110,7 +118,7 @@ jobs:
         id: publication
         if: ${{ inputs.dry_run != true }}
         run: |
-          git add collections/ Templates/
+          git add Collections/ Templates/
           if git diff --cached --quiet; then
             echo "Aucun changement à commiter."
             echo "modifie=false" >> "$GITHUB_OUTPUT"
@@ -124,4 +132,4 @@ jobs:
 
       - name: Vider le cache CDN jsDelivr
         if: steps.publication.outputs.modifie == 'true'
-        run: python3 -B scripts/purger_cache.py --depot "${{ github.repository }}" --branche "${{ github.ref_name }}"
+        run: python3 -B scripts/purger_cache.py --depot "${{ github.repository }}" --branche "${{ github.ref_name }}" --sortie Collections
