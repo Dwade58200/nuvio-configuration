@@ -78,8 +78,9 @@ Rien de cassé, juste des restes accumulés au fil des sessions.
 - Intégrer les Animés dans le Aiometadata puis dans les backdrops.
 - Changer les catalogues Trakt par des MDBList.
 - Modifié le AIOStream pour intégrer les animés (avec regex et/ou filtres propres) et modifier le le style du texte du lien. 
-- Validation du JSON de collections par un schéma en CI, pour attraper une
-  erreur de structure avant qu'elle ne casse l'import Nuvio
+- Validation du JSON de collections par un schéma en CI, pour attraper une erreur de structure avant qu'elle ne casse l'import Nuvio
+- Faciliter les modifications du style des Backdrop en créant un modificateur avec un visuel.
+
 
 ## ❌ Explicitement écarté (ne pas reproposer)
 
