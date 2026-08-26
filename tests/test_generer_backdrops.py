@@ -500,6 +500,110 @@ def test_catalogue_absent_de_l_export_retombe_sur_heuristique():
     assert requetes[0].params.get("with_genres") == 35  # repli heuristique par genre, toujours actif
 
 
+def test_trakt_recommendations_ne_sont_plus_reconnues():
+    """Retiré à la demande de l'utilisateur (compte secondaire sans
+    historique -> recommandations non pertinentes). Doit rester ignoré,
+    comme n'importe quel autre catalogue addon non résolu."""
+    dossier = {
+        "title": "Recommandation",
+        "sources": [
+            {"provider": "addon", "addonId": "aio-metadata", "catalogId": "trakt.recommendations.movies", "type": "movie"},
+            {"provider": "addon", "addonId": "aio-metadata", "catalogId": "trakt.recommendations.shows", "type": "series"},
+        ],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_DECOUVRIR, dossier)
+    assert requetes == []
+    assert len(ignorees) == 2
+    assert all("non résolu" in raison for raison in ignorees)
+
+
+# ---------------------------------------------------------------------------
+# Architecture de sortie : dossiers français + noms de fichiers personnalisés
+# ---------------------------------------------------------------------------
+
+def test_groupe_slugs_sont_en_francais():
+    from generer_backdrops import GROUPE_SLUGS, NOM_DOSSIER_RACINE, NOM_DOSSIER_BACKDROPS
+
+    assert NOM_DOSSIER_RACINE == "Collections"
+    assert NOM_DOSSIER_BACKDROPS == "Backdrops"
+    assert GROUPE_SLUGS[GROUPE_GENRES] == "Genres"
+    assert GROUPE_SLUGS[GROUPE_STREAMING] == "Services de Streaming"
+    assert GROUPE_SLUGS[GROUPE_THEMATIQUES] == "Thematiques"
+    assert GROUPE_SLUGS[GROUPE_VIBES] == "Vibes"
+    assert GROUPE_SLUGS[GROUPE_FRANCHISES] == "Franchises"
+    assert GROUPE_SLUGS[GROUPE_SPORTS] == "Sports"
+    assert GROUPE_SLUGS[GROUPE_DECOUVRIR] == "Decouvertes"
+
+
+def test_noms_backdrop_personnalises_exacts():
+    """Vérifie exactement les 15 correspondances demandées."""
+    from generer_backdrops import nom_fichier_backdrop
+
+    correspondances = {
+        "Sci-Fi": "Sci-Fi_Backdrop",
+        "Apple TV+": "Apple_TV_Backdrop",
+        "Canal+": "Canal+_Backdrop",
+        "TF1": "TF1_Backdrop",
+        "HBO Max": "HBO_Max_Backdrop",
+        "Prime Video": "Prime_Video_Backdrop",
+        "Disney+": "Disney+_Backdrop",
+        "Arts martiaux": "Arts_Martiaux_Backdrop",
+        "Chasse au trésor": "Chasse_au_Tresor_Backdrop",
+        "Comédie Romantique": "Comedie_Romantique_Backdrop",
+        "Grands réalisateurs du cinéma": "Grands_Realisateurs_Backdrop",
+        "Inspiré de faits réels": "Faits_Reels_Backdrop",
+        "Super-Héros": "Super-Heros_Backdrop",
+        "Voyage Temporel": "Voyage_Temporel_Backdrop",
+        "Retournent le cerveau": "Retournent_Cerveau_Backdrop",
+    }
+    for titre, attendu in correspondances.items():
+        assert nom_fichier_backdrop(titre) == attendu, titre
+
+
+def test_nom_fichier_backdrop_generique_pour_titre_non_liste():
+    """Un titre qui n'est PAS dans la table personnalisée doit quand même
+    produire un nom raisonnable automatiquement."""
+    from generer_backdrops import nom_fichier_backdrop
+
+    assert nom_fichier_backdrop("Action") == "Action_Backdrop"
+    assert nom_fichier_backdrop("Comédie") == "Comedie_Backdrop"  # accent retiré
+    assert nom_fichier_backdrop("Guerre") == "Guerre_Backdrop"
+
+
+def test_nom_fichier_backdrop_generique_met_les_sigles_connus_en_majuscules():
+    from generer_backdrops import nom_fichier_backdrop
+
+    # Un futur titre contenant "TV" ou "M6" non listé explicitement doit
+    # quand même avoir le sigle en majuscules automatiquement.
+    assert nom_fichier_backdrop("Nouvelle Chaine M6") == "Nouvelle_Chaine_M6_Backdrop"
+
+
+def test_chemin_backdrop_complet_utilise_la_nouvelle_arborescence():
+    """Test d'intégration léger : vérifie le chemin complet généré pour un
+    dossier réel, avec la nouvelle arborescence française."""
+    from generer_backdrops import GenerateurBackdrops
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="x", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"), dry_run=True
+    )
+    resultat = generateur.traiter_dossier(
+        GROUPE_GENRES,
+        {
+            "title": "Sci-Fi",
+            "sources": [
+                {
+                    "provider": "tmdb",
+                    "tmdbSourceType": "DISCOVER",
+                    "mediaType": "MOVIE",
+                    "sortBy": "popularity.desc",
+                    "filters": {"withGenres": "878"},
+                }
+            ],
+        },
+    )
+    assert resultat.chemin == "Genres/Backdrops/Sci-Fi_Backdrop.jpg"
+
+
 if __name__ == "__main__":
     import pytest
 
