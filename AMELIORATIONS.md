@@ -75,12 +75,9 @@ Rien de cassé, juste des restes accumulés au fil des sessions.
 
 ## ⚪ Idées plus lointaines (pas de demande explicite pour l'instant)
 
-- Étendre l'automatisation aux **logos** : TMDB `/images` renvoie déjà les
-  logos dans la même réponse mise en cache que les backdrops — quasi
-  gratuit à ajouter au pipeline existant
-- Génération de variantes `.webp` en plus du `.jpg`
-- Activer Franchises/Sports si un jour ils deviennent pertinents
-  (actuellement désactivés volontairement, pas par contrainte technique)
+- Intégrer les Animés dans le Aiometadata puis dans les backdrops.
+- Changer les catalogues Trakt par des MDBList.
+- Modifié le AIOStream pour intégrer les animés (avec regex et/ou filtres propres) et modifier le le style du texte du lien. 
 - Validation du JSON de collections par un schéma en CI, pour attraper une
   erreur de structure avant qu'elle ne casse l'import Nuvio
 
