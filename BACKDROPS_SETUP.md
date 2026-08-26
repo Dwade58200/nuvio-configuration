@@ -6,6 +6,40 @@ Nuvio de ce dépôt, à partir de `Templates/Nuvio-Collections-Dwade58200.json`.
 Inspiré du pipeline de [luckynumb3rs/stremio-perfect-setup](https://github.com/luckynumb3rs/stremio-perfect-setup),
 adapté à la structure de collections propre à ce dépôt.
 
+## 📁 Architecture de sortie (noms de dossiers/fichiers)
+
+Tous les fichiers atterrissent sous :
+```
+Collections/<NomDuGroupe>/Backdrops/<NomDuFichier>_Backdrop.jpg
+```
+
+Exemples réels : `Collections/Genres/Backdrops/Sci-Fi_Backdrop.jpg`,
+`Collections/Services de Streaming/Backdrops/Netflix_Backdrop.jpg`.
+
+**Tout est regroupé dans un seul bloc, en haut de `scripts/generer_backdrops.py`**
+(section "ARCHITECTURE DE SORTIE"), pour rester simple à modifier :
+
+- `NOM_DOSSIER_RACINE` -- nom du dossier racine (`Collections`)
+- `NOM_DOSSIER_BACKDROPS` -- nom du sous-dossier dans chaque groupe (`Backdrops`)
+- `GROUPE_SLUGS` -- nom de dossier (français) pour chaque groupe --
+  une ligne par groupe, facile à changer
+- `NOMS_BACKDROP_PERSONNALISES` -- table de correspondance EXPLICITE pour
+  les noms de fichiers avec un sigle (TF1, HBO), un "+" (Canal+, Disney+),
+  ou un raccourci (ex: "Grands réalisateurs du cinéma" → `Grands_Realisateurs`).
+  **Pour ajouter/changer un nom de fichier : une seule ligne à ajouter/éditer ici.**
+- Tout titre de dossier absent de cette table obtient un nom générique
+  calculé automatiquement (mots capitalisés séparés par underscore, sigles
+  connus -- `ACRONYMES_BACKDROP` -- mis en majuscules).
+
+⚠️ **Changement d'architecture depuis une version antérieure** : les
+dossiers de sortie sont passés de l'anglais minuscule (`collections/genres/backdrop/action.jpg`)
+au français capitalisé (`Collections/Genres/Backdrops/Action_Backdrop.jpg`).
+Le workflow supprime automatiquement l'ancien dossier `collections/`
+(minuscule) au premier lancement après cette mise à jour, pour éviter
+d'avoir les deux arborescences en parallèle. Pense à cocher
+**mettre_a_jour_urls** une fois après la mise à jour pour que
+`heroBackdropUrl` pointe vers les nouveaux chemins.
+
 ## 🎯 Comment ça marche
 
 Le script `scripts/generer_backdrops.py` lit `Templates/Nuvio-Collections-Dwade58200.json`,
@@ -19,13 +53,13 @@ et pour **chaque dossier de chaque groupe actif**, il :
 2. Si aucune source directe n'est exploitable, tente un repli heuristique
    (ex : dossier "Action" dans le groupe Genres → genre TMDB "Action" ;
    thématique "Arts martiaux" → recherche par mot-clé TMDB "martial arts") ;
-3. Récupère jusqu'à ~70 titres (films/séries) correspondants -- dédupliqués
+3. Récupère jusqu'à 12 titres (films/séries) correspondants -- dédupliqués
    même si un même film provient à la fois d'une collection et d'un
    catalogue discover -- et compose une **mosaïque** avec dégradé +
    couleur d'accent extraite automatiquement (voir section dédiée
    ci-dessous) ; en dessous de 3 titres distincts, bascule automatiquement
    sur l'ancien mode "1 seul backdrop" ;
-4. Enregistre l'image dans `collections/<groupe>/backdrop/<dossier>.jpg`.
+4. Enregistre l'image dans `Collections/<Groupe>/Backdrops/<Nom>_Backdrop.jpg`.
 
 ## 🎨 Mode mosaïque (par défaut)
 
@@ -69,7 +103,7 @@ régionale n'est JAMAIS considéré comme "français" -- seul le tag exact
 
 ### Volume de requêtes : cache + budget de repli
 
-Avec ~70 titres par dossier sur des dizaines de dossiers, le nombre d'appels TMDB peut
+Avec ~70 titres par dossier sur 43 dossiers, le nombre d'appels TMDB peut
 vite grimper. Deux protections en place :
 
 - **Cache** : un même titre (souvent présent dans plusieurs dossiers --
@@ -108,21 +142,14 @@ Sur les collections actuelles, la couverture est :
 
 | Groupe | Dossiers résolus | Notes |
 |---|---|---|
-| 🔭 Découvrir | 4 / 6 | "Recommandation" résolu via l'authentification OAuth Trakt (voir plus bas) ; 2 catalogues (TV, Magnet) volontairement exclus du ciblage |
-| 🎬 Streaming | 9 / 9 | ✅ (résolu via TMDB) |
+| 🔭 Découvrir | 3 / 6 | "Recommandation" nécessite Trakt (non géré) |
+| 🎬 Streaming | 0 / 9 | volontairement désactivé (sources FlixPatrol, non-TMDB) |
 | 🎭 Genres | 15 / 15 | ✅ |
-| 🎨 Thématiques | 14 / 14 | ✅ (résolu via une liste Trakt publique) |
+| 🎨 Thématiques | 13 / 14 | 1 dossier nécessite Trakt |
 | Vibe | 4 / 4 | ✅ |
 | 📅 Années | 8 / 8 | ✅ |
 | Franchises | 0 / 158 | volontairement désactivé (à la demande de l'utilisateur) |
-| Sports | 0 / 7 | volontairement désactivé (pas pertinent pour un backdrop) |
-| **Total** | **54 / 221** | vérifié via `--dry-run --mosaique --groupe <X>` sur chaque groupe |
-
-⚠️ Ce tableau reflète ce que le pipeline est capable de *tenter* de
-résoudre (vérifié en `--dry-run`). Le résultat réel de "Découvrir" (4/6)
-dépend en pratique de l'authentification OAuth Trakt configurée et
-toujours valide (voir la section "🎬 Trakt" plus bas) -- sans elle,
-"Recommandation" repasse à l'état non résolu comme avant.
+| Sports | 0 / 8 | volontairement désactivé (pas pertinent pour un backdrop) |
 
 Les dossiers non résolus sont **journalisés avec la raison** (jamais échoués
 en silence) — voir le résumé affiché à la fin de chaque exécution.
@@ -183,7 +210,7 @@ Options utiles de `generer_backdrops.py` :
 | Option | Effet |
 |---|---|
 | `--dry-run` | Ne fait aucun appel réseau, affiche juste ce qui serait généré |
-| `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 3 titres) |
+| `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 6 titres) |
 | `--limite-appels-tmdb-images` | Budget d'appels TMDB `/images` avant repli Fanart seul (défaut 300) |
 | `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues avec leurs vrais filtres TMDB |
 | `--fichier-tokens-trakt chemin.json` | Écrit les tokens Trakt renouvelés ici (pour un step CI qui les re-sauvegarde) |
@@ -215,10 +242,9 @@ nuvio-configuration/
 ├── .github/workflows/
 │   └── generer-backdrops.yml        # Workflow d'automatisation
 ├── Templates/
-│   ├── Nuvio-Collections-Dwade58200.json  # Source de vérité des collections
-│   └── aiometadata-setup.json       # (Optionnel) export AIOMetadata, voir section dédiée
-├── collections/
-│   └── <groupe>/backdrop/*.jpg      # Images générées (ex: genres/backdrop/action.jpg)
+│   └── Nuvio-Collections-Dwade58200.json  # Source de vérité des collections
+├── Collections/
+│   └── <Groupe>/Backdrops/*.jpg      # Images générées (ex: Genres/Backdrops/Action_Backdrop.jpg)
 ├── scripts/
 │   ├── generer_backdrops.py         # Script principal
 │   ├── mosaique.py                  # Composition de la grille + couleur d'accent
@@ -300,15 +326,12 @@ une config obsolète pour les anciens.
 Les catalogues FlixPatrol/`streaming.*`/`custom.*` (non-TMDB, ex: Top 10
 France) restent non résolus -- ils n'ont pas d'équivalent TMDB direct.
 
-## 🎬 Trakt (listes publiques, et OAuth pour les listes privées/recommandations)
+## 🎬 Trakt (listes publiques uniquement)
 
 Certaines Franchises et Thématiques référencent une liste Trakt
-(`traktListId`) plutôt qu'un catalogue TMDB direct. Avec un Client ID Trakt
-configuré, ces listes sont résolues (à condition d'être **publiques** sur
-Trakt) -- voir "Configuration" ci-dessous. Pour les listes privées et pour
-le dossier "Recommandation" (recommandations personnalisées), il faut en
-plus l'authentification OAuth complète -- voir la sous-section dédiée plus
-bas.
+(`traktListId`) plutôt qu'un catalogue TMDB direct. Avec une clé Trakt
+configurée, ces listes sont désormais résolues (à condition d'être
+**publiques** sur Trakt).
 
 ### Configuration (optionnelle)
 
@@ -322,18 +345,24 @@ bas.
 Sans cette clé, les sources Trakt restent simplement ignorées (comportement
 identique à avant), aucune erreur.
 
-### ✅ "Recommandation" (trakt.recommendations.*) -- authentification OAuth
+### ✅ Listes privées Trakt -- authentification OAuth
 
-Contrairement aux listes publiques (Client ID seul), le dossier
-Découvrir/Recommandation et l'accès aux **listes privées** d'un compte
-nécessitent un vrai jeton OAuth Trakt (access_token + refresh_token) --
-c'est maintenant pris en charge, moyennant une configuration en 2 étapes.
+Contrairement aux listes publiques (Client ID seul), l'accès aux **listes
+privées** d'un compte (ex: ton second compte Trakt dédié à ce pipeline)
+nécessite un vrai jeton OAuth Trakt (access_token + refresh_token) --
+c'est pris en charge, moyennant une configuration en 2 étapes.
+
+⚠️ Ceci ne couvre PAS le dossier "Recommandation"
+(`trakt.recommendations.movies/shows`) : les recommandations Trakt sont
+calculées à partir de l'historique de visionnage du compte authentifié --
+un compte secondaire dédié à ce pipeline n'en a pas, donc ce catalogue
+n'est pas pertinent ici et reste volontairement ignoré (comme avant).
 
 #### Étape 1 -- Créer une application Trakt
 
 1. Connecte-toi sur https://trakt.tv avec le compte que tu veux utiliser
-   pour ce pipeline (ex: un second compte dédié, pour ne pas mélanger tes
-   listes/recommandations personnelles avec celles de l'automatisation).
+   pour ce pipeline (ex: ton second compte dédié, pour ne pas mélanger tes
+   listes personnelles avec celles de l'automatisation).
 2. Crée une application sur https://trakt.tv/oauth/applications
    ("New Application"). Redirect URI : `urn:ietf:wg:oauth:2.0:oob`.
 3. Note le **Client ID** et le **Client Secret**.
@@ -405,13 +434,12 @@ espaces réduits) plutôt qu'en texte exact. Concrètement :
 
 ## 🗺️ Idées pour plus tard (non planifiées)
 
-Le projet s'arrête ici pour l'instant (mosaïque + accent color + Trakt
-OAuth = dernières phases prévues). Pistes possibles si tu veux reprendre
-un jour :
+Le projet s'arrête ici pour l'instant (mosaïque + accent color = dernière
+phase prévue). Pistes possibles si tu veux reprendre un jour :
 
+- Intégrer l'API Trakt pour résoudre les ~28 dossiers restants
+  ("Recommandation", quelques Franchises/Thématiques)
 - Génération de variantes `.webp` en plus du `.jpg`
-- Activer Franchises/Sports si un jour ils deviennent pertinents pour toi
-  (actuellement désactivés volontairement, pas par contrainte technique)
 
 ---
 
