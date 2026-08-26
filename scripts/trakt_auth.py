@@ -11,14 +11,11 @@ dans GitHub Actions).
 Pourquoi c'est nécessaire :
 ----------------------------
 Un simple "Client ID" Trakt suffit pour lire des LISTES PUBLIQUES, mais
-pas pour :
-- accéder aux listes PRIVÉES d'un compte donné (ex: ton second compte
-  Trakt dédié à ce pipeline) ;
-- récupérer `/recommendations/movies` et `/recommendations/shows`
-  (catalogues "trakt.recommendations.*", ex: le dossier "Recommandation").
+pas pour accéder aux listes PRIVÉES d'un compte donné (ex: ton second
+compte Trakt dédié à ce pipeline).
 
-Ces deux cas nécessitent un vrai jeton OAuth (access_token + refresh_token)
-lié à un compte Trakt précis.
+Ce cas nécessite un vrai jeton OAuth (access_token + refresh_token) lié
+à un compte Trakt précis.
 
 Prérequis :
 ------------
