@@ -643,6 +643,133 @@ def test_trakt_resultats_mis_en_cache():
 
 
 # ---------------------------------------------------------------------------
+# ClientMDBList : alternative à Trakt (clé API simple, pas d'OAuth)
+# ---------------------------------------------------------------------------
+
+def test_mdblist_recupere_les_items_d_une_liste_par_user_slug():
+    from generer_backdrops import ClientMDBList
+
+    client = ClientMDBList(api_key="fausse-cle-mdblist")
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        assert url == "https://api.mdblist.com/lists/dwade/james-bond/items"
+        assert params["apikey"] == "fausse-cle-mdblist"
+        return FausseReponse({
+            "movies": [{"id": 100, "title": "A"}],
+            "shows": [{"id": 200, "title": "B"}],
+        })
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    items = client.recuperer_items_liste("dwade", "james-bond")
+    assert items == [(100, "movie"), (200, "tv")]
+
+
+def test_mdblist_recupere_les_items_d_une_liste_par_id():
+    from generer_backdrops import ClientMDBList
+
+    client = ClientMDBList(api_key="fausse-cle-mdblist")
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        assert url == "https://api.mdblist.com/lists/2194/items"
+        return FausseReponse({"movies": [{"id": 550}], "shows": []})
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    assert client.recuperer_items_liste_par_id(2194) == [(550, "movie")]
+
+
+def test_mdblist_par_id_sans_cle_retourne_liste_vide_sans_appel_reseau():
+    from generer_backdrops import ClientMDBList
+
+    client = ClientMDBList(api_key=None)
+
+    def fausse_get(*args, **kwargs):
+        raise AssertionError("ne devrait jamais être appelé sans clé MDBList")
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    assert client.recuperer_items_liste_par_id(2194) == []
+
+
+def test_mdblist_par_user_slug_sans_cle_utilise_le_repli_json_public():
+    """Sans clé API, la résolution par (user, slug) doit quand même
+    fonctionner via l'export JSON public de la liste -- confirmé comme
+    méthode d'accès légitime par le développeur de MDBList lui-même."""
+    from generer_backdrops import ClientMDBList
+
+    client = ClientMDBList(api_key=None)
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        assert url == "https://mdblist.com/lists/dwade/james-bond/json/"
+        return FausseReponse({"movies": [{"id": 100}], "shows": []})
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    assert client.recuperer_items_liste("dwade", "james-bond") == [(100, "movie")]
+
+
+def test_mdblist_repli_json_public_utilise_si_api_officielle_echoue():
+    from generer_backdrops import ClientMDBList
+
+    client = ClientMDBList(api_key="fausse-cle-mdblist")
+    appels = []
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        appels.append(url)
+        if "api.mdblist.com" in url:
+            return FausseReponse(status_code=500)
+        return FausseReponse({"movies": [{"id": 100}], "shows": []})
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    items = client.recuperer_items_liste("dwade", "james-bond")
+    assert items == [(100, "movie")]
+    assert len(appels) == 2  # API officielle tentée d'abord, puis repli JSON
+
+
+def test_mdblist_resultats_mis_en_cache():
+    from generer_backdrops import ClientMDBList
+
+    client = ClientMDBList(api_key="fausse-cle-mdblist")
+    compteur = {"n": 0}
+
+    def fausse_get(*args, **kwargs):
+        compteur["n"] += 1
+        return FausseReponse({"movies": [{"id": 1}], "shows": []})
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    client.recuperer_items_liste("dwade", "james-bond")
+    client.recuperer_items_liste("dwade", "james-bond")
+    assert compteur["n"] == 1
+
+
+def test_mdblist_rechercher_listes_trie_par_nombre_d_items():
+    from generer_backdrops import ClientMDBList
+
+    client = ClientMDBList(api_key="fausse-cle-mdblist")
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        assert url == "https://api.mdblist.com/lists/search"
+        assert params == {"apikey": "fausse-cle-mdblist", "query": "james bond"}
+        return FausseReponse([
+            {"id": 1, "name": "Petite liste 007", "slug": "petite", "user_name": "a", "items": 5},
+            {"id": 2, "name": "Grande liste 007", "slug": "grande", "user_name": "b", "items": 50},
+        ])
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    resultats = client.rechercher_listes("james bond")
+    assert [r["id"] for r in resultats] == [2, 1]
+
+
+def test_mdblist_rechercher_listes_sans_cle_retourne_liste_vide():
+    from generer_backdrops import ClientMDBList
+
+    client = ClientMDBList(api_key=None)
+
+    def fausse_get(*args, **kwargs):
+        raise AssertionError("ne devrait jamais être appelé sans clé MDBList")
+
+    client.session.get = MagicMock(side_effect=fausse_get)
+    assert client.rechercher_listes("james bond") == []
+
+
+# ---------------------------------------------------------------------------
 # ClientTrakt : authentification OAuth (device flow) et recommandations
 # ---------------------------------------------------------------------------
 

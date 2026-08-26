@@ -9,10 +9,8 @@ nouvelles images soient servies immédiatement (jsDelivr cache sinon les
 fichiers pendant ~7 jours).
 
 Usage :
-    python3 scripts/purger_cache.py --depot Dwade58200/nuvio-configuration --sortie Collections
-    # --branche est optionnel : auto-détectée depuis la branche Git
-    # courante si absente. Ne la préciser que pour forcer une valeur
-    # différente.
+    python3 scripts/purger_cache.py --depot Dwade58200/nuvio-configuration \
+        --branche feature/backdrops-automation --sortie Collections
 """
 
 from __future__ import annotations
@@ -24,10 +22,6 @@ from pathlib import Path
 from urllib.parse import quote
 
 import requests
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-from generer_backdrops import detecter_branche_courante  # noqa: E402
 
 
 def purger_cdn(depot: str, branche: str, repertoire_sortie: Path, delai: float = 0.3) -> None:
@@ -64,17 +58,12 @@ def purger_cdn(depot: str, branche: str, repertoire_sortie: Path, delai: float =
 def main() -> int:
     parser = argparse.ArgumentParser(description="Purge le cache jsDelivr pour les backdrops générés.")
     parser.add_argument("--depot", default="Dwade58200/nuvio-configuration", help="owner/repo GitHub")
-    parser.add_argument(
-        "--branche", default=None,
-        help="Branche cible pour les URLs de purge. Par défaut : la branche Git actuellement extraite (auto-détectée).",
-    )
+    parser.add_argument("--branche", default="feature/backdrops-automation")
     parser.add_argument("--sortie", default="Collections", help="Répertoire contenant les backdrops générés")
     parser.add_argument("--delai", type=float, default=0.3, help="Délai (s) entre chaque requête de purge")
     args = parser.parse_args()
-    branche = args.branche or detecter_branche_courante()
-    print(f"Branche cible : {branche}" + (" (auto-détectée)" if not args.branche else ""))
 
-    purger_cdn(args.depot, branche, Path(args.sortie), args.delai)
+    purger_cdn(args.depot, args.branche, Path(args.sortie), args.delai)
     return 0
 
 

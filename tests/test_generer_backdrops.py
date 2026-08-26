@@ -31,6 +31,8 @@ from generer_backdrops import (  # noqa: E402
     dossier_actif,
     slugifier,
     normaliser,
+    analyser_url_mdblist,
+    ClientMDBList,
 )
 
 
@@ -271,6 +273,84 @@ def test_source_trakt_sans_liste_est_ignoree():
     requetes, ignorees = construire_requetes(GROUPE_DECOUVRIR, dossier)
     assert requetes == []
     assert "traktListId" in ignorees[0]
+
+
+# ---------------------------------------------------------------------------
+# Passerelle MDBList (alternative à Trakt, clé API simple sans OAuth)
+# ---------------------------------------------------------------------------
+
+def test_analyser_url_mdblist_formats_courants():
+    assert analyser_url_mdblist("https://mdblist.com/lists/dwade/james-bond") == ("dwade", "james-bond")
+    assert analyser_url_mdblist("https://www.mdblist.com/lists/dwade/james-bond/") == ("dwade", "james-bond")
+    assert analyser_url_mdblist("mdblist.com/lists/dwade/james-bond/json/") == ("dwade", "james-bond")
+
+
+def test_analyser_url_mdblist_url_invalide_retourne_none():
+    assert analyser_url_mdblist("https://example.com/pas-une-liste") is None
+    assert analyser_url_mdblist("") is None
+
+
+def test_source_mdblist_avec_url_produit_une_requete_mdblist_liste():
+    dossier = {
+        "title": "007",
+        "sources": [{"provider": "mdblist", "mdblistUrl": "https://mdblist.com/lists/dwade/james-bond"}],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_FRANCHISES, dossier)
+    assert len(requetes) == 1
+    assert requetes[0].kind == "mdblist_liste"
+    assert requetes[0].params == {"mdblist_user": "dwade", "mdblist_slug": "james-bond"}
+    assert ignorees == []
+
+
+def test_source_mdblist_avec_id_numerique_produit_une_requete_mdblist_liste():
+    dossier = {"title": "X", "sources": [{"provider": "mdblist", "mdblistId": 2194}]}
+    requetes, ignorees = construire_requetes(GROUPE_GENRES, dossier)
+    assert len(requetes) == 1
+    assert requetes[0].kind == "mdblist_liste"
+    assert requetes[0].params == {"mdblist_id": 2194}
+
+
+def test_source_mdblist_avec_user_et_slug_explicites():
+    dossier = {
+        "title": "X",
+        "sources": [{"provider": "mdblist", "mdblistUser": "dwade", "mdblistSlug": "james-bond"}],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_GENRES, dossier)
+    assert len(requetes) == 1
+    assert requetes[0].params == {"mdblist_user": "dwade", "mdblist_slug": "james-bond"}
+
+
+def test_source_mdblist_sans_identifiant_est_ignoree():
+    dossier = {"title": "Y", "sources": [{"provider": "mdblist"}]}
+    requetes, ignorees = construire_requetes(GROUPE_DECOUVRIR, dossier)
+    assert requetes == []
+    assert "mdblist" in ignorees[0]
+
+
+def test_mdblist_items_depuis_reponse_format_dict_movies_shows():
+    reponse = {
+        "movies": [{"id": 550, "title": "Fight Club"}],
+        "shows": [{"id": 1396, "title": "Breaking Bad"}],
+    }
+    assert ClientMDBList._items_depuis_reponse(reponse) == [(550, "movie"), (1396, "tv")]
+
+
+def test_mdblist_items_depuis_reponse_format_liste_plate():
+    reponse = [{"id": 550, "mediatype": "movie"}, {"id": 1396, "mediatype": "show"}]
+    assert ClientMDBList._items_depuis_reponse(reponse) == [(550, "movie"), (1396, "tv")]
+
+
+def test_mdblist_items_depuis_reponse_ignore_items_sans_id():
+    reponse = {"movies": [{"title": "Sans id TMDB"}], "shows": []}
+    assert ClientMDBList._items_depuis_reponse(reponse) == []
+
+
+def test_mdblist_sans_cle_api_par_id_retourne_liste_vide_sans_exception():
+    """Sans clé API, la résolution par id numérique ne peut pas fonctionner
+    (l'export JSON public nécessite de connaître user+slug) -- doit
+    échouer proprement, jamais lever d'exception."""
+    client = ClientMDBList(api_key=None)
+    assert client.recuperer_items_liste_par_id(2194) == []
 
 
 def test_genre_sans_source_directe_utilise_repli_titre():

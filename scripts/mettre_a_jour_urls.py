@@ -21,10 +21,8 @@ Usage :
     python3 scripts/mettre_a_jour_urls.py \
         --collections Templates/Nuvio-Collections-Dwade58200.json \
         --sortie Collections \
-        --depot Dwade58200/nuvio-configuration
-        # --branche est optionnel : auto-détectée depuis la branche Git
-        # courante si absente. Ne la préciser que pour forcer une valeur
-        # différente (ex: tester sur une autre branche que celle extraite).
+        --depot Dwade58200/nuvio-configuration \
+        --branche feature/backdrops-automation
 """
 
 from __future__ import annotations
@@ -42,7 +40,6 @@ from generer_backdrops import (  # noqa: E402
     GROUPE_SLUGS,
     NOM_DOSSIER_BACKDROPS,
     NOM_DOSSIER_RACINE,
-    detecter_branche_courante,
     dossier_actif,
     nom_fichier_backdrop,
     normaliser,
@@ -101,20 +98,15 @@ def main() -> int:
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
     parser.add_argument("--sortie", default=NOM_DOSSIER_RACINE)
     parser.add_argument("--depot", default="Dwade58200/nuvio-configuration")
-    parser.add_argument(
-        "--branche", default=None,
-        help="Branche cible pour les URLs CDN. Par défaut : la branche Git actuellement extraite (auto-détectée).",
-    )
+    parser.add_argument("--branche", default="feature/backdrops-automation")
     parser.add_argument("--dry-run", action="store_true", help="N'écrit rien, affiche juste ce qui changerait")
     args = parser.parse_args()
-    branche = args.branche or detecter_branche_courante()
 
     chemin_json = Path(args.collections)
     with chemin_json.open(encoding="utf-8") as f:
         collections = json.load(f)
 
-    print(f"Branche cible : {branche}" + (" (auto-détectée)" if not args.branche else ""))
-    mis_a_jour, inchanges = mettre_a_jour(collections, Path(args.sortie), args.depot, branche)
+    mis_a_jour, inchanges = mettre_a_jour(collections, Path(args.sortie), args.depot, args.branche)
 
     print(f"heroBackdropUrl mis à jour : {mis_a_jour}")
     print(f"heroBackdropUrl inchangés  : {inchanges}")

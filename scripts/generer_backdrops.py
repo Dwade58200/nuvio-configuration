@@ -28,6 +28,10 @@ Tout ce qui n'est pas résoluble (Trakt sans clé API, FlixPatrol, Sports,
 etc.) est explicitement IGNORÉ et journalisé avec la raison -- jamais
 échoué en silence. Ces cas seront traités dans une phase ultérieure.
 
+Les sources `provider: "mdblist"` sont résolues via l'API MDBList.com
+(clé API simple, pas d'OAuth) -- voir la classe ClientMDBList plus bas
+pour le détail et les raisons de ce choix par rapport à Trakt.
+
 Ce choix "honnête" fait qu'au lancement, certains dossiers n'auront pas
 de backdrop généré : c'est normal et voulu pour cette phase. Le résumé
 final indique précisément combien de dossiers sont dans ce cas et pourquoi.
@@ -42,7 +46,6 @@ import json
 import logging
 import math
 import re
-import subprocess
 import sys
 import threading
 import time
@@ -75,48 +78,6 @@ TMDB_API_BASE = "https://api.themoviedb.org/3"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p"
 FANART_API_BASE = "https://webservice.fanart.tv/v3"
 TRAKT_API_BASE = "https://api.trakt.tv"
-
-# Le pipeline traite plusieurs dossiers en parallèle (--parallelisme), et
-# chacun télécharge en plus ses tuiles en parallèle (jusqu'à 12 threads) --
-# soit potentiellement plusieurs dizaines de requêtes HTTP simultanées vers
-# les mêmes hôtes (TMDB, Fanart, Trakt). Le pool de connexions par défaut de
-# `requests`/urllib3 (10 par hôte) est trop petit pour ça et produit un flot
-# d'avertissements "Connection pool is full, discarding connection" -- sans
-# gravité (les connexions sont juste recréées au lieu d'être réutilisées),
-# mais évitable en élargissant le pool une bonne fois pour toutes ici.
-
-
-def creer_session_http() -> requests.Session:
-    """Session HTTP partagée entre threads, avec un pool de connexions assez
-    large pour la concurrence réelle du pipeline (voir commentaire ci-dessus)."""
-    session = requests.Session()
-    adaptateur = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=50)
-    session.mount("https://", adaptateur)
-    session.mount("http://", adaptateur)
-    return session
-
-
-def detecter_branche_courante() -> str:
-    """Détecte la branche Git actuellement extraite (checkout) là où le
-    script est lancé, pour servir de valeur par défaut à --branche sans
-    avoir à la coder en dur (et donc sans avoir à la changer à chaque fois
-    qu'on renomme/fusionne une branche -- voir le souci qu'on a eu avec
-    "feature/backdrops-automation" resté en dur après la fusion vers main).
-    Retombe sur "main" si la détection échoue (pas un dépôt Git, HEAD
-    détaché, `git` absent du PATH...) -- jamais d'exception ici, c'est
-    juste une valeur par défaut, pas une vérité absolue : --branche reste
-    disponible pour forcer une autre valeur si besoin."""
-    try:
-        resultat = subprocess.run(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            capture_output=True, text=True, timeout=5, check=True,
-        )
-        branche = resultat.stdout.strip()
-        if branche and branche != "HEAD":  # "HEAD" = HEAD détaché, pas une vraie branche
-            return branche
-    except (subprocess.SubprocessError, OSError):
-        pass
-    return "main"
 
 # Titres EXACTS des groupes tels qu'ils existent réellement dans le JSON.
 # (le bug initial venait d'un mauvais mapping ici -> corrigé, puis reproduit
@@ -578,6 +539,35 @@ def construire_requetes(
                 requetes.append(RequeteTMDB(kind="trakt_liste", media_type=media_type_trakt, tmdb_id=trakt_list_id))
             else:
                 ignorees.append("trakt sans traktListId exploitable")
+
+        elif provider == "mdblist":
+            # Trois façons équivalentes d'identifier une liste MDBList dans
+            # le JSON, de la plus pratique (coller l'URL telle quelle depuis
+            # le navigateur) à la plus explicite :
+            #   - "mdblistUrl": "https://mdblist.com/lists/<user>/<slug>"
+            #   - "mdblistUser" + "mdblistSlug"
+            #   - "mdblistId": <id numérique de la liste>
+            mdblist_id = source.get("mdblistId")
+            user_slug = None
+            if source.get("mdblistUrl"):
+                user_slug = analyser_url_mdblist(source["mdblistUrl"])
+            elif source.get("mdblistUser") and source.get("mdblistSlug"):
+                user_slug = (source["mdblistUser"], source["mdblistSlug"])
+
+            if mdblist_id:
+                requetes.append(RequeteTMDB(kind="mdblist_liste", params={"mdblist_id": mdblist_id}))
+            elif user_slug:
+                requetes.append(
+                    RequeteTMDB(
+                        kind="mdblist_liste",
+                        params={"mdblist_user": user_slug[0], "mdblist_slug": user_slug[1]},
+                    )
+                )
+            else:
+                ignorees.append(
+                    "mdblist sans identifiant de liste exploitable "
+                    "(mdblistUrl / mdblistId / mdblistUser+mdblistSlug)"
+                )
         else:
             ignorees.append(f"provider non géré ({provider})")
 
@@ -626,7 +616,7 @@ class ClientTMDB:
         limite_appels_images: int = 300,
     ):
         self.cle_api = cle_api
-        self.session = session or creer_session_http()
+        self.session = session or requests.Session()
         self.langue = langue
         self._cache_keyword: dict[str, int | None] = {}
         self._cache_images: dict[tuple[int, str], dict[str, Any]] = {}
@@ -832,7 +822,7 @@ class ClientTMDB:
 class ClientFanart:
     def __init__(self, cle_api: str | None, session: requests.Session | None = None):
         self.cle_api = cle_api
-        self.session = session or creer_session_http()
+        self.session = session or requests.Session()
         self._cache_donnees: dict[tuple[int, str], dict[str, Any] | None] = {}
         self._verrou = threading.Lock()  # ce client est partagé entre threads (voir ClientTMDB)
 
@@ -941,7 +931,7 @@ class ClientTrakt:
         self.client_secret = client_secret
         self.access_token = access_token
         self.refresh_token = refresh_token
-        self.session = session or creer_session_http()
+        self.session = session or requests.Session()
         self._cache_liste: dict[int, list[tuple[int, str]]] = {}
         self._verrou = threading.Lock()  # ce client est partagé entre threads (voir ClientTMDB)
         self.tokens_ont_change = False  # True si rafraichir_token() a produit de nouveaux tokens
@@ -1027,6 +1017,164 @@ class ClientTrakt:
         return resultat
 
 
+def analyser_url_mdblist(url: str) -> tuple[str, str] | None:
+    """Extrait (username, slug) d'une URL de liste MDBList telle que collée
+    depuis le navigateur, ex:
+        https://mdblist.com/lists/linaspurinis/top-watched-movies
+        https://www.mdblist.com/lists/linaspurinis/top-watched-movies/
+        mdblist.com/lists/linaspurinis/top-watched-movies/json/
+    Retourne None si l'URL ne correspond pas au format attendu."""
+    if not url:
+        return None
+    nettoyee = url.strip()
+    nettoyee = re.sub(r"^https?://", "", nettoyee)
+    nettoyee = re.sub(r"^www\.", "", nettoyee)
+    segments = [s for s in nettoyee.split("/") if s]
+    # segments attendus : ["mdblist.com", "lists", "<user>", "<slug>", ...]
+    try:
+        i = segments.index("lists")
+    except ValueError:
+        return None
+    if len(segments) < i + 3:
+        return None
+    user, slug = segments[i + 1], segments[i + 2]
+    if not user or not slug or slug == "json":
+        return None
+    return user, slug
+
+
+class ClientMDBList:
+    """Accès en lecture aux listes MDBList.com via une simple clé API
+    (pas d'OAuth, pas de renouvellement de jeton -- contrairement à Trakt).
+
+    Pourquoi MDBList plutôt que Trakt : créer une application Trakt
+    nécessite désormais un abonnement VIP (voir discussion du 2 août 2026
+    sur forums.trakt.tv). MDBList permet de se connecter avec un compte
+    Trakt gratuit ("Login with Trakt" sur mdblist.com, via LEUR application
+    déjà enregistrée) puis délivre sa PROPRE clé API MDBList, gratuite
+    (1000 requêtes/jour), sans jamais toucher à l'API Trakt directement.
+
+    Deux stratégies de récupération, dans cet ordre :
+      1. API officielle authentifiée par clé (`api.mdblist.com/lists/...`).
+      2. Repli sur l'export JSON public de la liste
+         (`mdblist.com/lists/<user>/<slug>/json/`), qui ne nécessite AUCUNE
+         clé et fonctionne pour toute liste PUBLIQUE -- confirmé par le
+         développeur de MDBList lui-même comme méthode d'accès légitime
+         sans API (voir github.com/jurialmunkey/plugin.video.themoviedb.helper/issues/741).
+         Utile si la clé API est absente/épuisée, ou si l'endpoint exact de
+         l'API officielle change.
+
+    Ne lève jamais d'exception : liste vide en cas d'échec, comme ClientTrakt.
+    """
+
+    API_BASE = "https://api.mdblist.com"
+    SITE_BASE = "https://mdblist.com"
+
+    def __init__(self, api_key: str | None, session: requests.Session | None = None):
+        self.api_key = api_key
+        self.session = session or requests.Session()
+        self._cache_liste: dict[str, list[tuple[int, str]]] = {}
+        self._verrou = threading.Lock()  # client partagé entre threads, comme ClientTrakt
+
+    @staticmethod
+    def _items_depuis_reponse(data: Any) -> list[tuple[int, str]]:
+        """Normalise la réponse MDBList (dict avec 'movies'/'shows', OU liste
+        brute) en tuples (tmdb_id, media_type). Le champ 'id' d'un item
+        MDBList est déjà l'identifiant TMDB (confirmé par les exemples
+        officiels de list-items / media-info)."""
+        resultat: list[tuple[int, str]] = []
+        if isinstance(data, dict):
+            for item in data.get("movies") or []:
+                tmdb_id = item.get("id")
+                if tmdb_id:
+                    resultat.append((tmdb_id, "movie"))
+            for item in data.get("shows") or []:
+                tmdb_id = item.get("id")
+                if tmdb_id:
+                    resultat.append((tmdb_id, "tv"))
+        elif isinstance(data, list):
+            for item in data:
+                tmdb_id = item.get("id")
+                if not tmdb_id:
+                    continue
+                media_type_brut = (item.get("mediatype") or item.get("type") or "movie").lower()
+                resultat.append((tmdb_id, "tv" if media_type_brut in ("tv", "show", "shows") else "movie"))
+        return resultat
+
+    def _recuperer(self, cle_cache: str, urls_et_params: list[tuple[str, dict[str, Any]]]) -> list[tuple[int, str]]:
+        with self._verrou:
+            if cle_cache in self._cache_liste:
+                return self._cache_liste[cle_cache]
+
+        resultat: list[tuple[int, str]] = []
+        for url, params in urls_et_params:
+            try:
+                r = self.session.get(url, params=params, timeout=15)
+                if r.status_code == 200:
+                    resultat = self._items_depuis_reponse(r.json())
+                    if resultat:
+                        break
+            except (requests.RequestException, ValueError):
+                continue
+
+        with self._verrou:
+            self._cache_liste[cle_cache] = resultat
+        return resultat
+
+    def recuperer_items_liste_par_id(self, mdblist_id: int, limite: int = 50) -> list[tuple[int, str]]:
+        """Récupère les items d'une liste MDBList identifiée par son id
+        numérique. Nécessite une clé API (pas de repli JSON public sans
+        connaître le user/slug)."""
+        if not self.api_key:
+            return []
+        cle_cache = f"id:{mdblist_id}"
+        url = f"{self.API_BASE}/lists/{mdblist_id}/items"
+        params = {"apikey": self.api_key, "limit": limite}
+        return self._recuperer(cle_cache, [(url, params)])
+
+    def recuperer_items_liste(self, username: str, slug: str, limite: int = 50) -> list[tuple[int, str]]:
+        """Récupère les items d'une liste MDBList identifiée par
+        (username, slug) -- ce que donne `analyser_url_mdblist()` à partir
+        d'une URL collée depuis le navigateur. Essaie l'API officielle avec
+        clé, puis l'export JSON public (sans clé) en repli."""
+        cle_cache = f"{username}/{slug}"
+        tentatives: list[tuple[str, dict[str, Any]]] = []
+        if self.api_key:
+            tentatives.append(
+                (f"{self.API_BASE}/lists/{username}/{slug}/items", {"apikey": self.api_key, "limit": limite})
+            )
+        tentatives.append((f"{self.SITE_BASE}/lists/{username}/{slug}/json/", {}))
+        return self._recuperer(cle_cache, tentatives)
+
+    def rechercher_listes(self, requete: str, limite: int = 20) -> list[dict[str, Any]]:
+        """Recherche des listes PUBLIQUES par titre (endpoint confirmé par
+        lecture du code source officiel du client Go `mdblist-cli` :
+        GET /lists/search?apikey=...&query=... -- voir
+        github.com/luckylittle/mdblist-cli/blob/main/internal/client/mdblist.go).
+
+        Retourne les résultats bruts (dicts avec au moins : id, name, slug,
+        user_name, mediatype, items, likes, private) triés par nombre
+        d'items décroissant, sans exception en cas d'échec (liste vide).
+        Nécessite une clé API (contrairement à la lecture d'une liste
+        déjà connue, qui a un repli public sans clé)."""
+        if not self.api_key or not requete.strip():
+            return []
+        try:
+            r = self.session.get(
+                f"{self.API_BASE}/lists/search",
+                params={"apikey": self.api_key, "query": requete.strip()},
+                timeout=15,
+            )
+            if r.status_code != 200:
+                return []
+            resultats = r.json()
+            if not isinstance(resultats, list):
+                return []
+            return sorted(resultats, key=lambda l: -(l.get("items") or 0))[:limite]
+        except (requests.RequestException, ValueError):
+            return []
+
+
 # ---------------------------------------------------------------------------
 # Résolution TMDB /images (backdrops tagués par langue)
 # ---------------------------------------------------------------------------
@@ -1096,12 +1244,13 @@ class GenerateurBackdrops:
         langue_preferee: str = "fr",
         limite_appels_tmdb_images: int = 300,
         cle_trakt: str | None = None,
+        cle_mdblist: str | None = None,
         catalogues_aiometadata: dict[str, dict[str, Any]] | None = None,
         trakt_client_secret: str | None = None,
         trakt_access_token: str | None = None,
         trakt_refresh_token: str | None = None,
     ):
-        self.session = creer_session_http()
+        self.session = requests.Session()
         self.tmdb = ClientTMDB(cle_tmdb, session=self.session, limite_appels_images=limite_appels_tmdb_images)
         self.fanart = ClientFanart(cle_fanart, session=self.session)
         self.trakt = ClientTrakt(
@@ -1111,6 +1260,7 @@ class GenerateurBackdrops:
             access_token=trakt_access_token,
             refresh_token=trakt_refresh_token,
         )
+        self.mdblist = ClientMDBList(cle_mdblist, session=self.session)
         self.repertoire_sortie = repertoire_sortie
         self.profil = profil
         self.dry_run = dry_run
@@ -1268,6 +1418,14 @@ class GenerateurBackdrops:
             # backdrop_path/langue inconnus à ce stade -- la cascade de
             # résolution de tuile (TMDB /images -> Fanart) n'en a pas besoin,
             # ils ne servent que de tout dernier repli.
+            return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
+        if requete.kind == "mdblist_liste":
+            if "mdblist_id" in requete.params:
+                items = self.mdblist.recuperer_items_liste_par_id(requete.params["mdblist_id"], limite=cible)
+            else:
+                items = self.mdblist.recuperer_items_liste(
+                    requete.params["mdblist_user"], requete.params["mdblist_slug"], limite=cible
+                )
             return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
         return self.tmdb.resoudre_backdrops_multiples(requete, limite=cible, pages=pages)
 
@@ -1468,6 +1626,7 @@ def main() -> int:
     parser.add_argument("--cle-tmdb", default=None, help="Clé API TMDB (ou variable TMDB_API_KEY)")
     parser.add_argument("--cle-fanart", default=None, help="Clé API Fanart.tv (optionnel)")
     parser.add_argument("--cle-trakt", default=None, help="Client ID Trakt.tv, pour résoudre les traktListId publiques (optionnel)")
+    parser.add_argument("--cle-mdblist", default=None, help="Clé API MDBList.com, pour résoudre les sources provider=mdblist (optionnel, ou variable MDBLIST_API_KEY)")
     parser.add_argument("--trakt-client-secret", default=None, help="Client Secret Trakt.tv (nécessaire pour l'auth OAuth complète, optionnel)")
     parser.add_argument("--trakt-access-token", default=None, help="Access token OAuth Trakt.tv (optionnel, voir scripts/trakt_auth.py)")
     parser.add_argument("--trakt-refresh-token", default=None, help="Refresh token OAuth Trakt.tv (optionnel, voir scripts/trakt_auth.py)")
@@ -1506,6 +1665,7 @@ def main() -> int:
         langue_preferee=args.langue_preferee,
         limite_appels_tmdb_images=args.limite_appels_tmdb_images,
         cle_trakt=args.cle_trakt or os.environ.get("TRAKT_CLIENT_ID"),
+        cle_mdblist=args.cle_mdblist or os.environ.get("MDBLIST_API_KEY"),
         catalogues_aiometadata=charger_catalogues_aiometadata(Path(args.aiometadata) if args.aiometadata else None),
         trakt_client_secret=args.trakt_client_secret or os.environ.get("TRAKT_CLIENT_SECRET"),
         trakt_access_token=args.trakt_access_token or os.environ.get("TRAKT_ACCESS_TOKEN"),

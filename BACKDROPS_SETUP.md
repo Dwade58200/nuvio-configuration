@@ -183,6 +183,7 @@ Dans **Settings → Secrets and variables → Actions** du dépôt, créez :
 - `TRAKT_CLIENT_ID` (optionnel -- résout les Franchises/Thématiques basées sur une liste Trakt publique)
 - `TRAKT_CLIENT_SECRET`, `TRAKT_ACCESS_TOKEN`, `TRAKT_REFRESH_TOKEN` (optionnels -- pour "Recommandation" et les listes privées, voir section Trakt ci-dessous)
 - `GH_PAT_SECRETS` (optionnel -- permet le renouvellement automatique des tokens Trakt, voir section Trakt ci-dessous)
+- `MDBLIST_API_KEY` (optionnel -- alternative à Trakt pour les sources de type liste, voir section MDBList ci-dessous)
 
 ## 📝 Utilisation
 
@@ -214,6 +215,7 @@ Options utiles de `generer_backdrops.py` :
 | `--limite-appels-tmdb-images` | Budget d'appels TMDB `/images` avant repli Fanart seul (défaut 300) |
 | `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues avec leurs vrais filtres TMDB |
 | `--fichier-tokens-trakt chemin.json` | Écrit les tokens Trakt renouvelés ici (pour un step CI qui les re-sauvegarde) |
+| `--cle-mdblist clé` | Clé API MDBList.com (ou variable `MDBLIST_API_KEY`) -- voir section MDBList ci-dessous |
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
 | `--profil {standard,haute,compresse}` | Taille/qualité de sortie |
@@ -417,6 +419,94 @@ ignorés à nouveau). Il faudra alors relancer `scripts/trakt_auth.py` en
 local pour renouveler l'accès. Un message clair s'affiche dans les logs
 du workflow si ça arrive.
 
+## 📋 MDBList (alternative à Trakt, recommandée)
+
+Depuis août 2026, créer une application Trakt nécessite un abonnement
+Trakt VIP -- ce qui bloque la section Trakt ci-dessus pour un compte
+gratuit. **MDBList.com** est une alternative qui évite complètement ce
+problème : la connexion à MDBList se fait via ton compte Trakt gratuit
+("Login with Trakt" -- c'est l'application *de MDBList*, pas la tienne,
+qui est déjà enregistrée), et MDBList délivre ensuite sa **propre** clé
+API, gratuite, sans OAuth ni renouvellement de jeton.
+
+Les sources `provider: "mdblist"` dans le JSON de collections sont
+résolues de la même façon que les sources `trakt` (même logique de
+cascade d'images ensuite), mais lues depuis MDBList.
+
+### Configuration (optionnelle)
+
+1. Va sur https://mdblist.com, clique sur **Login**, puis **with Trakt.tv**
+   -- connecte-toi avec ton compte Trakt habituel (gratuit, aucun VIP requis).
+2. Une fois connecté, va dans **Preferences** (https://mdblist.com/preferences/)
+   et clique sur **New API Key** pour générer ta clé.
+3. Secret GitHub `MDBLIST_API_KEY` (Settings → Secrets and variables → Actions).
+
+Palier gratuit : 1000 requêtes/jour (largement suffisant pour une
+exécution périodique du pipeline). Sans cette clé, les sources `mdblist`
+sont simplement ignorées, comme pour Trakt.
+
+### Comment référencer une liste MDBList dans le JSON
+
+Trois formats acceptés pour une source, du plus simple au plus explicite
+(un seul suffit) :
+
+```json
+{ "provider": "mdblist", "mdblistUrl": "https://mdblist.com/lists/ton-pseudo/nom-de-la-liste" }
+```
+```json
+{ "provider": "mdblist", "mdblistId": 12345 }
+```
+```json
+{ "provider": "mdblist", "mdblistUser": "ton-pseudo", "mdblistSlug": "nom-de-la-liste" }
+```
+
+Le plus simple en pratique : ouvre ta liste sur mdblist.com, copie l'URL
+telle quelle depuis la barre d'adresse dans `mdblistUrl`.
+
+### Chercher une liste par titre (`mdblist_recherche.py`)
+
+Pour trouver la bonne liste à mettre en `mdblistUrl` sans avoir à
+fouiller le site à la main, un petit script local est fourni :
+
+```bash
+export MDBLIST_API_KEY="ta_cle_ici"
+python3 scripts/mdblist_recherche.py "james bond"
+```
+
+Il interroge l'endpoint officiel de recherche de listes publiques
+(`GET /lists/search`) et affiche, pour chaque résultat trouvé (triés par
+nombre d'items décroissant), le nombre d'items/likes et surtout le
+snippet JSON prêt à coller directement dans une source `mdblist` :
+
+```
+1. James Bond Collection
+   👤 someuser  ·  📦 27 items  ·  ❤️  142 likes  ·  🎬 movie
+   🔗 https://mdblist.com/lists/someuser/james-bond-collection
+   Snippet JSON à coller dans une source :
+   { "provider": "mdblist", "mdblistUrl": "https://mdblist.com/lists/someuser/james-bond-collection" }
+```
+
+Ce script est à lancer en local uniquement (pas besoin dans le workflow
+GitHub Actions) -- il sert juste à préparer tes remplacements manuels de
+sources `trakt` vers `mdblist` dans le JSON de collections.
+
+⚠️ **Recommandations exclues** : comme pour Trakt, les catalogues de
+recommandations personnalisées (`trakt.recommendations.*`) ne sont pas
+concernés par cette passerelle -- MDBList ne fait que lire des listes
+existantes (les tiennes ou des listes publiques), pas générer de
+recommandations à partir d'un historique de visionnage. Ces catalogues
+restent à retirer manuellement du JSON de collections.
+
+### Repli sans clé API
+
+Si `MDBLIST_API_KEY` est absent ou que l'API officielle échoue pour une
+raison quelconque, le pipeline retente automatiquement l'export JSON
+public de la liste (`mdblist.com/lists/<user>/<slug>/json/`), qui ne
+nécessite aucune clé -- mais qui ne fonctionne que pour des listes
+**publiques** et seulement quand la liste est identifiée par
+`mdblistUrl`/`mdblistUser`+`mdblistSlug` (pas par `mdblistId` seul, qui
+lui nécessite une clé API).
+
 ## 🛡️ Résilience aux renommages de groupes
 
 Nuvio a déjà renommé les groupes de collections à plusieurs reprises
@@ -437,8 +527,11 @@ espaces réduits) plutôt qu'en texte exact. Concrètement :
 Le projet s'arrête ici pour l'instant (mosaïque + accent color = dernière
 phase prévue). Pistes possibles si tu veux reprendre un jour :
 
-- Intégrer l'API Trakt pour résoudre les ~28 dossiers restants
-  ("Recommandation", quelques Franchises/Thématiques)
+- ~~Intégrer l'API Trakt pour résoudre les ~28 dossiers restants~~ --
+  Trakt nécessite désormais un compte VIP pour créer une application ;
+  utiliser la passerelle **MDBList** à la place (voir section dédiée
+  ci-dessus) en remplaçant manuellement les sources `trakt` du JSON par
+  des sources `mdblist` équivalentes (hors "Recommandation", non couvert)
 - Génération de variantes `.webp` en plus du `.jpg`
 
 ---
