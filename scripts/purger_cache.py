@@ -9,7 +9,7 @@ nouvelles images soient servies immédiatement (jsDelivr cache sinon les
 fichiers pendant ~7 jours).
 
 Usage :
-    python3 scripts/purger_cache.py --depot Dwade58200/nuvio-configuration --sortie collections
+    python3 scripts/purger_cache.py --depot Dwade58200/nuvio-configuration --sortie Collections
     # --branche est optionnel : auto-détectée depuis la branche Git
     # courante si absente. Ne la préciser que pour forcer une valeur
     # différente.
@@ -21,6 +21,7 @@ import argparse
 import sys
 import time
 from pathlib import Path
+from urllib.parse import quote
 
 import requests
 
@@ -38,10 +39,12 @@ def purger_cdn(depot: str, branche: str, repertoire_sortie: Path, delai: float =
 
     reussis, echoues = 0, 0
     for fichier in fichiers:
-        chemin_relatif = fichier.relative_to(repertoire_sortie.parent if repertoire_sortie.name else repertoire_sortie)
-        # chemin tel qu'il apparaît dans le dépôt (ex: collections/genres/backdrop/action.jpg)
+        # chemin tel qu'il apparaît dans le dépôt (ex: Collections/Genres/Backdrops/Action_Backdrop.jpg)
         chemin_depot = f"{repertoire_sortie.name}/{fichier.relative_to(repertoire_sortie)}"
-        url_purge = f"https://purge.jsdelivr.net/gh/{depot}@{branche}/{chemin_depot}"
+        # chaque segment est encodé séparément (ex: l'espace dans
+        # "Services de Streaming"), pour que l'URL de purge reste valide.
+        chemin_encode = "/".join(quote(segment) for segment in Path(chemin_depot).parts)
+        url_purge = f"https://purge.jsdelivr.net/gh/{depot}@{branche}/{chemin_encode}"
         try:
             r = requests.get(url_purge, timeout=10)
             if r.status_code == 200:
@@ -65,7 +68,7 @@ def main() -> int:
         "--branche", default=None,
         help="Branche cible pour les URLs de purge. Par défaut : la branche Git actuellement extraite (auto-détectée).",
     )
-    parser.add_argument("--sortie", default="collections", help="Répertoire contenant les backdrops générés")
+    parser.add_argument("--sortie", default="Collections", help="Répertoire contenant les backdrops générés")
     parser.add_argument("--delai", type=float, default=0.3, help="Délai (s) entre chaque requête de purge")
     args = parser.parse_args()
     branche = args.branche or detecter_branche_courante()
