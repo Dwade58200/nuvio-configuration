@@ -143,18 +143,82 @@ GROUPE_SPORTS = "sports"
 # sont exclues pour éviter les quasi-doublons et le biais vers un seul pays.
 LANGUES_SOURCES_EXCLUES = {"fr"}
 
-# Slug de sortie (chemin sur disque / URL jsDelivr), aligné sur la
-# convention déjà utilisée par luckynumb3rs pour rester cohérent.
+# =============================================================================
+# ARCHITECTURE DE SORTIE -- tout ce qui touche aux noms de dossiers/fichiers
+# est regroupé ici pour rester simple à modifier en un seul endroit.
+# =============================================================================
+
+# Dossier racine de sortie (remplace l'ancien "collections" en minuscule).
+NOM_DOSSIER_RACINE = "Collections"
+
+# Sous-dossier contenant les images, dans CHAQUE groupe.
+NOM_DOSSIER_BACKDROPS = "Backdrops"
+
+# Nom de dossier (en français) pour chaque groupe -> chemin
+# Collections/<NOM>/Backdrops/... "Années" ne figurait pas dans la liste
+# fournie ; "Annees" a été choisi par cohérence avec le reste (pas
+# d'accent) -- à changer ici si besoin, une seule ligne à éditer.
 GROUPE_SLUGS: dict[str, str] = {
-    GROUPE_DECOUVRIR: "discover",
-    GROUPE_STREAMING: "streaming",
-    GROUPE_GENRES: "genres",
-    GROUPE_THEMATIQUES: "themes",
-    GROUPE_VIBES: "vibes",
-    GROUPE_ANNEES: "decades",
-    GROUPE_FRANCHISES: "franchises",
-    GROUPE_SPORTS: "sports",
+    GROUPE_DECOUVRIR: "Decouvertes",
+    GROUPE_STREAMING: "Services de Streaming",
+    GROUPE_GENRES: "Genres",
+    GROUPE_THEMATIQUES: "Thematiques",
+    GROUPE_VIBES: "Vibes",
+    GROUPE_ANNEES: "Annees",
+    GROUPE_FRANCHISES: "Franchises",
+    GROUPE_SPORTS: "Sports",
 }
+
+# Table de correspondance EXPLICITE pour les noms de fichiers qui ne
+# suivent pas la règle générique automatique (sigles à mettre en
+# majuscules, "+" à conserver, raccourcis). Clé = titre EXACT du dossier
+# tel qu'il apparaît dans le JSON Nuvio ; valeur = nom de fichier voulu,
+# SANS le suffixe "_Backdrop.jpg" (ajouté automatiquement).
+# Pour ajouter/changer un nom de fichier : une seule ligne à éditer ici.
+NOMS_BACKDROP_PERSONNALISES: dict[str, str] = {
+    "Sci-Fi": "Sci-Fi",
+    "Apple TV+": "Apple_TV",
+    "Canal+": "Canal+",
+    "TF1": "TF1",
+    "HBO Max": "HBO_Max",
+    "Prime Video": "Prime_Video",
+    "Disney+": "Disney+",
+    "Arts martiaux": "Arts_Martiaux",
+    "Chasse au trésor": "Chasse_au_Tresor",
+    "Comédie Romantique": "Comedie_Romantique",
+    "Grands réalisateurs du cinéma": "Grands_Realisateurs",
+    "Inspiré de faits réels": "Faits_Reels",
+    "Super-Héros": "Super-Heros",
+    "Voyage Temporel": "Voyage_Temporel",
+    "Retournent le cerveau": "Retournent_Cerveau",
+}
+
+# Sigles/acronymes à mettre entièrement en majuscules quand ils
+# apparaissent dans un titre non couvert par NOMS_BACKDROP_PERSONNALISES
+# (repli générique automatique, voir `nom_fichier_backdrop`).
+ACRONYMES_BACKDROP = {"tv", "hbo", "tf1", "m6", "vf", "vo"}
+
+
+def _mettre_en_forme_mot(mot: str) -> str:
+    if mot.lower() in ACRONYMES_BACKDROP:
+        return mot.upper()
+    return mot[:1].upper() + mot[1:].lower() if mot else mot
+
+
+def nom_fichier_backdrop(titre_dossier: str) -> str:
+    """Nom de fichier (SANS l'extension .jpg) pour le backdrop d'un
+    dossier, au format `Nom_Du_Dossier_Backdrop`. Utilise
+    NOMS_BACKDROP_PERSONNALISES pour les cas particuliers (sigles, "+",
+    raccourcis) ; sinon dérive un nom générique automatiquement à partir
+    du titre (mots séparés par underscore, chaque mot capitalisé, sigles
+    connus en majuscules)."""
+    base = NOMS_BACKDROP_PERSONNALISES.get(titre_dossier)
+    if base is None:
+        texte_normalise = normaliser(titre_dossier)  # minuscule, sans accents/emoji
+        mots = [m for m in texte_normalise.split() if m]
+        base = "_".join(_mettre_en_forme_mot(m) for m in mots) or "Sans_Titre"
+    return f"{base}_Backdrop"
+
 
 # Groupes activés pour la génération en Phase 1, et filtres optionnels de
 # titres de dossiers (inclusion/exclusion). None = tous les dossiers.
@@ -446,11 +510,6 @@ def construire_requetes(
                 requetes.append(
                     RequeteTMDB(kind="discover", media_type=info_aiometadata["media_type"], params=params_reels)
                 )
-                continue
-
-            if catalog_id in ("trakt.recommendations.movies", "trakt.recommendations.shows"):
-                media_type_reco = "movie" if catalog_id.endswith("movies") else "tv"
-                requetes.append(RequeteTMDB(kind="trakt_recommandations", media_type=media_type_reco))
                 continue
 
             if catalog_id in CATALOGID_VERS_ENDPOINT:
@@ -854,16 +913,20 @@ class ClientFanart:
 
 
 class ClientTrakt:
-    """Accès aux listes Trakt (publiques via Client ID seul, privées et
-    recommandations personnalisées via authentification OAuth complète).
+    """Accès aux listes Trakt (publiques via Client ID seul, privées via
+    authentification OAuth complète).
 
     - Sans access_token : seules les listes PUBLIQUES (traktListId) fonctionnent.
-    - Avec access_token (+ refresh_token + client_secret) : accès aux listes
-      privées du compte authentifié, et à `/recommendations/movies|shows`
-      (catalogues "trakt.recommendations.*").
+    - Avec access_token (+ refresh_token + client_secret) : accès aussi
+      aux listes PRIVÉES du compte authentifié.
 
     Voir scripts/trakt_auth.py pour obtenir un access_token/refresh_token
     (flux "device code" OAuth, à faire une fois en local).
+
+    NOTE : `/recommendations/movies|shows` n'est volontairement PAS
+    implémenté -- ça nécessiterait un compte avec un vrai historique de
+    visionnage pour donner des résultats pertinents, ce qui n'est pas le
+    cas d'un compte secondaire dédié à ce pipeline.
     """
 
     def __init__(
@@ -880,7 +943,6 @@ class ClientTrakt:
         self.refresh_token = refresh_token
         self.session = session or creer_session_http()
         self._cache_liste: dict[int, list[tuple[int, str]]] = {}
-        self._cache_recommandations: dict[str, list[tuple[int, str]]] = {}
         self._verrou = threading.Lock()  # ce client est partagé entre threads (voir ClientTMDB)
         self.tokens_ont_change = False  # True si rafraichir_token() a produit de nouveaux tokens
 
@@ -962,45 +1024,6 @@ class ClientTrakt:
 
         with self._verrou:
             self._cache_liste[trakt_list_id] = resultat
-        return resultat
-
-    def recuperer_recommandations(self, media_type: str, limite: int = 50) -> list[tuple[int, str]]:
-        """Recommandations personnalisées pour le compte authentifié.
-        Nécessite un access_token valide -- retourne une liste vide sinon
-        (pas d'exception), ex: si l'authentification n'a pas été configurée
-        ou a expiré sans pouvoir être rafraîchie."""
-        cle_cache = media_type
-        with self._verrou:
-            if cle_cache in self._cache_recommandations:
-                return self._cache_recommandations[cle_cache]
-
-        resultat: list[tuple[int, str]] = []
-        if self.access_token:
-            chemin = "movies" if media_type == "movie" else "shows"
-            try:
-                r = self.session.get(
-                    f"{TRAKT_API_BASE}/recommendations/{chemin}",
-                    headers=self._headers(),
-                    params={"limit": limite},
-                    timeout=15,
-                )
-                if r.status_code == 200:
-                    for item in r.json() or []:
-                        # Deux formats possibles selon l'endpoint Trakt :
-                        # objet média direct ({"ids": {...}}) ou enveloppé
-                        # ({"movie"/"show": {"ids": {...}}}) -- on gère les deux.
-                        ids = item.get("ids")
-                        if ids is None:
-                            bloc = item.get("movie") or item.get("show") or {}
-                            ids = bloc.get("ids") or {}
-                        tmdb_id = ids.get("tmdb")
-                        if tmdb_id:
-                            resultat.append((tmdb_id, media_type))
-            except requests.RequestException:
-                pass
-
-        with self._verrou:
-            self._cache_recommandations[cle_cache] = resultat
         return resultat
 
 
@@ -1237,17 +1260,14 @@ class GenerateurBackdrops:
 
     def _resoudre_liste_candidats(self, requete: RequeteTMDB, cible: int, pages: int) -> list[tuple[str, int, str, str | None]]:
         """Résout une requête en liste de candidats (backdrop_path, tmdb_id,
-        media_type, langue_originale) -- gère les requêtes TMDB classiques,
-        les listes Trakt (`kind == "trakt_liste"`), et les recommandations
-        Trakt personnalisées (`kind == "trakt_recommandations"`)."""
+        media_type, langue_originale) -- gère aussi bien les requêtes TMDB
+        classiques que les listes Trakt (`kind == "trakt_liste"`, publiques
+        ou privées selon l'authentification disponible)."""
         if requete.kind == "trakt_liste":
             items = self.trakt.recuperer_items_liste(requete.tmdb_id, limite=cible)
             # backdrop_path/langue inconnus à ce stade -- la cascade de
             # résolution de tuile (TMDB /images -> Fanart) n'en a pas besoin,
             # ils ne servent que de tout dernier repli.
-            return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
-        if requete.kind == "trakt_recommandations":
-            items = self.trakt.recuperer_recommandations(requete.media_type, limite=cible)
             return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
         return self.tmdb.resoudre_backdrops_multiples(requete, limite=cible, pages=pages)
 
@@ -1310,7 +1330,7 @@ class GenerateurBackdrops:
             raison = "; ".join(raisons) or "aucune source exploitable"
             return ResultatDossier(groupe_titre, dossier_titre, "ignore", raison)
 
-        chemin_relatif = Path(GROUPE_SLUGS.get(normaliser(groupe_titre), slugifier(groupe_titre))) / "backdrop" / f"{slugifier(dossier_titre)}.jpg"
+        chemin_relatif = Path(GROUPE_SLUGS.get(normaliser(groupe_titre), slugifier(groupe_titre))) / NOM_DOSSIER_BACKDROPS / f"{nom_fichier_backdrop(dossier_titre)}.jpg"
         chemin_sortie = self.repertoire_sortie / chemin_relatif
 
         if self.dry_run:
@@ -1453,7 +1473,7 @@ def main() -> int:
     parser.add_argument("--trakt-refresh-token", default=None, help="Refresh token OAuth Trakt.tv (optionnel, voir scripts/trakt_auth.py)")
     parser.add_argument("--aiometadata", default=None, help="Chemin vers un export AIOMetadata (JSON) pour résoudre les catalogues avec leurs vrais filtres TMDB (optionnel)")
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
-    parser.add_argument("--sortie", default="collections")
+    parser.add_argument("--sortie", default=NOM_DOSSIER_RACINE)
     parser.add_argument("--profil", choices=list(PROFILS_QUALITE), default="standard")
     parser.add_argument("--parallelisme", type=int, default=4)
     parser.add_argument("--groupe", default=None, help="Ne traiter qu'un seul groupe (ex: Genres)")
@@ -1502,7 +1522,7 @@ def main() -> int:
             print("🔑 Token Trakt rafraîchi.")
         else:
             print(
-                "⚠️  Échec du rafraîchissement du token Trakt -- les recommandations/listes "
+                "⚠️  Échec du rafraîchissement du token Trakt -- les listes privées "
                 "privées ne seront pas disponibles cette fois. Refaire l'authentification "
                 "avec scripts/trakt_auth.py si besoin."
             )
