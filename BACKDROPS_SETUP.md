@@ -6,6 +6,40 @@ Nuvio de ce dépôt, à partir de `Templates/Nuvio-Collections-Dwade58200.json`.
 Inspiré du pipeline de [luckynumb3rs/stremio-perfect-setup](https://github.com/luckynumb3rs/stremio-perfect-setup),
 adapté à la structure de collections propre à ce dépôt.
 
+## 📁 Architecture de sortie (noms de dossiers/fichiers)
+
+Tous les fichiers atterrissent sous :
+```
+Collections/<NomDuGroupe>/Backdrops/<NomDuFichier>_Backdrop.jpg
+```
+
+Exemples réels : `Collections/Genres/Backdrops/Sci-Fi_Backdrop.jpg`,
+`Collections/Services de Streaming/Backdrops/Netflix_Backdrop.jpg`.
+
+**Tout est regroupé dans un seul bloc, en haut de `scripts/generer_backdrops.py`**
+(section "ARCHITECTURE DE SORTIE"), pour rester simple à modifier :
+
+- `NOM_DOSSIER_RACINE` -- nom du dossier racine (`Collections`)
+- `NOM_DOSSIER_BACKDROPS` -- nom du sous-dossier dans chaque groupe (`Backdrops`)
+- `GROUPE_SLUGS` -- nom de dossier (français) pour chaque groupe --
+  une ligne par groupe, facile à changer
+- `NOMS_BACKDROP_PERSONNALISES` -- table de correspondance EXPLICITE pour
+  les noms de fichiers avec un sigle (TF1, HBO), un "+" (Canal+, Disney+),
+  ou un raccourci (ex: "Grands réalisateurs du cinéma" → `Grands_Realisateurs`).
+  **Pour ajouter/changer un nom de fichier : une seule ligne à ajouter/éditer ici.**
+- Tout titre de dossier absent de cette table obtient un nom générique
+  calculé automatiquement (mots capitalisés séparés par underscore, sigles
+  connus -- `ACRONYMES_BACKDROP` -- mis en majuscules).
+
+⚠️ **Changement d'architecture depuis une version antérieure** : les
+dossiers de sortie sont passés de l'anglais minuscule (`collections/genres/backdrop/action.jpg`)
+au français capitalisé (`Collections/Genres/Backdrops/Action_Backdrop.jpg`).
+Le workflow supprime automatiquement l'ancien dossier `collections/`
+(minuscule) au premier lancement après cette mise à jour, pour éviter
+d'avoir les deux arborescences en parallèle. Pense à cocher
+**mettre_a_jour_urls** une fois après la mise à jour pour que
+`heroBackdropUrl` pointe vers les nouveaux chemins.
+
 ## 🎯 Comment ça marche
 
 Le script `scripts/generer_backdrops.py` lit `Templates/Nuvio-Collections-Dwade58200.json`,
@@ -19,13 +53,13 @@ et pour **chaque dossier de chaque groupe actif**, il :
 2. Si aucune source directe n'est exploitable, tente un repli heuristique
    (ex : dossier "Action" dans le groupe Genres → genre TMDB "Action" ;
    thématique "Arts martiaux" → recherche par mot-clé TMDB "martial arts") ;
-3. Récupère jusqu'à ~70 titres (films/séries) correspondants -- dédupliqués
+3. Récupère jusqu'à 12 titres (films/séries) correspondants -- dédupliqués
    même si un même film provient à la fois d'une collection et d'un
    catalogue discover -- et compose une **mosaïque** avec dégradé +
    couleur d'accent extraite automatiquement (voir section dédiée
    ci-dessous) ; en dessous de 3 titres distincts, bascule automatiquement
    sur l'ancien mode "1 seul backdrop" ;
-4. Enregistre l'image dans `collections/<groupe>/backdrop/<dossier>.jpg`.
+4. Enregistre l'image dans `Collections/<Groupe>/Backdrops/<Nom>_Backdrop.jpg`.
 
 ## 🎨 Mode mosaïque (par défaut)
 
@@ -69,30 +103,27 @@ régionale n'est JAMAIS considéré comme "français" -- seul le tag exact
 
 ### Volume de requêtes : cache + budget de repli
 
-Avec ~70 titres par dossier sur des dizaines de dossiers, le nombre d'appels TMDB peut
-vite grimper. Deux protections en place :
+Avec ~70 titres par dossier sur 43 dossiers, le nombre d'appels TMDB peut
+vite grimper. Une protection est en place :
 
 - **Cache** : un même titre (souvent présent dans plusieurs dossiers --
   ex: un blockbuster apparaît dans "Populaire", "Action" ET "Tendance") ne
   déclenche qu'un seul appel TMDB `/images` et un seul appel Fanart pour
   toute l'exécution, même s'il est rencontré plusieurs fois.
-- **Budget de repli** (`--limite-appels-tmdb-images`, défaut **300**) :
-  au-delà de ce nombre d'appels TMDB `/images` réussis sur l'exécution, le
-  script arrête d'interroger TMDB pour ce palier et bascule directement sur
-  Fanart (puis backdrop générique) pour tous les titres restants -- aucune
-  erreur, juste moins de vérifications côté TMDB. Un message s'affiche en
-  fin d'exécution si ce budget a été atteint.
+
+TMDB n'impose pas de quota fixe d'appels par run (juste une limitation de
+débit, gérée par des tentatives avec délai croissant en cas de réponse
+`429`) -- il n'y a donc pas de "budget" artificiel de repli sur Fanart à
+configurer.
 
 C'est le comportement **par défaut** (`--mosaique`, activé aussi dans le
 workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
 de 3 titres distincts résolus, le script repasse automatiquement sur
 l'ancien mode "1 seul backdrop TMDB/Fanart", sans erreur.
 
-**Pas de doublon visible** : la grille inclinée contient environ 72 cases
-(9 colonnes × 8 lignes, quel que soit le profil de qualité -- les trois
-profils actuels partagent le même canvas ≥1280px de large). Le script
-récupère donc jusqu'à ~70 titres distincts par dossier (pagination TMDB
-automatique) pour remplir
+**Pas de doublon visible** : la grille inclinée contient environ 70 cases
+(quelle que soit la résolution de sortie). Le script récupère donc jusqu'à
+~70 titres distincts par dossier (pagination TMDB automatique) pour remplir
 toute la grille sans répéter la même affiche. Si un dossier a réellement
 moins de titres disponibles que de cases (catalogue restreint), les
 images sont répétées (cycle) en dernier recours pour compléter, comme le
@@ -110,15 +141,14 @@ Sur les collections actuelles, la couverture est :
 
 | Groupe | Dossiers résolus | Notes |
 |---|---|---|
-| 🔭 Découvrir | 3 / 6 | "Recommandation" nécessite l'OAuth Trakt personnalisé (non géré, voir plus bas) |
-| 🎬 Streaming | 9 / 9 | ✅ (résolu via TMDB, plus besoin de FlixPatrol) |
+| 🔭 Découvrir | 3 / 6 | "Recommandation" est une liste MDBList personnalisée au compte, sans URL publique -- non résolvable |
+| 🎬 Streaming | 0 / 9 | volontairement désactivé (sources FlixPatrol, non-TMDB) |
 | 🎭 Genres | 15 / 15 | ✅ |
-| 🎨 Thématiques | 14 / 14 | ✅ (dernier dossier résolu via une liste Trakt publique) |
+| 🎨 Thématiques | 14 / 14 | ✅ (résolu via l'export AIOMetadata + MDBList) |
 | Vibe | 4 / 4 | ✅ |
 | 📅 Années | 8 / 8 | ✅ |
 | Franchises | 0 / 158 | volontairement désactivé (à la demande de l'utilisateur) |
-| Sports | 0 / 7 | volontairement désactivé (pas pertinent pour un backdrop) |
-| **Total** | **53 / 221** | vérifié via `--dry-run --mosaique --groupe <X>` sur chaque groupe |
+| Sports | 0 / 8 | volontairement désactivé (pas pertinent pour un backdrop) |
 
 Les dossiers non résolus sont **journalisés avec la raison** (jamais échoués
 en silence) — voir le résumé affiché à la fin de chaque exécution.
@@ -132,7 +162,7 @@ backdrop dépend uniquement du chemin du fichier (groupe + titre du
 dossier), qui ne change pas d'un mois à l'autre — seule l'image derrière
 cette URL est remplacée. Il suffit donc de le lancer une fois pour les
 dossiers déjà résolus, puis de le relancer uniquement quand de *nouveaux*
-dossiers deviennent résolvables (ex : après l'intégration de Trakt).
+dossiers deviennent résolvables (ex : après l'ajout d'un nouveau catalogue).
 
 ## ✅ Configuration requise
 
@@ -149,7 +179,12 @@ dossiers deviennent résolvables (ex : après l'intégration de Trakt).
 Dans **Settings → Secrets and variables → Actions** du dépôt, créez :
 - `TMDB_API_KEY`
 - `FANART_API_KEY` (recommandé -- sans lui, les mosaïques n'ont pas de titre visible)
-- `TRAKT_CLIENT_ID` (optionnel -- résout les Franchises/Thématiques basées sur une liste Trakt publique)
+- `MDBLIST_API_KEY` (optionnel -- voir section MDBList ci-dessous ; sans lui, seules les listes MDBList *publiques* fonctionnent, ce qui couvre la quasi-totalité des cas)
+
+Trakt n'est **pas pris en charge** (créer une application Trakt nécessite
+désormais un abonnement VIP) -- toute source `provider: "trakt"` est
+explicitement ignorée et journalisée, jamais une erreur. MDBList (voir
+plus bas) couvre le même besoin sans ce problème.
 
 ## 📝 Utilisation
 
@@ -177,9 +212,9 @@ Options utiles de `generer_backdrops.py` :
 | Option | Effet |
 |---|---|
 | `--dry-run` | Ne fait aucun appel réseau, affiche juste ce qui serait généré |
-| `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 3 titres) |
-| `--limite-appels-tmdb-images` | Budget d'appels TMDB `/images` avant repli Fanart seul (défaut 300) |
-| `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues avec leurs vrais filtres TMDB |
+| `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 6 titres) |
+| `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues (dont les listes MDBList ajoutées via l'addon) avec leurs vrais filtres/URLs |
+| `--cle-mdblist clé` | Clé API MDBList.com (ou variable `MDBLIST_API_KEY`) -- voir section MDBList ci-dessous |
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
 | `--profil {standard,haute,compresse}` | Taille/qualité de sortie |
@@ -208,20 +243,22 @@ nuvio-configuration/
 ├── .github/workflows/
 │   └── generer-backdrops.yml        # Workflow d'automatisation
 ├── Templates/
-│   ├── Nuvio-Collections-Dwade58200.json  # Source de vérité des collections
-│   └── aiometadata-setup.json       # (Optionnel) export AIOMetadata, voir section dédiée
-├── collections/
-│   └── <groupe>/backdrop/*.jpg      # Images générées (ex: genres/backdrop/action.jpg)
+│   └── Nuvio-Collections-Dwade58200.json  # Source de vérité des collections
+├── Collections/
+│   └── <Groupe>/Backdrops/*.jpg      # Images générées (ex: Genres/Backdrops/Action_Backdrop.jpg)
 ├── scripts/
 │   ├── generer_backdrops.py         # Script principal
 │   ├── mosaique.py                  # Composition de la grille + couleur d'accent
 │   ├── mettre_a_jour_urls.py        # Met à jour heroBackdropUrl vers le CDN du repo
+│   ├── mdblist_recherche.py         # Recherche de listes MDBList publiques (usage local)
 │   └── purger_cache.py              # Purge du cache CDN jsDelivr
 ├── tests/
 │   ├── test_generer_backdrops.py    # Tests de la logique de résolution
 │   ├── test_mosaique.py             # Tests du module de mosaïque (hors-ligne)
 │   ├── test_mosaique_integration.py # Test bout-en-bout du mode mosaïque
 │   ├── test_mettre_a_jour_urls.py   # Tests de la mise à jour des URLs
+│   ├── fixtures/aiometadata-exemple.json          # Fixture AIOMetadata (format réel, config.catalogs)
+│   ├── fixtures/aiometadata-exemple-legacy-plat.json  # Fixture ancien format (catalogs à la racine)
 │   └── test_pipeline_integration.py # Test bout-en-bout (HTTP simulé)
 └── BACKDROPS_SETUP.md               # Ce fichier
 ```
@@ -232,9 +269,10 @@ nuvio-configuration/
 
 **Un dossier n'a pas de backdrop après une exécution réelle** → regarde la
 section "Dossiers ignorés, par raison" dans le résumé : c'est très souvent
-une source Trakt (non gérée pour l'instant) ou un catalogue "addon" propre
-à ta configuration Stremio qu'on ne peut pas résoudre sans son fichier de
-définition.
+une source `provider: "trakt"` (non prise en charge, voir plus bas), une
+liste MDBList personnalisée sans URL publique (ex: "Recommandation"), ou
+un catalogue "addon" propre à ta configuration Stremio qu'on ne peut pas
+résoudre sans son fichier de définition (`--aiometadata`).
 
 **Les images ne se mettent pas à jour sur Nuvio** → jsDelivr cache les
 fichiers ~7 jours ; le workflow purge automatiquement le cache après chaque
@@ -290,38 +328,107 @@ une config obsolète pour les anciens.
 Les catalogues FlixPatrol/`streaming.*`/`custom.*` (non-TMDB, ex: Top 10
 France) restent non résolus -- ils n'ont pas d'équivalent TMDB direct.
 
-## 🎬 Trakt (listes publiques uniquement)
+## 🎬 Trakt (non pris en charge)
 
-Certaines Franchises et Thématiques référencent une liste Trakt
-(`traktListId`) plutôt qu'un catalogue TMDB direct. Avec une clé Trakt
-configurée, ces listes sont désormais résolues (à condition d'être
-**publiques** sur Trakt).
+Créer une application Trakt nécessite désormais un abonnement Trakt VIP
+(voir la discussion du 2 août 2026 sur forums.trakt.tv), ce qui n'est
+pas disponible pour ce projet. Toute source `provider: "trakt"` dans le
+JSON de collections est donc explicitement **ignorée et journalisée**
+avec la raison -- jamais une erreur. **MDBList (ci-dessous) couvre le
+même besoin** (listes de films/séries) sans ce problème : la connexion à
+MDBList se fait via un compte Trakt **gratuit** ("Login with Trakt" --
+c'est l'application *de MDBList*, pas la tienne, qui est déjà
+enregistrée), et MDBList délivre ensuite sa propre clé API, gratuite,
+sans OAuth ni renouvellement de jeton.
 
-### Configuration (optionnelle)
+## 📋 MDBList
 
-1. Crée un compte sur https://trakt.tv, puis une application sur
-   https://trakt.tv/oauth/applications ("New Application") -- Redirect
-   URI : `urn:ietf:wg:oauth:2.0:oob` suffit pour cet usage.
-2. Récupère le **Client ID** (pas besoin du Client Secret, ni de connexion
-   OAuth complète -- les listes publiques ne demandent que ça).
-3. Secret GitHub `TRAKT_CLIENT_ID` (Settings → Secrets and variables → Actions).
+Les sources `provider: "mdblist"` dans le JSON de collections, ainsi que
+les catalogues **ajoutés via l'addon AIOMetadata** (`provider: "addon"`
+avec un `catalogId` du type `mdblist.<id>`, ex : "Sitcom") sont
+résolus via l'API MDBList.com -- ces derniers nécessitent de fournir
+`--aiometadata Templates/aiometadata-setup.json` (déjà fait
+automatiquement par le workflow GitHub Actions s'il trouve ce fichier).
 
-Sans cette clé, les sources Trakt restent simplement ignorées (comportement
-identique à avant), aucune erreur.
+⚠️ **Cas non résolvable : les listes "Recommandation" personnalisées**
+(`mdblist.recommended.*`). Ce sont des recommandations calculées à partir
+de l'historique de visionnage du compte MDBList/Trakt lié, sans URL
+publique fixe -- MDBList ne fait que lire des listes existantes (les
+tiennes ou des listes publiques), pas générer des recommandations à
+partir d'un historique. Ce catalogue reste explicitement ignoré, message
+à l'appui, plutôt que traité en silence.
 
-### ⚠️ Non couvert : "Recommandation" (trakt.recommendations.*)
+### Configuration (optionnelle mais recommandée)
 
-Le dossier Découvrir/Recommandation utilise un catalogue
-`trakt.recommendations.movies/shows` -- ce ne sont pas des listes
-publiques mais de **vraies recommandations personnalisées**, qui
-nécessitent un jeton OAuth utilisateur Trakt complet (connexion avec ton
-compte, pas juste une clé). C'est un chantier significativement plus lourd
-(flux d'autorisation, stockage/renouvellement de token) que je n'ai pas
-implémenté ici. Si tu veux ce dossier résolu, il faudra soit :
-- accepter un contenu de repli (ex: tendances Trakt publiques, pas
-  vraiment "recommandé") à la place ;
-- soit mettre en place l'authentification OAuth complète (à envisager
-  comme un chantier séparé).
+1. Va sur https://mdblist.com, clique sur **Login**, puis **with Trakt.tv**
+   -- connecte-toi avec ton compte Trakt habituel (gratuit, aucun VIP requis).
+2. Une fois connecté, va dans **Preferences** (https://mdblist.com/preferences/)
+   et clique sur **New API Key** pour générer ta clé.
+3. Secret GitHub `MDBLIST_API_KEY` (Settings → Secrets and variables → Actions).
+
+Palier gratuit : 1000 requêtes/jour (largement suffisant pour une
+exécution périodique du pipeline). **Sans cette clé**, les listes
+MDBList **publiques** référencées par une URL (ce qui couvre la quasi-
+totalité des cas, y compris tous les catalogues ajoutés via l'addon
+AIOMetadata) continuent de fonctionner via le repli JSON public de
+MDBList (voir plus bas) -- la clé n'est vraiment utile que pour les
+listes référencées uniquement par un identifiant numérique opaque, ou
+pour éviter les limites de débit du repli public.
+
+### Comment référencer une liste MDBList manuellement dans le JSON
+
+Trois formats acceptés pour une source `provider: "mdblist"` ajoutée à la
+main (indépendamment de l'addon AIOMetadata), du plus simple au plus
+explicite (un seul suffit) :
+
+```json
+{ "provider": "mdblist", "mdblistUrl": "https://mdblist.com/lists/ton-pseudo/nom-de-la-liste" }
+```
+```json
+{ "provider": "mdblist", "mdblistId": 12345 }
+```
+```json
+{ "provider": "mdblist", "mdblistUser": "ton-pseudo", "mdblistSlug": "nom-de-la-liste" }
+```
+
+Le plus simple en pratique : ouvre ta liste sur mdblist.com, copie l'URL
+telle quelle depuis la barre d'adresse dans `mdblistUrl`.
+
+### Chercher une liste par titre (`mdblist_recherche.py`)
+
+Pour trouver la bonne liste à mettre en `mdblistUrl` sans avoir à
+fouiller le site à la main, un petit script local est fourni :
+
+```bash
+export MDBLIST_API_KEY="ta_cle_ici"
+python3 scripts/mdblist_recherche.py "james bond"
+```
+
+Il interroge l'endpoint officiel de recherche de listes publiques
+(`GET /lists/search`) et affiche, pour chaque résultat trouvé (triés par
+nombre d'items décroissant), le nombre d'items/likes et surtout le
+snippet JSON prêt à coller directement dans une source `mdblist` :
+
+```
+1. James Bond Collection
+   👤 someuser  ·  📦 27 items  ·  ❤️  142 likes  ·  🎬 movie
+   🔗 https://mdblist.com/lists/someuser/james-bond-collection
+   Snippet JSON à coller dans une source :
+   { "provider": "mdblist", "mdblistUrl": "https://mdblist.com/lists/someuser/james-bond-collection" }
+```
+
+Ce script est à lancer en local uniquement (pas besoin dans le workflow
+GitHub Actions).
+
+### Repli sans clé API
+
+Si `MDBLIST_API_KEY` est absent ou que l'API officielle échoue pour une
+raison quelconque, le pipeline retente automatiquement l'export JSON
+public de la liste (`mdblist.com/lists/<user>/<slug>/json/`), qui ne
+nécessite aucune clé -- mais qui ne fonctionne que pour des listes
+**publiques** et seulement quand la liste est identifiée par
+`mdblistUrl`/`mdblistUser`+`mdblistSlug` (pas par `mdblistId` seul, qui
+lui nécessite une clé API).
 
 ## 🛡️ Résilience aux renommages de groupes
 
@@ -340,12 +447,16 @@ espaces réduits) plutôt qu'en texte exact. Concrètement :
 
 ## 🗺️ Idées pour plus tard (non planifiées)
 
-Le projet s'arrête ici pour l'instant (mosaïque + accent color + Trakt
-listes publiques = dernières phases prévues). Pistes possibles si tu veux
-reprendre un jour :
+Le projet s'arrête ici pour l'instant (mosaïque + accent color = dernière
+phase prévue). Pistes possibles si tu veux reprendre un jour :
 
-- Authentification OAuth Trakt complète, pour débloquer le dernier
-  dossier restant (Découvrir/Recommandation, voir "Non couvert" plus haut)
+- ~~Intégrer l'API Trakt pour résoudre les ~28 dossiers restants~~ --
+  Trakt nécessite désormais un compte VIP pour créer une application ;
+  **retiré du projet**. La quasi-totalité de ces dossiers est maintenant
+  résolue automatiquement via MDBList (catalogues ajoutés dans l'addon
+  AIOMetadata + `--aiometadata`, voir section dédiée ci-dessus) ; seule
+  "Recommandation" (liste personnalisée sans URL publique) reste hors
+  d'atteinte.
 - Génération de variantes `.webp` en plus du `.jpg`
 
 ---

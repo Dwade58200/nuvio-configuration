@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 mettre_a_jour_urls.py
 ========================
@@ -20,7 +19,7 @@ synchronisés sur les chemins de fichiers.
 Usage :
     python3 scripts/mettre_a_jour_urls.py \
         --collections Templates/Nuvio-Collections-Dwade58200.json \
-        --sortie collections \
+        --sortie Collections \
         --depot Dwade58200/nuvio-configuration \
         --branche feature/backdrops-automation
 """
@@ -32,14 +31,26 @@ import json
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from generer_backdrops import GROUPE_SLUGS, dossier_actif, normaliser, slugifier  # noqa: E402
+from generer_backdrops import (  # noqa: E402
+    GROUPE_SLUGS,
+    NOM_DOSSIER_BACKDROPS,
+    NOM_DOSSIER_RACINE,
+    dossier_actif,
+    nom_fichier_backdrop,
+    normaliser,
+)
 
 
 def construire_url_cdn(depot: str, branche: str, chemin_relatif: Path) -> str:
-    return f"https://cdn.jsdelivr.net/gh/{depot}@{branche}/collections/{chemin_relatif.as_posix()}"
+    """Encode chaque segment du chemin (ex: l'espace dans
+    "Services de Streaming") pour une URL jsDelivr toujours valide."""
+    segments_encodes = [quote(segment) for segment in chemin_relatif.parts]
+    chemin_encode = "/".join(segments_encodes)
+    return f"https://cdn.jsdelivr.net/gh/{depot}@{branche}/{NOM_DOSSIER_RACINE}/{chemin_encode}"
 
 
 def mettre_a_jour(
@@ -63,8 +74,8 @@ def mettre_a_jour(
                 inchanges += 1
                 continue  # groupe/dossier désactivé (ex: Franchises) -> jamais touché
 
-            slug_dossier = slugifier(dossier.get("title", ""))
-            chemin_relatif = Path(slug_groupe) / "backdrop" / f"{slug_dossier}.jpg"
+            nom_fichier = nom_fichier_backdrop(dossier.get("title", ""))
+            chemin_relatif = Path(slug_groupe) / NOM_DOSSIER_BACKDROPS / f"{nom_fichier}.jpg"
             chemin_disque = repertoire_sortie / chemin_relatif
 
             if not chemin_disque.exists():
@@ -84,7 +95,7 @@ def mettre_a_jour(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Met à jour heroBackdropUrl vers les backdrops générés.")
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
-    parser.add_argument("--sortie", default="collections")
+    parser.add_argument("--sortie", default=NOM_DOSSIER_RACINE)
     parser.add_argument("--depot", default="Dwade58200/nuvio-configuration")
     parser.add_argument("--branche", default="feature/backdrops-automation")
     parser.add_argument("--dry-run", action="store_true", help="N'écrit rien, affiche juste ce qui changerait")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 generer_backdrops.py
 =====================
@@ -24,9 +23,21 @@ de résoudre une source TMDB fiable :
      rapproché d'un genre TMDB connu, ou utilisé comme recherche de
      mot-clé TMDB (endpoint /search/keyword) pour les thématiques.
 
-Tout ce qui n'est pas résoluble (Trakt sans clé API, FlixPatrol, Sports,
-etc.) est explicitement IGNORÉ et journalisé avec la raison -- jamais
-échoué en silence. Ces cas seront traités dans une phase ultérieure.
+Tout ce qui n'est pas résoluble (Trakt -- non pris en charge, voir plus
+bas --, FlixPatrol, Sports, etc.) est explicitement IGNORÉ et journalisé
+avec la raison -- jamais échoué en silence. Ces cas seront traités dans
+une phase ultérieure.
+
+Les sources `provider: "mdblist"`, ainsi que les catalogues
+`provider: "addon"/aio-metadata` de type `source: "mdblist"` référencés
+dans un export AIOMetadata (voir `--aiometadata`), sont résolues via
+l'API MDBList.com (clé API simple, pas d'OAuth) -- voir la classe
+ClientMDBList plus bas.
+
+Trakt n'est PAS pris en charge : créer une application Trakt nécessite
+désormais un abonnement VIP (voir la discussion du 2 août 2026 sur
+forums.trakt.tv), ce qui n'est pas disponible pour ce projet. Toute
+source `provider: "trakt"` est explicitement ignorée et journalisée.
 
 Ce choix "honnête" fait qu'au lancement, certains dossiers n'auront pas
 de backdrop généré : c'est normal et voulu pour cette phase. Le résumé
@@ -41,14 +52,16 @@ import io
 import json
 import logging
 import math
+import os
 import re
 import sys
+import threading
 import time
 import unicodedata
-from datetime import date as _date
 from dataclasses import dataclass, field
+from datetime import date as _date
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 try:
     import requests
@@ -64,7 +77,6 @@ except ImportError:  # pragma: no cover
 
 import mosaique as mosaique_module  # module compagnon, scripts/mosaique.py
 
-
 # ---------------------------------------------------------------------------
 # Configuration générale
 # ---------------------------------------------------------------------------
@@ -72,7 +84,6 @@ import mosaique as mosaique_module  # module compagnon, scripts/mosaique.py
 TMDB_API_BASE = "https://api.themoviedb.org/3"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p"
 FANART_API_BASE = "https://webservice.fanart.tv/v3"
-TRAKT_API_BASE = "https://api.trakt.tv"
 
 # Titres EXACTS des groupes tels qu'ils existent réellement dans le JSON.
 # (le bug initial venait d'un mauvais mapping ici -> corrigé, puis reproduit
@@ -99,18 +110,82 @@ GROUPE_SPORTS = "sports"
 # sont exclues pour éviter les quasi-doublons et le biais vers un seul pays.
 LANGUES_SOURCES_EXCLUES = {"fr"}
 
-# Slug de sortie (chemin sur disque / URL jsDelivr), aligné sur la
-# convention déjà utilisée par luckynumb3rs pour rester cohérent.
+# =============================================================================
+# ARCHITECTURE DE SORTIE -- tout ce qui touche aux noms de dossiers/fichiers
+# est regroupé ici pour rester simple à modifier en un seul endroit.
+# =============================================================================
+
+# Dossier racine de sortie (remplace l'ancien "collections" en minuscule).
+NOM_DOSSIER_RACINE = "Collections"
+
+# Sous-dossier contenant les images, dans CHAQUE groupe.
+NOM_DOSSIER_BACKDROPS = "Backdrops"
+
+# Nom de dossier (en français) pour chaque groupe -> chemin
+# Collections/<NOM>/Backdrops/... "Années" ne figurait pas dans la liste
+# fournie ; "Annees" a été choisi par cohérence avec le reste (pas
+# d'accent) -- à changer ici si besoin, une seule ligne à éditer.
 GROUPE_SLUGS: dict[str, str] = {
-    GROUPE_DECOUVRIR: "discover",
-    GROUPE_STREAMING: "streaming",
-    GROUPE_GENRES: "genres",
-    GROUPE_THEMATIQUES: "themes",
-    GROUPE_VIBES: "vibes",
-    GROUPE_ANNEES: "decades",
-    GROUPE_FRANCHISES: "franchises",
-    GROUPE_SPORTS: "sports",
+    GROUPE_DECOUVRIR: "Decouvertes",
+    GROUPE_STREAMING: "Services de Streaming",
+    GROUPE_GENRES: "Genres",
+    GROUPE_THEMATIQUES: "Thematiques",
+    GROUPE_VIBES: "Vibes",
+    GROUPE_ANNEES: "Annees",
+    GROUPE_FRANCHISES: "Franchises",
+    GROUPE_SPORTS: "Sports",
 }
+
+# Table de correspondance EXPLICITE pour les noms de fichiers qui ne
+# suivent pas la règle générique automatique (sigles à mettre en
+# majuscules, "+" à conserver, raccourcis). Clé = titre EXACT du dossier
+# tel qu'il apparaît dans le JSON Nuvio ; valeur = nom de fichier voulu,
+# SANS le suffixe "_Backdrop.jpg" (ajouté automatiquement).
+# Pour ajouter/changer un nom de fichier : une seule ligne à éditer ici.
+NOMS_BACKDROP_PERSONNALISES: dict[str, str] = {
+    "Sci-Fi": "Sci-Fi",
+    "Apple TV+": "Apple_TV",
+    "Canal+": "Canal+",
+    "TF1": "TF1",
+    "HBO Max": "HBO_Max",
+    "Prime Video": "Prime_Video",
+    "Disney+": "Disney+",
+    "Arts martiaux": "Arts_Martiaux",
+    "Chasse au trésor": "Chasse_au_Tresor",
+    "Comédie Romantique": "Comedie_Romantique",
+    "Grands réalisateurs du cinéma": "Grands_Realisateurs",
+    "Inspiré de faits réels": "Faits_Reels",
+    "Super-Héros": "Super-Heros",
+    "Voyage Temporel": "Voyage_Temporel",
+    "Retournent le cerveau": "Retournent_Cerveau",
+}
+
+# Sigles/acronymes à mettre entièrement en majuscules quand ils
+# apparaissent dans un titre non couvert par NOMS_BACKDROP_PERSONNALISES
+# (repli générique automatique, voir `nom_fichier_backdrop`).
+ACRONYMES_BACKDROP = {"tv", "hbo", "tf1", "m6", "vf", "vo"}
+
+
+def _mettre_en_forme_mot(mot: str) -> str:
+    if mot.lower() in ACRONYMES_BACKDROP:
+        return mot.upper()
+    return mot[:1].upper() + mot[1:].lower() if mot else mot
+
+
+def nom_fichier_backdrop(titre_dossier: str) -> str:
+    """Nom de fichier (SANS l'extension .jpg) pour le backdrop d'un
+    dossier, au format `Nom_Du_Dossier_Backdrop`. Utilise
+    NOMS_BACKDROP_PERSONNALISES pour les cas particuliers (sigles, "+",
+    raccourcis) ; sinon dérive un nom générique automatiquement à partir
+    du titre (mots séparés par underscore, chaque mot capitalisé, sigles
+    connus en majuscules)."""
+    base = NOMS_BACKDROP_PERSONNALISES.get(titre_dossier)
+    if base is None:
+        texte_normalise = normaliser(titre_dossier)  # minuscule, sans accents/emoji
+        mots = [m for m in texte_normalise.split() if m]
+        base = "_".join(_mettre_en_forme_mot(m) for m in mots) or "Sans_Titre"
+    return f"{base}_Backdrop"
+
 
 # Groupes activés pour la génération en Phase 1, et filtres optionnels de
 # titres de dossiers (inclusion/exclusion). None = tous les dossiers.
@@ -314,12 +389,25 @@ def _resoudre_placeholder_date(valeur: Any) -> Any:
     return valeur
 
 
-def charger_catalogues_aiometadata(chemin: "Path | None") -> dict[str, dict[str, Any]]:
+def charger_catalogues_aiometadata(chemin: Path | None) -> dict[str, dict[str, Any]]:
     """Charge un export AIOMetadata (Réglages -> Export dans l'addon) et
-    construit un index {catalogId: {"media_type", "params"}} pour les
-    catalogues de type "discover" qui ont une config TMDB exacte exportée
-    -- permet de résoudre un catalogue (ex: Streaming, Genres...) avec les
-    VRAIS filtres plutôt qu'une heuristique de repli à partir du nom.
+    construit un index {catalogId: {...}} pour résoudre un catalogue (ex:
+    Streaming, Genres, MDBList...) avec ses VRAIS filtres/identifiants
+    plutôt qu'une heuristique de repli à partir du nom.
+
+    Deux formes de catalogues sont indexées, distinguées par la clé "kind" :
+      - {"kind": "discover", "media_type", "params"} : catalogue TMDB avec
+        une config "discover" exacte exportée (Streaming, Genres...).
+      - {"kind": "mdblist", "media_type", "mdblist_url"} : catalogue
+        `source: "mdblist"` avec une URL de liste publique exportée dans
+        `metadata.url` (ex: "Sitcom" -> mdblist.37087).
+
+    IMPORTANT : selon la version de l'export, la clé "catalogs" se trouve
+    soit à la racine du JSON, soit sous "config" (export réel observé --
+    `{"version", "exportedAt", "config": {"catalogs": [...]}, "metadata": {...}}`).
+    On accepte les deux, en préférant "config.catalogs" quand il existe,
+    pour ne PLUS silencieusement charger un index vide sur un vrai export.
+
     Retourne un dict vide si le fichier est absent/invalide (aucune erreur)."""
     if not chemin:
         return {}
@@ -329,16 +417,31 @@ def charger_catalogues_aiometadata(chemin: "Path | None") -> dict[str, dict[str,
     except (OSError, json.JSONDecodeError):
         return {}
 
+    catalogues_bruts = (data.get("config") or {}).get("catalogs")
+    if catalogues_bruts is None:
+        catalogues_bruts = data.get("catalogs")
+
     index: dict[str, dict[str, Any]] = {}
-    for entree in data.get("catalogs", []) or []:
+    for entree in catalogues_bruts or []:
+        catalog_id = entree.get("id")
+        if not catalog_id:
+            continue
+
         discover = ((entree.get("metadata") or {}).get("discover")) or {}
         params = discover.get("params")
         media_type_brut = discover.get("mediaType")
-        catalog_id = entree.get("id")
-        if not (catalog_id and params and media_type_brut):
+        if catalog_id and params and media_type_brut:
+            media_type = "tv" if media_type_brut in ("tv", "series") else "movie"
+            index[catalog_id] = {"kind": "discover", "media_type": media_type, "params": dict(params)}
             continue
-        media_type = "tv" if media_type_brut in ("tv", "series") else "movie"
-        index[catalog_id] = {"media_type": media_type, "params": dict(params)}
+
+        if entree.get("source") == "mdblist":
+            url_liste = (entree.get("metadata") or {}).get("url")
+            if url_liste and analyser_url_mdblist(url_liste):
+                media_type_brut = (entree.get("type") or (entree.get("metadata") or {}).get("mediatype") or "movie")
+                media_type = "tv" if media_type_brut in ("tv", "series", "show", "shows") else "movie"
+                index[catalog_id] = {"kind": "mdblist", "media_type": media_type, "mdblist_url": url_liste}
+
     return index
 
 
@@ -391,16 +494,39 @@ def construire_requetes(
             media_type = "movie" if source.get("type") == "movie" else "tv"
 
             # Priorité absolue : si un export AIOMetadata a été fourni et
-            # connaît ce catalogue exact, on utilise ses VRAIS filtres TMDB
-            # plutôt qu'une heuristique de repli à partir du nom/hash.
+            # connaît ce catalogue exact, on utilise ses VRAIS filtres/
+            # identifiants plutôt qu'une heuristique de repli à partir du
+            # nom/hash.
             info_aiometadata = (catalogues_aiometadata or {}).get(catalog_id)
-            if info_aiometadata:
+            if info_aiometadata and info_aiometadata.get("kind") == "mdblist":
+                user_slug = analyser_url_mdblist(info_aiometadata["mdblist_url"])
+                if user_slug:
+                    requetes.append(
+                        RequeteTMDB(
+                            kind="mdblist_liste",
+                            media_type=info_aiometadata["media_type"],
+                            params={"mdblist_user": user_slug[0], "mdblist_slug": user_slug[1]},
+                        )
+                    )
+                    continue
+            if info_aiometadata and info_aiometadata.get("kind", "discover") == "discover":
                 params_reels = {
                     cle: _resoudre_placeholder_date(valeur) for cle, valeur in info_aiometadata["params"].items()
                 }
                 params_reels.setdefault("sort_by", "popularity.desc")
                 requetes.append(
                     RequeteTMDB(kind="discover", media_type=info_aiometadata["media_type"], params=params_reels)
+                )
+                continue
+
+            # Repli MDBList : certains catalogId "mdblist.<id>" n'ont pas
+            # d'URL exportée exploitable (ex: "mdblist.recommended.*",
+            # personnalisé par compte -- non résolvable via l'API publique)
+            # -- explicitement journalisé plutôt que noyé dans le message
+            # générique "catalogId non résolu".
+            if catalog_id.startswith("mdblist.recommended."):
+                ignorees.append(
+                    f"mdblist recommandation personnalisée non résolvable sans compte lié ({catalog_id})"
                 )
                 continue
 
@@ -464,12 +590,39 @@ def construire_requetes(
             ignorees.append(f"addon/aio-metadata catalogId non résolu ({catalog_id})")
 
         elif provider == "trakt":
-            trakt_list_id = source.get("traktListId")
-            if trakt_list_id:
-                media_type_trakt = "movie" if source.get("mediaType") == "MOVIE" else "tv"
-                requetes.append(RequeteTMDB(kind="trakt_liste", media_type=media_type_trakt, tmdb_id=trakt_list_id))
+            # Trakt n'est plus pris en charge (créer une application Trakt
+            # nécessite désormais un abonnement VIP, voir MDBList plus haut) :
+            # on journalise proprement plutôt que de tenter une résolution.
+            ignorees.append("trakt non pris en charge (application Trakt indisponible sans abonnement VIP)")
+
+        elif provider == "mdblist":
+            # Trois façons équivalentes d'identifier une liste MDBList dans
+            # le JSON, de la plus pratique (coller l'URL telle quelle depuis
+            # le navigateur) à la plus explicite :
+            #   - "mdblistUrl": "https://mdblist.com/lists/<user>/<slug>"
+            #   - "mdblistUser" + "mdblistSlug"
+            #   - "mdblistId": <id numérique de la liste>
+            mdblist_id = source.get("mdblistId")
+            user_slug = None
+            if source.get("mdblistUrl"):
+                user_slug = analyser_url_mdblist(source["mdblistUrl"])
+            elif source.get("mdblistUser") and source.get("mdblistSlug"):
+                user_slug = (source["mdblistUser"], source["mdblistSlug"])
+
+            if mdblist_id:
+                requetes.append(RequeteTMDB(kind="mdblist_liste", params={"mdblist_id": mdblist_id}))
+            elif user_slug:
+                requetes.append(
+                    RequeteTMDB(
+                        kind="mdblist_liste",
+                        params={"mdblist_user": user_slug[0], "mdblist_slug": user_slug[1]},
+                    )
+                )
             else:
-                ignorees.append("trakt sans traktListId exploitable")
+                ignorees.append(
+                    "mdblist sans identifiant de liste exploitable "
+                    "(mdblistUrl / mdblistId / mdblistUser+mdblistSlug)"
+                )
         else:
             ignorees.append(f"provider non géré ({provider})")
 
@@ -515,7 +668,6 @@ class ClientTMDB:
         cle_api: str,
         session: requests.Session | None = None,
         langue: str = "fr-FR",
-        limite_appels_images: int = 300,
     ):
         self.cle_api = cle_api
         self.session = session or requests.Session()
@@ -523,9 +675,11 @@ class ClientTMDB:
         self._cache_keyword: dict[str, int | None] = {}
         self._cache_images: dict[tuple[int, str], dict[str, Any]] = {}
         self._cache_tvdb_id: dict[int, int | None] = {}
-        self.limite_appels_images = limite_appels_images
-        self.compteur_appels_images = 0
-        self.budget_images_epuise = False  # exposé pour le résumé final (log utilisateur)
+        # Ce client est partagé entre plusieurs threads (traitement de dossiers
+        # en parallèle, chacun téléchargeant lui-même ses tuiles en parallèle) :
+        # sans verrou, deux threads peuvent rater le cache au même instant et
+        # refaire le même appel en double.
+        self._verrou = threading.Lock()
 
     def _get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         params = dict(params or {})
@@ -546,29 +700,33 @@ class ClientTMDB:
         return {}
 
     def rechercher_mot_cle(self, mot: str) -> int | None:
-        if mot in self._cache_keyword:
-            return self._cache_keyword[mot]
+        with self._verrou:
+            if mot in self._cache_keyword:
+                return self._cache_keyword[mot]
         try:
             data = self._get("/search/keyword", {"query": mot})
             resultats = data.get("results") or []
             keyword_id = resultats[0]["id"] if resultats else None
         except requests.RequestException:
             keyword_id = None
-        self._cache_keyword[mot] = keyword_id
+        with self._verrou:
+            self._cache_keyword[mot] = keyword_id
         return keyword_id
 
     def recuperer_tvdb_id(self, tmdb_id: int) -> int | None:
         """Fanart.tv indexe les séries par TheTVDB, pas par TMDB -- il faut
         d'abord résoudre l'identifiant externe. Mis en cache (le même titre
         revient souvent dans plusieurs dossiers/groupes)."""
-        if tmdb_id in self._cache_tvdb_id:
-            return self._cache_tvdb_id[tmdb_id]
+        with self._verrou:
+            if tmdb_id in self._cache_tvdb_id:
+                return self._cache_tvdb_id[tmdb_id]
         try:
             data = self._get(f"/tv/{tmdb_id}/external_ids")
             resultat = data.get("tvdb_id")
         except requests.RequestException:
             resultat = None
-        self._cache_tvdb_id[tmdb_id] = resultat
+        with self._verrou:
+            self._cache_tvdb_id[tmdb_id] = resultat
         return resultat
 
     def recuperer_images(self, tmdb_id: int, media_type: str) -> dict[str, Any]:
@@ -580,19 +738,11 @@ class ClientTMDB:
         Mis en cache par (tmdb_id, media_type) -- le même titre populaire
         revient souvent dans plusieurs dossiers/groupes durant une même
         exécution, inutile de le redemander à chaque fois.
-
-        Au-delà de `limite_appels_images` appels réussis sur CETTE
-        exécution, on arrête d'interroger TMDB pour cet enrichissement et
-        on bascule directement sur Fanart pour tous les candidats restants
-        -- protection contre la limitation de débit TMDB sur de gros runs.
         """
         cle_cache = (tmdb_id, media_type)
-        if cle_cache in self._cache_images:
-            return self._cache_images[cle_cache]
-
-        if self.compteur_appels_images >= self.limite_appels_images:
-            self.budget_images_epuise = True
-            return {}
+        with self._verrou:
+            if cle_cache in self._cache_images:
+                return self._cache_images[cle_cache]
 
         chemin = "movie" if media_type != "tv" else "tv"
         try:
@@ -600,8 +750,8 @@ class ClientTMDB:
         except requests.RequestException:
             resultat = {}
 
-        self.compteur_appels_images += 1
-        self._cache_images[cle_cache] = resultat
+        with self._verrou:
+            self._cache_images[cle_cache] = resultat
         return resultat
 
     def resoudre_backdrop(self, requete: RequeteTMDB) -> tuple[str | None, int | None, str | None]:
@@ -711,6 +861,7 @@ class ClientFanart:
         self.cle_api = cle_api
         self.session = session or requests.Session()
         self._cache_donnees: dict[tuple[int, str], dict[str, Any] | None] = {}
+        self._verrou = threading.Lock()  # ce client est partagé entre threads (voir ClientTMDB)
 
     def _normaliser_langue(self, valeur: Any) -> str | None:
         """Normalise en minuscule/strip. IMPORTANT : ceci ne fusionne PAS
@@ -727,8 +878,9 @@ class ClientFanart:
         revient souvent dans plusieurs dossiers/groupes durant une même
         exécution, inutile de le redemander à chaque fois à Fanart."""
         cle_cache = (tmdb_ou_tvdb_id, media_type)
-        if cle_cache in self._cache_donnees:
-            return self._cache_donnees[cle_cache]
+        with self._verrou:
+            if cle_cache in self._cache_donnees:
+                return self._cache_donnees[cle_cache]
 
         chemin = "movies" if media_type == "movie" else "tv"
         try:
@@ -741,7 +893,8 @@ class ClientFanart:
         except requests.RequestException:
             resultat = None
 
-        self._cache_donnees[cle_cache] = resultat
+        with self._verrou:
+            self._cache_donnees[cle_cache] = resultat
         return resultat
 
     def _candidats_par_type(self, data: dict[str, Any], media_type: str, type_nom: str) -> list[dict[str, Any]]:
@@ -786,57 +939,164 @@ class ClientFanart:
         return meilleur.get("url")
 
 
-class ClientTrakt:
-    """Accès en lecture seule aux LISTES PUBLIQUES Trakt (traktListId).
+def analyser_url_mdblist(url: str) -> tuple[str, str] | None:
+    """Extrait (username, slug) d'une URL de liste MDBList telle que collée
+    depuis le navigateur, ex:
+        https://mdblist.com/lists/linaspurinis/top-watched-movies
+        https://www.mdblist.com/lists/linaspurinis/top-watched-movies/
+        mdblist.com/lists/linaspurinis/top-watched-movies/json/
+    Retourne None si l'URL ne correspond pas au format attendu."""
+    if not url:
+        return None
+    nettoyee = url.strip()
+    nettoyee = re.sub(r"^https?://", "", nettoyee)
+    nettoyee = re.sub(r"^www\.", "", nettoyee)
+    segments = [s for s in nettoyee.split("/") if s]
+    # segments attendus : ["mdblist.com", "lists", "<user>", "<slug>", ...]
+    try:
+        i = segments.index("lists")
+    except ValueError:
+        return None
+    if len(segments) < i + 3:
+        return None
+    user, slug = segments[i + 1], segments[i + 2]
+    if not user or not slug or slug == "json":
+        return None
+    return user, slug
 
-    Une simple clé "Client ID" (gratuite, https://trakt.tv/oauth/applications)
-    suffit pour ça -- pas besoin d'authentification OAuth complète.
 
-    ATTENTION : ceci ne couvre PAS les catalogues "trakt.recommendations.*"
-    (recommandations personnalisées), qui nécessitent un vrai jeton OAuth
-    utilisateur -- hors scope ici, voir BACKDROPS_SETUP.md.
+class ClientMDBList:
+    """Accès en lecture aux listes MDBList.com via une simple clé API
+    (pas d'OAuth, pas de renouvellement de jeton).
+
+    Pourquoi MDBList : créer une application Trakt nécessite désormais un
+    abonnement VIP (voir discussion du 2 août 2026 sur forums.trakt.tv),
+    ce qui est indisponible pour ce projet -- Trakt n'est donc pas pris en
+    charge (voir plus haut). MDBList permet de se connecter avec un
+    compte Trakt gratuit ("Login with Trakt" sur mdblist.com, via LEUR
+    application déjà enregistrée) puis délivre sa PROPRE clé API MDBList,
+    gratuite (1000 requêtes/jour), sans jamais toucher à l'API Trakt
+    directement.
+
+    Deux stratégies de récupération, dans cet ordre :
+      1. API officielle authentifiée par clé (`api.mdblist.com/lists/...`).
+      2. Repli sur l'export JSON public de la liste
+         (`mdblist.com/lists/<user>/<slug>/json/`), qui ne nécessite AUCUNE
+         clé et fonctionne pour toute liste PUBLIQUE -- confirmé par le
+         développeur de MDBList lui-même comme méthode d'accès légitime
+         sans API (voir github.com/jurialmunkey/plugin.video.themoviedb.helper/issues/741).
+         Utile si la clé API est absente/épuisée, ou si l'endpoint exact de
+         l'API officielle change.
+
+    Ne lève jamais d'exception : liste vide en cas d'échec.
     """
 
-    def __init__(self, client_id: str | None, session: requests.Session | None = None):
-        self.client_id = client_id
+    API_BASE = "https://api.mdblist.com"
+    SITE_BASE = "https://mdblist.com"
+
+    def __init__(self, api_key: str | None, session: requests.Session | None = None):
+        self.api_key = api_key
         self.session = session or requests.Session()
-        self._cache_liste: dict[int, list[tuple[int, str]]] = {}
+        self._cache_liste: dict[str, list[tuple[int, str]]] = {}
+        self._verrou = threading.Lock()  # client partagé entre threads, comme ClientTMDB/ClientFanart
 
-    def _headers(self) -> dict[str, str]:
-        return {
-            "Content-Type": "application/json",
-            "trakt-api-key": self.client_id or "",
-            "trakt-api-version": "2",
-        }
+    @staticmethod
+    def _items_depuis_reponse(data: Any) -> list[tuple[int, str]]:
+        """Normalise la réponse MDBList (dict avec 'movies'/'shows', OU liste
+        brute) en tuples (tmdb_id, media_type). Le champ 'id' d'un item
+        MDBList est déjà l'identifiant TMDB (confirmé par les exemples
+        officiels de list-items / media-info)."""
+        resultat: list[tuple[int, str]] = []
+        if isinstance(data, dict):
+            for item in data.get("movies") or []:
+                tmdb_id = item.get("id")
+                if tmdb_id:
+                    resultat.append((tmdb_id, "movie"))
+            for item in data.get("shows") or []:
+                tmdb_id = item.get("id")
+                if tmdb_id:
+                    resultat.append((tmdb_id, "tv"))
+        elif isinstance(data, list):
+            for item in data:
+                tmdb_id = item.get("id")
+                if not tmdb_id:
+                    continue
+                media_type_brut = (item.get("mediatype") or item.get("type") or "movie").lower()
+                resultat.append((tmdb_id, "tv" if media_type_brut in ("tv", "show", "shows") else "movie"))
+        return resultat
 
-    def recuperer_items_liste(self, trakt_list_id: int, limite: int = 50) -> list[tuple[int, str]]:
-        """Retourne une liste de (tmdb_id, media_type) pour les items d'une
-        liste Trakt PUBLIQUE. Liste vide si pas de clé, liste privée, ou
-        erreur réseau -- jamais d'exception."""
-        if trakt_list_id in self._cache_liste:
-            return self._cache_liste[trakt_list_id]
+    def _recuperer(self, cle_cache: str, urls_et_params: list[tuple[str, dict[str, Any]]]) -> list[tuple[int, str]]:
+        with self._verrou:
+            if cle_cache in self._cache_liste:
+                return self._cache_liste[cle_cache]
 
         resultat: list[tuple[int, str]] = []
-        if self.client_id:
+        for url, params in urls_et_params:
             try:
-                r = self.session.get(
-                    f"{TRAKT_API_BASE}/lists/{trakt_list_id}/items",
-                    headers=self._headers(),
-                    params={"limit": limite},
-                    timeout=15,
-                )
+                r = self.session.get(url, params=params, timeout=15)
                 if r.status_code == 200:
-                    for item in r.json() or []:
-                        type_item = item.get("type")  # "movie" ou "show"
-                        bloc = item.get(type_item) or {}
-                        tmdb_id = (bloc.get("ids") or {}).get("tmdb")
-                        if tmdb_id:
-                            resultat.append((tmdb_id, "movie" if type_item == "movie" else "tv"))
-            except requests.RequestException:
-                pass
+                    resultat = self._items_depuis_reponse(r.json())
+                    if resultat:
+                        break
+            except (requests.RequestException, ValueError):
+                continue
 
-        self._cache_liste[trakt_list_id] = resultat
+        with self._verrou:
+            self._cache_liste[cle_cache] = resultat
         return resultat
+
+    def recuperer_items_liste_par_id(self, mdblist_id: int, limite: int = 50) -> list[tuple[int, str]]:
+        """Récupère les items d'une liste MDBList identifiée par son id
+        numérique. Nécessite une clé API (pas de repli JSON public sans
+        connaître le user/slug)."""
+        if not self.api_key:
+            return []
+        cle_cache = f"id:{mdblist_id}"
+        url = f"{self.API_BASE}/lists/{mdblist_id}/items"
+        params = {"apikey": self.api_key, "limit": limite}
+        return self._recuperer(cle_cache, [(url, params)])
+
+    def recuperer_items_liste(self, username: str, slug: str, limite: int = 50) -> list[tuple[int, str]]:
+        """Récupère les items d'une liste MDBList identifiée par
+        (username, slug) -- ce que donne `analyser_url_mdblist()` à partir
+        d'une URL collée depuis le navigateur. Essaie l'API officielle avec
+        clé, puis l'export JSON public (sans clé) en repli."""
+        cle_cache = f"{username}/{slug}"
+        tentatives: list[tuple[str, dict[str, Any]]] = []
+        if self.api_key:
+            tentatives.append(
+                (f"{self.API_BASE}/lists/{username}/{slug}/items", {"apikey": self.api_key, "limit": limite})
+            )
+        tentatives.append((f"{self.SITE_BASE}/lists/{username}/{slug}/json/", {}))
+        return self._recuperer(cle_cache, tentatives)
+
+    def rechercher_listes(self, requete: str, limite: int = 20) -> list[dict[str, Any]]:
+        """Recherche des listes PUBLIQUES par titre (endpoint confirmé par
+        lecture du code source officiel du client Go `mdblist-cli` :
+        GET /lists/search?apikey=...&query=... -- voir
+        github.com/luckylittle/mdblist-cli/blob/main/internal/client/mdblist.go).
+
+        Retourne les résultats bruts (dicts avec au moins : id, name, slug,
+        user_name, mediatype, items, likes, private) triés par nombre
+        d'items décroissant, sans exception en cas d'échec (liste vide).
+        Nécessite une clé API (contrairement à la lecture d'une liste
+        déjà connue, qui a un repli public sans clé)."""
+        if not self.api_key or not requete.strip():
+            return []
+        try:
+            r = self.session.get(
+                f"{self.API_BASE}/lists/search",
+                params={"apikey": self.api_key, "query": requete.strip()},
+                timeout=15,
+            )
+            if r.status_code != 200:
+                return []
+            resultats = r.json()
+            if not isinstance(resultats, list):
+                return []
+            return sorted(resultats, key=lambda liste: -(liste.get("items") or 0))[:limite]
+        except (requests.RequestException, ValueError):
+            return []
 
 
 # ---------------------------------------------------------------------------
@@ -854,7 +1114,6 @@ def meilleur_backdrop_tmdb_langue(images_data: dict[str, Any] | None, langue: st
         return None
     meilleur = sorted(candidats, key=lambda b: -(b.get("vote_average") or 0))[0]
     return meilleur.get("file_path")
-
 
 
 # ---------------------------------------------------------------------------
@@ -906,14 +1165,23 @@ class GenerateurBackdrops:
         dry_run: bool = False,
         mosaique: bool = False,
         langue_preferee: str = "fr",
-        limite_appels_tmdb_images: int = 300,
-        cle_trakt: str | None = None,
+        cle_mdblist: str | None = None,
         catalogues_aiometadata: dict[str, dict[str, Any]] | None = None,
     ):
         self.session = requests.Session()
-        self.tmdb = ClientTMDB(cle_tmdb, session=self.session, limite_appels_images=limite_appels_tmdb_images)
+        # Le profil `mosaique` télécharge jusqu'à 12 tuiles en parallèle par
+        # dossier, potentiellement pour plusieurs dossiers en même temps
+        # (`--parallelisme`) : la taille de pool par défaut de `requests`
+        # (10) est vite dépassée sur les mêmes hôtes (TMDB/Fanart), ce qui
+        # fait fermer/rouvrir des connexions en boucle ("Connection pool is
+        # full, discarding connection") sans que ce soit une erreur, juste
+        # un gâchis de connexions TCP. On agrandit le pool en conséquence.
+        adaptateur = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=64)
+        self.session.mount("https://", adaptateur)
+        self.session.mount("http://", adaptateur)
+        self.tmdb = ClientTMDB(cle_tmdb, session=self.session)
         self.fanart = ClientFanart(cle_fanart, session=self.session)
-        self.trakt = ClientTrakt(cle_trakt, session=self.session)
+        self.mdblist = ClientMDBList(cle_mdblist, session=self.session)
         self.repertoire_sortie = repertoire_sortie
         self.profil = profil
         self.dry_run = dry_run
@@ -928,7 +1196,7 @@ class GenerateurBackdrops:
         hauteur = round(largeur * 9 / 16)
         return largeur, hauteur
 
-    def _telecharger_une_image(self, url: str) -> "Image.Image | None":
+    def _telecharger_une_image(self, url: str) -> Image.Image | None:
         try:
             r = self.session.get(url, timeout=20)
             r.raise_for_status()
@@ -938,7 +1206,7 @@ class GenerateurBackdrops:
 
     def _obtenir_fond_pour_clearart(
         self, fanart_data: dict[str, Any] | None, media_type: str, backdrop_path_repli: str | None
-    ) -> "Image.Image | None":
+    ) -> Image.Image | None:
         """Un clearart est détouré (transparent) : on lui trouve un vrai
         fond derrière plutôt qu'une couleur plate -- d'abord un
         'background' Fanart (n'importe quelle langue, il n'a pas de texte
@@ -953,7 +1221,7 @@ class GenerateurBackdrops:
             return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path_repli}")
         return None
 
-    def _resoudre_image_tuile(self, candidat: tuple[str, int, str, str | None]) -> "Image.Image | None":
+    def _resoudre_image_tuile(self, candidat: tuple[str, int, str, str | None]) -> Image.Image | None:
         """Cascade de résolution pour une tuile, dans l'ordre demandé :
 
         Pour chaque langue en (français, anglais) :
@@ -1044,7 +1312,7 @@ class GenerateurBackdrops:
 
     def _telecharger_images_pour_mosaique(
         self, candidats: list[tuple[str, int, str, str | None]]
-    ) -> list["Image.Image"]:
+    ) -> list[Image.Image]:
         """Résout (cascade TMDB langue -> Fanart -> sans texte) et
         télécharge en parallèle les images des candidats ; retourne les
         images PIL valides (dans l'ordre, en ignorant les échecs)."""
@@ -1064,12 +1332,14 @@ class GenerateurBackdrops:
     def _resoudre_liste_candidats(self, requete: RequeteTMDB, cible: int, pages: int) -> list[tuple[str, int, str, str | None]]:
         """Résout une requête en liste de candidats (backdrop_path, tmdb_id,
         media_type, langue_originale) -- gère aussi bien les requêtes TMDB
-        classiques que les listes Trakt publiques (`kind == "trakt_liste"`)."""
-        if requete.kind == "trakt_liste":
-            items = self.trakt.recuperer_items_liste(requete.tmdb_id, limite=cible)
-            # backdrop_path/langue inconnus à ce stade -- la cascade de
-            # résolution de tuile (TMDB /images -> Fanart) n'en a pas besoin,
-            # ils ne servent que de tout dernier repli.
+        classiques que les listes MDBList (`kind == "mdblist_liste"`)."""
+        if requete.kind == "mdblist_liste":
+            if "mdblist_id" in requete.params:
+                items = self.mdblist.recuperer_items_liste_par_id(requete.params["mdblist_id"], limite=cible)
+            else:
+                items = self.mdblist.recuperer_items_liste(
+                    requete.params["mdblist_user"], requete.params["mdblist_slug"], limite=cible
+                )
             return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
         return self.tmdb.resoudre_backdrops_multiples(requete, limite=cible, pages=pages)
 
@@ -1132,7 +1402,7 @@ class GenerateurBackdrops:
             raison = "; ".join(raisons) or "aucune source exploitable"
             return ResultatDossier(groupe_titre, dossier_titre, "ignore", raison)
 
-        chemin_relatif = Path(GROUPE_SLUGS.get(normaliser(groupe_titre), slugifier(groupe_titre))) / "backdrop" / f"{slugifier(dossier_titre)}.jpg"
+        chemin_relatif = Path(GROUPE_SLUGS.get(normaliser(groupe_titre), slugifier(groupe_titre))) / NOM_DOSSIER_BACKDROPS / f"{nom_fichier_backdrop(dossier_titre)}.jpg"
         chemin_sortie = self.repertoire_sortie / chemin_relatif
 
         if self.dry_run:
@@ -1217,7 +1487,16 @@ class GenerateurBackdrops:
                 for titre_groupe, dossier in taches
             }
             for futur in concurrent.futures.as_completed(futurs):
-                resultats.append(futur.result())
+                titre_groupe, dossier = futurs[futur]
+                dossier_titre = dossier.get("title", "sans-titre")
+                try:
+                    resultats.append(futur.result())
+                except Exception as exc:  # noqa: BLE001 -- une erreur inattendue sur UN dossier
+                    # ne doit jamais faire perdre les résultats déjà obtenus pour les autres.
+                    logging.debug("Erreur inattendue sur [%s] %s : %s", titre_groupe, dossier_titre, exc)
+                    resultats.append(
+                        ResultatDossier(titre_groupe, dossier_titre, "erreur", f"exception inattendue : {exc}")
+                    )
 
         return resultats
 
@@ -1260,10 +1539,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Génère les backdrops des collections Nuvio.")
     parser.add_argument("--cle-tmdb", default=None, help="Clé API TMDB (ou variable TMDB_API_KEY)")
     parser.add_argument("--cle-fanart", default=None, help="Clé API Fanart.tv (optionnel)")
-    parser.add_argument("--cle-trakt", default=None, help="Client ID Trakt.tv, pour résoudre les traktListId publiques (optionnel)")
+    parser.add_argument("--cle-mdblist", default=None, help="Clé API MDBList.com, pour résoudre les sources provider=mdblist (optionnel, ou variable MDBLIST_API_KEY)")
     parser.add_argument("--aiometadata", default=None, help="Chemin vers un export AIOMetadata (JSON) pour résoudre les catalogues avec leurs vrais filtres TMDB (optionnel)")
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
-    parser.add_argument("--sortie", default="collections")
+    parser.add_argument("--sortie", default=NOM_DOSSIER_RACINE)
     parser.add_argument("--profil", choices=list(PROFILS_QUALITE), default="standard")
     parser.add_argument("--parallelisme", type=int, default=4)
     parser.add_argument("--groupe", default=None, help="Ne traiter qu'un seul groupe (ex: Genres)")
@@ -1271,13 +1550,10 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="Simule sans appeler TMDB ni écrire d'image")
     parser.add_argument("--mosaique", action="store_true", help="Génère une mosaïque multi-titres + couleur d'accent au lieu d'un seul backdrop (repli automatique si pas assez d'images)")
     parser.add_argument("--langue-preferee", default="fr", help="Code langue Fanart.tv préféré pour les artworks avec titre incrusté (défaut: fr)")
-    parser.add_argument("--limite-appels-tmdb-images", type=int, default=300, help="Au-delà de ce nombre d'appels TMDB /images sur l'exécution, bascule sur Fanart uniquement (défaut: 300)")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO, format="%(message)s")
-
-    import os
 
     cle_tmdb = args.cle_tmdb or os.environ.get("TMDB_API_KEY")
     if not cle_tmdb and not args.dry_run:
@@ -1287,26 +1563,21 @@ def main() -> int:
     collections = charger_collections(Path(args.collections))
     generateur = GenerateurBackdrops(
         cle_tmdb=cle_tmdb or "dry-run",
-        cle_fanart=args.cle_fanart or __import__("os").environ.get("FANART_API_KEY"),
+        cle_fanart=args.cle_fanart or os.environ.get("FANART_API_KEY"),
         repertoire_sortie=Path(args.sortie),
         profil=args.profil,
         dry_run=args.dry_run,
         mosaique=args.mosaique,
         langue_preferee=args.langue_preferee,
-        limite_appels_tmdb_images=args.limite_appels_tmdb_images,
-        cle_trakt=args.cle_trakt or __import__("os").environ.get("TRAKT_CLIENT_ID"),
+        cle_mdblist=args.cle_mdblist or os.environ.get("MDBLIST_API_KEY"),
         catalogues_aiometadata=charger_catalogues_aiometadata(Path(args.aiometadata) if args.aiometadata else None),
     )
+
     resultats = generateur.generer_tout(
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
     )
     afficher_resume(resultats)
-    if generateur.tmdb.budget_images_epuise:
-        print(
-            f"\n⚠️  Budget d'appels TMDB /images atteint ({generateur.tmdb.limite_appels_images}) : "
-            "les derniers titres traités sont passés directement en résolution Fanart uniquement "
-            "(--limite-appels-tmdb-images pour ajuster)."
-        )
+
     return 0
 
 
