@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "exportedAt": "2026-02-01T00:00:00.000Z",
+  "catalogs": [
+    {
+      "id": "tmdb.discover.movie.genre_horreur.global",
+      "type": "movie",
+      "name": "Horreur",
+      "enabled": true,
+      "source": "tmdb",
+      "metadata": {
+        "discover": {
+          "version": 2,
+          "source": "tmdb",
+          "mediaType": "movie",
+          "params": {
+            "sort_by": "popularity.desc",
+            "with_genres": "27"
+          }
+        }
+      }
+    }
+  ]
+}
