@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 mosaique.py
 ============
@@ -20,8 +19,8 @@ import colorsys
 import io
 import itertools
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 from PIL import Image, ImageDraw, ImageFilter
 

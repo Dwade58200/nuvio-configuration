@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 generer_backdrops.py
 =====================
@@ -59,8 +58,8 @@ import sys
 import threading
 import time
 import unicodedata
-from datetime import date as _date
 from dataclasses import dataclass, field
+from datetime import date as _date
 from pathlib import Path
 from typing import Any
 
@@ -77,7 +76,6 @@ except ImportError:  # pragma: no cover
     raise
 
 import mosaique as mosaique_module  # module compagnon, scripts/mosaique.py
-
 
 # ---------------------------------------------------------------------------
 # Configuration générale
@@ -391,7 +389,7 @@ def _resoudre_placeholder_date(valeur: Any) -> Any:
     return valeur
 
 
-def charger_catalogues_aiometadata(chemin: "Path | None") -> dict[str, dict[str, Any]]:
+def charger_catalogues_aiometadata(chemin: Path | None) -> dict[str, dict[str, Any]]:
     """Charge un export AIOMetadata (Réglages -> Export dans l'addon) et
     construit un index {catalogId: {...}} pour résoudre un catalogue (ex:
     Streaming, Genres, MDBList...) avec ses VRAIS filtres/identifiants
@@ -1114,7 +1112,7 @@ class ClientMDBList:
             resultats = r.json()
             if not isinstance(resultats, list):
                 return []
-            return sorted(resultats, key=lambda l: -(l.get("items") or 0))[:limite]
+            return sorted(resultats, key=lambda liste: -(liste.get("items") or 0))[:limite]
         except (requests.RequestException, ValueError):
             return []
 
@@ -1207,7 +1205,7 @@ class GenerateurBackdrops:
         hauteur = round(largeur * 9 / 16)
         return largeur, hauteur
 
-    def _telecharger_une_image(self, url: str) -> "Image.Image | None":
+    def _telecharger_une_image(self, url: str) -> Image.Image | None:
         try:
             r = self.session.get(url, timeout=20)
             r.raise_for_status()
@@ -1217,7 +1215,7 @@ class GenerateurBackdrops:
 
     def _obtenir_fond_pour_clearart(
         self, fanart_data: dict[str, Any] | None, media_type: str, backdrop_path_repli: str | None
-    ) -> "Image.Image | None":
+    ) -> Image.Image | None:
         """Un clearart est détouré (transparent) : on lui trouve un vrai
         fond derrière plutôt qu'une couleur plate -- d'abord un
         'background' Fanart (n'importe quelle langue, il n'a pas de texte
@@ -1232,7 +1230,7 @@ class GenerateurBackdrops:
             return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path_repli}")
         return None
 
-    def _resoudre_image_tuile(self, candidat: tuple[str, int, str, str | None]) -> "Image.Image | None":
+    def _resoudre_image_tuile(self, candidat: tuple[str, int, str, str | None]) -> Image.Image | None:
         """Cascade de résolution pour une tuile, dans l'ordre demandé :
 
         Pour chaque langue en (français, anglais) :
@@ -1323,7 +1321,7 @@ class GenerateurBackdrops:
 
     def _telecharger_images_pour_mosaique(
         self, candidats: list[tuple[str, int, str, str | None]]
-    ) -> list["Image.Image"]:
+    ) -> list[Image.Image]:
         """Résout (cascade TMDB langue -> Fanart -> sans texte) et
         télécharge en parallèle les images des candidats ; retourne les
         images PIL valides (dans l'ordre, en ignorant les échecs)."""

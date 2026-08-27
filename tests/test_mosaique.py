@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests pour scripts/mosaique.py (grille inclinée) -- entièrement hors-ligne."""
 
 import sys
@@ -128,7 +127,7 @@ def test_construire_grille_inclinee_dimensions_canvas():
 def test_construire_grille_inclinee_leve_erreur_si_liste_vide():
     try:
         construire_grille_inclinee([], 1920, 1080)
-        assert False, "aurait dû lever ValueError"
+        raise AssertionError("aurait dû lever ValueError")
     except ValueError:
         pass
 
@@ -152,7 +151,7 @@ def test_construire_grille_inclinee_utilise_plusieurs_images_distinctes():
     trouvees = set()
     for couleur in couleurs_presentes:
         for base in couleurs_de_base:
-            if sum(abs(c - b) for c, b in zip(couleur, base)) < 40:
+            if sum(abs(c - b) for c, b in zip(couleur, base, strict=True)) < 40:
                 trouvees.add(base)
     assert len(trouvees) >= 4
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests de la cascade de résolution d'image pour une tuile de mosaïque.
 
@@ -27,7 +26,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from generer_backdrops import GenerateurBackdrops, GROUPE_GENRES, construire_requetes  # noqa: E402
+from generer_backdrops import GROUPE_GENRES, GenerateurBackdrops, construire_requetes  # noqa: E402
 
 
 def _image_bytes(couleur, taille=(1280, 720)):

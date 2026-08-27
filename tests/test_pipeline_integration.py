@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Test d'intégration : simule les réponses TMDB/Fanart avec de fausses
 requêtes HTTP, pour vérifier que tout le pipeline
@@ -16,8 +15,8 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from generer_backdrops import (  # noqa: E402
-    GenerateurBackdrops,
     GROUPE_GENRES,
+    GenerateurBackdrops,
 )
 
 

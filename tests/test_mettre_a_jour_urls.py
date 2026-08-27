@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests pour scripts/mettre_a_jour_urls.py (aucun appel réseau)."""
 
 import sys

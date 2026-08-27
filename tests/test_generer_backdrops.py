@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests unitaires pour scripts/generer_backdrops.py
 
@@ -9,33 +8,33 @@ contenait le bug initial sur les titres de groupes).
 Lancer avec : pytest tests/ -v
 """
 
-import sys
 import json
+import sys
 from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from generer_backdrops import (  # noqa: E402
+    GROUPE_DECOUVRIR,
+    GROUPE_FRANCHISES,
     GROUPE_GENRES,
     GROUPE_SPORTS,
     GROUPE_STREAMING,
-    GROUPE_DECOUVRIR,
-    GROUPE_FRANCHISES,
-    GROUPE_VIBES,
     GROUPE_THEMATIQUES,
-    _mapper_filtres_discover,
+    GROUPE_VIBES,
+    ClientMDBList,
     _extraire_slug_thematique,
+    _mapper_filtres_discover,
     _resoudre_genre_depuis_texte,
+    analyser_url_mdblist,
     charger_catalogues_aiometadata,
     charger_collections,
     construire_requetes,
     dossier_actif,
-    slugifier,
-    normaliser,
-    analyser_url_mdblist,
     meilleur_backdrop_tmdb_langue,
-    ClientMDBList,
+    normaliser,
+    slugifier,
 )
 
 
@@ -678,7 +677,7 @@ def test_trakt_recommendations_ne_sont_plus_reconnues():
 # ---------------------------------------------------------------------------
 
 def test_groupe_slugs_sont_en_francais():
-    from generer_backdrops import GROUPE_SLUGS, NOM_DOSSIER_RACINE, NOM_DOSSIER_BACKDROPS
+    from generer_backdrops import GROUPE_SLUGS, NOM_DOSSIER_BACKDROPS, NOM_DOSSIER_RACINE
 
     assert NOM_DOSSIER_RACINE == "Collections"
     assert NOM_DOSSIER_BACKDROPS == "Backdrops"

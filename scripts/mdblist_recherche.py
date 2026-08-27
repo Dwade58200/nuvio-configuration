@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 mdblist_recherche.py
 =====================
@@ -54,7 +53,7 @@ def rechercher(cle_api: str, requete: str) -> list[dict]:
     if not isinstance(resultats, list):
         print(f"Réponse inattendue de l'API MDBList : {resultats!r}", file=sys.stderr)
         return []
-    return sorted(resultats, key=lambda l: -(l.get("items") or 0))
+    return sorted(resultats, key=lambda liste: -(liste.get("items") or 0))
 
 
 def afficher(resultats: list[dict]) -> None:

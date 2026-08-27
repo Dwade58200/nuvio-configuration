@@ -1,99 +1,92 @@
-# Comment appliquer ce correctif (arborescence française + noms de fichiers personnalisés)
+# Session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 
-## ⚠️ Ce paquet remplace la TOTALITÉ des scripts et tests
+## 🐛 Le vrai bug MDBList (trouvé et corrigé)
 
-Vu l'ampleur des changements (architecture de dossiers), le plus sûr est
-de remplacer tous les fichiers ci-dessous plutôt que de faire des diffs
-partiels.
+Ce n'était **pas** un problème de clé API ni de JSON mal formé. Vérifié
+empiriquement en exécutant `charger_catalogues_aiometadata()` sur ton
+export réel (`Templates/aiometadata-setup.json`) : elle chargeait **0**
+catalogue, alors que le fichier en contient 227.
 
-## Fichiers à remplacer/ajouter sur GitHub
-
-| Fichier | Emplacement dans ton repo | Action |
-|---|---|---|
-| scripts/generer_backdrops.py | scripts/generer_backdrops.py | remplacer |
-| scripts/mosaique.py | scripts/mosaique.py | remplacer (inchangé, mais fourni pour cohérence) |
-| scripts/mettre_a_jour_urls.py | scripts/mettre_a_jour_urls.py | remplacer |
-| scripts/purger_cache.py | scripts/purger_cache.py | remplacer |
-| scripts/trakt_auth.py | scripts/trakt_auth.py | ajouter (nouveau) |
-| tests/*.py | tests/ | remplacer tous |
-| tests/fixtures/*.json | tests/fixtures/ | remplacer |
-| .github/workflows/generer-backdrops.yml | .github/workflows/generer-backdrops.yml | remplacer |
-| BACKDROPS_SETUP.md | BACKDROPS_SETUP.md | remplacer |
-| requirements-dev.txt | requirements-dev.txt | remplacer (inchangé) |
-
-⚠️ RAPPEL : sélectionne TOUT le contenu existant (Ctrl+A) et supprime-le
-AVANT de coller le nouveau contenu, pour chaque fichier remplacé.
-
-## Ce qui a changé
-
-### 1. Nouvelle arborescence (français, capitalisée)
-
+**Cause** : la fonction lisait `data.get("catalogs", [])` à la racine du
+JSON. Mais ton export réel (AIOMetadata v2.15.0) range ses catalogues
+sous `config.catalogs` :
+```json
+{"version": "2.15.0", "exportedAt": "...", "config": {"catalogs": [...]}}
 ```
-Collections/
-├── Decouvertes/Backdrops/*.jpg
-├── Franchises/Backdrops/*.jpg          (groupe désactivé, dossier vide)
-├── Genres/Backdrops/*.jpg
-├── Services de Streaming/Backdrops/*.jpg
-├── Sports/Backdrops/*.jpg              (groupe désactivé, dossier vide)
-├── Thematiques/Backdrops/*.jpg
-├── Vibes/Backdrops/*.jpg
-└── Annees/Backdrops/*.jpg              (absent de ta liste, nommé par défaut --
-                                          change GROUPE_SLUGS dans le script si besoin)
-```
+L'ancien fixture de test utilisait l'ancien format à plat (`catalogs` à
+la racine) — les tests passaient donc alors que le vrai fichier échouait
+silencieusement à chaque exécution. Le fixture a été corrigé pour
+refléter le vrai format, avec un second fixture dédié pour vérifier que
+l'ancien format à plat reste aussi accepté (compatibilité ascendante).
 
-### 2. Fichiers renommés en `Nom_Backdrop.jpg`
+**Second problème, distinct** : même une fois cette structure corrigée,
+la fonction n'indexait que les catalogues avec un bloc `metadata.discover`
+(filtres TMDB). Les catalogues `source: "mdblist"` (comme "Sitcom", avec
+`metadata.url`) n'ont pas ce bloc — ils étaient donc exclus même après la
+correction du niveau d'imbrication. `charger_catalogues_aiometadata`
+indexe maintenant aussi ces catalogues (kind="mdblist"), et
+`construire_requetes` les résout via l'URL publique exportée en
+réutilisant `ClientMDBList` (déjà existant, jamais branché sur ce cas).
 
-Les 15 correspondances demandées sont exactement respectées (vérifiées
-par test), ex : `Sci-Fi_Backdrop.jpg`, `Canal+_Backdrop.jpg`,
-`TF1_Backdrop.jpg`, `Chasse_au_Tresor_Backdrop.jpg`, etc. Tout titre non
-listé obtient un nom générique automatique cohérent.
+**Impact mesuré** (comparaison directe avant/après sur ta vraie
+collection) : **51 des ~54 dossiers actifs** obtiennent des filtres TMDB
+différents (souvent plus précis : les bons `with_watch_providers` pour
+chaque service de streaming, `with_genres` réel au lieu d'une heuristique,
+etc.) — le bug touchait bien plus que MDBList seul, tout catalogue
+`addon/aio-metadata` était concerné. "Sitcom" est désormais résolu ;
+"Recommandation" reste et restera ignoré (liste MDBList personnalisée au
+compte, sans URL publique fixe à interroger) — mais avec un message
+explicite plutôt que le générique "catalogId non résolu".
 
-**Pour changer un nom de dossier ou de fichier plus tard** : tout est
-regroupé dans un seul bloc en haut de `scripts/generer_backdrops.py`
-("ARCHITECTURE DE SORTIE") -- une ligne à éditer par cas.
+## 🗑️ Trakt entièrement retiré
 
-### 3. Nettoyage automatique de l'ancienne arborescence
+Plus aucune trace dans le code : `ClientTrakt`, `scripts/trakt_auth.py`,
+les tests associés, les arguments CLI (`--cle-trakt`, `--trakt-*`), les
+variables d'environnement, la logique de rafraîchissement de token dans
+`main()`, les secrets et l'étape dédiée du workflow GitHub Actions. Toute
+source `provider: "trakt"` reste gérée proprement : ignorée et
+journalisée avec une raison explicite, jamais une erreur.
 
-Le workflow supprime automatiquement l'ancien dossier `collections/`
-(minuscule) au prochain lancement, pour ne pas avoir les deux en
-parallèle. Ça part dans le même commit que la nouvelle génération.
+## 🔧 Optimisations "règles de l'art"
 
-### 4. Encodage d'URL
+- `.github/workflows/tests.yml` : CI qui lance `ruff check`, `mypy`
+  (informatif) et `pytest tests/ -v` sur chaque push/PR — jusqu'ici rien
+  ne faisait tourner les tests avant un déploiement réel.
+- `requirements.txt` (runtime : `requests`, `Pillow`) séparé de
+  `requirements-dev.txt` (`-r requirements.txt` + `pytest`/`ruff`/`mypy`) ;
+  `PyYAML` retiré (jamais utilisé nulle part dans le code).
+- `pyproject.toml` ajouté pour la config `ruff`/`mypy`/`pytest`.
+- `Iterable` (import `typing` inutilisé) retiré ; `import os` déplacé en
+  haut de `generer_backdrops.py` (il était fait localement dans `main()`).
+- `.gitignore` ajouté (absent jusqu'ici).
+- Tests ajoutés pour deux fonctions pures jusque-là non testées
+  directement : `meilleur_backdrop_tmdb_langue` et `charger_collections`.
+- Secret GitHub `MDBLIST_API_KEY` maintenant transmis au script par le
+  workflow (absent avant, alors que `--cle-mdblist`/`ClientMDBList`
+  existaient déjà).
 
-Le dossier "Services de Streaming" contient un espace -- les URLs
-jsDelivr générées (mise à jour des liens + purge du cache) l'encodent
-maintenant correctement (%20).
+## Tests
 
-### 5. Recommandations Trakt retirées
-
-`trakt.recommendations.movies/shows` n'est plus reconnu (retombe en
-"ignoré", comme avant l'ajout Trakt). L'authentification OAuth Trakt
-(access_token/refresh_token) reste utile pour accéder aux LISTES PRIVÉES
-de ton second compte -- voir BACKDROPS_SETUP.md.
-
-## Test en local
+Cette session a été faite sans accès réseau (pas d'installation possible
+de `pytest`) : chaque fonction modifiée a été vérifiée en l'import\ant et
+en l'exécutant directement en Python, y compris sur tes vrais fichiers
+(`Templates/aiometadata-setup.json`, `Templates/Nuvio-Collections-Dwade58200.json`).
+La suite de tests complète (115 tests, dont les nouveaux) a aussi été
+rejouée avec un petit harnais maison qui simule `pytest` (gère `tmp_path`
+et `capsys`) : **115/115 passent**. À reconfirmer avec un vrai
+`pytest tests/ -v` en local ou via la nouvelle CI, par prudence.
 
 ```bash
 pip install -r requirements-dev.txt
-pytest tests/ -v   # doit afficher 104 passed
+pytest tests/ -v   # attendu : 115 passed
 
 python3 scripts/generer_backdrops.py --dry-run --mosaique --aiometadata Templates/aiometadata-setup.json
-# doit donner 53 générés (54 avant le retrait des recommandations, -1 = 53)
 ```
 
-## Test réel via GitHub Actions
+## ⚠️ Point d'attention pour la prochaine session
 
-1. Actions → Générer les Backdrops → Run workflow
-2. `groupe` = `Genres`, `limite` = `2`, dry_run décoché, desactiver_mosaique décoché
-3. Vérifie dans les logs l'étape "Nettoyer l'ancienne arborescence"
-4. Vérifie sur GitHub que les fichiers apparaissent bien sous
-   `Collections/Genres/Backdrops/..._Backdrop.jpg`
-5. Coche `mettre_a_jour_urls` sur un run complet une fois que tu es
-   satisfait, pour que le JSON Nuvio pointe vers les nouveaux chemins
-6. Si tout va bien, relance en génération complète (sans limite)
-
-## ⚠️ Confirme-moi
-
-Le nom "Annees" pour le groupe Années (absent de ta liste d'origine) --
-dis-moi si tu préfères un autre nom, c'est une ligne à changer dans
-`GROUPE_SLUGS`.
+Comme d'habitude : si le prochain export ZIP que tu fournis a été
+généré depuis une base antérieure à cette session, ces corrections
+disparaîtront silencieusement et devront être réappliquées. Vérifier
+d'abord que `charger_catalogues_aiometadata()` cherche bien
+`config.catalogs` avant de repartir sur autre chose.
