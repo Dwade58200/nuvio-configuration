@@ -1,4 +1,5 @@
 # Session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
+# + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
 
 ## 🐛 Le vrai bug MDBList (trouvé et corrigé)
 
@@ -90,3 +91,42 @@ généré depuis une base antérieure à cette session, ces corrections
 disparaîtront silencieusement et devront être réappliquées. Vérifier
 d'abord que `charger_catalogues_aiometadata()` cherche bien
 `config.catalogs` avant de repartir sur autre chose.
+
+## 🔧 Corrections suivantes (même jour)
+
+### Lint ruff (CI qui échouait)
+
+35 erreurs `ruff check` corrigées (jamais vérifiées avant livraison,
+faute d'accès réseau pour installer ruff dans l'environnement de la
+session précédente) : déclarations `# -*- coding: utf-8 -*-` inutiles en
+Python 3, imports non triés (`I001`), annotations entre guillemets
+redondantes avec `from __future__ import annotations` (`UP037`), variable
+ambiguë `l` renommée en `liste` (`E741`), `Sequence` importé depuis
+`collections.abc` au lieu de `typing` (`UP035`), `assert False` remplacé
+par `raise AssertionError(...)` (`B011`), `zip(..., strict=True)`
+explicite (`B905`). Un second passage a aussi corrigé un double saut de
+ligne restant après un bloc d'imports dans `tests/test_generer_backdrops.py`.
+
+### Pool de connexions HTTP trop petit (warnings en boucle en exécution réelle)
+
+`requests.Session()` utilise par défaut un pool de 10 connexions par
+hôte. En mode `--mosaique` (jusqu'à 12 téléchargements en parallèle par
+dossier) combiné à `--parallelisme` (plusieurs dossiers traités en même
+temps), ça dépasse largement 10 connexions simultanées vers TMDB/Fanart
+-- d'où les warnings `Connection pool is full, discarding connection` en
+boucle dans les logs. Pas une erreur bloquante, mais un vrai gâchis de
+connexions TCP rouvertes en boucle. Corrigé en montant un
+`requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=64)` sur
+la session partagée.
+
+### "Budget" artificiel d'appels TMDB /images retiré
+
+`--limite-appels-tmdb-images` (défaut 300) faisait basculer le script sur
+Fanart uniquement au-delà de N appels TMDB `/images` réussis sur
+l'exécution -- une protection **auto-imposée**, pas une vraie limite de
+l'API TMDB (qui n'impose pas de quota fixe par run, seulement une
+limitation de débit gérée par les tentatives avec délai croissant déjà en
+place sur les réponses `429`). Entièrement retiré : `ClientTMDB` n'a plus
+de compteur/budget, l'argument CLI a disparu, ainsi que le message de
+résumé associé.
+

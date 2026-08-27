@@ -75,6 +75,25 @@ CANDIDAT_FILM = ("/brut.jpg", 42, "movie", "en")
 
 
 # ---------------------------------------------------------------------------
+# Pool de connexions HTTP (mosaïque + parallélisme = beaucoup de requêtes
+# concurrentes vers les mêmes hôtes)
+# ---------------------------------------------------------------------------
+
+def test_pool_de_connexions_agrandi_au_dela_du_defaut_requests():
+    """Régression : avec le pool par défaut de `requests` (10), le mode
+    mosaïque (jusqu'à 12 téléchargements en parallèle par dossier) plus
+    `--parallelisme` déclenchait en boucle un warning urllib3 "Connection
+    pool is full, discarding connection" sur TMDB/Fanart -- pas une erreur
+    bloquante, mais un vrai gâchis de connexions TCP à chaque run réel."""
+    generateur = _generateur()
+    adaptateur_https = generateur.session.get_adapter("https://api.themoviedb.org")
+    assert adaptateur_https._pool_maxsize > 10
+    # Le même objet adaptateur doit être monté sur http:// et https:// (un
+    # seul pool partagé pour TMDB, Fanart.tv, MDBList, et les CDN d'images).
+    assert generateur.session.get_adapter("http://example.com") is adaptateur_https
+
+
+# ---------------------------------------------------------------------------
 # Palier 1 : backdrop TMDB tagué langue (avant même Fanart)
 # ---------------------------------------------------------------------------
 
@@ -526,58 +545,6 @@ def test_fanart_donnees_est_mis_en_cache():
     generateur._resoudre_image_tuile(CANDIDAT_FILM)
 
     assert compteur_appels["n"] == 1, "Fanart aurait dû être interrogé une seule fois (mis en cache)"
-
-
-# ---------------------------------------------------------------------------
-# Budget d'appels TMDB /images -> bascule Fanart uniquement
-# ---------------------------------------------------------------------------
-
-def test_budget_tmdb_images_epuise_bascule_sur_fanart():
-    generateur = _generateur(langue_preferee="fr")
-    generateur.tmdb.limite_appels_images = 1  # budget volontairement minuscule pour le test
-
-    def fausse_get(url, params=None, timeout=None, **kwargs):
-        if "/images" in url:
-            return FausseReponse({"backdrops": [{"file_path": "/depuis_tmdb.jpg", "iso_639_1": "fr", "vote_average": 5}]})
-        if "depuis_tmdb.jpg" in url:
-            return FausseReponse(content=_image_bytes((1, 1, 1)))
-        if "webservice.fanart.tv/v3/movies/2" in url:
-            return FausseReponse({"moviethumb": [{"url": "https://fanart.example/thumb2.jpg", "lang": "fr", "likes": "1"}]})
-        if "thumb2.jpg" in url:
-            return FausseReponse(content=_image_bytes((2, 2, 2)))
-        raise AssertionError(f"URL inattendue: {url}")
-
-    generateur.session.get = MagicMock(side_effect=fausse_get)
-
-    # 1er candidat : le budget (1) permet encore l'appel /images -> consommé ici
-    assert generateur._resoudre_image_tuile(("/brut1.jpg", 1, "movie", "en")) is not None
-    assert generateur.tmdb.budget_images_epuise is False
-    assert generateur.tmdb.compteur_appels_images == 1
-
-    # 2e candidat : budget épuisé -> /images ne doit PLUS être appelé, bascule Fanart directe
-    image = generateur._resoudre_image_tuile(("/brut2.jpg", 2, "movie", "en"))
-    assert image is not None
-    assert generateur.tmdb.budget_images_epuise is True
-    assert generateur.tmdb.compteur_appels_images == 1  # inchangé : pas de second appel /images
-
-
-def test_recuperer_images_sans_reseau_une_fois_budget_epuise():
-    """Vérifie qu'aucun appel réseau n'est fait du tout une fois le budget
-    atteint (pas juste ignoré après coup)."""
-    from generer_backdrops import ClientTMDB
-
-    client = ClientTMDB(cle_api="x", limite_appels_images=0)
-    appelé = {"valeur": False}
-
-    def fausse_get(*args, **kwargs):
-        appelé["valeur"] = True
-        raise AssertionError("ne devrait jamais être appelé, budget déjà à 0")
-
-    client.session.get = MagicMock(side_effect=fausse_get)
-    resultat = client.recuperer_images(123, "movie")
-    assert resultat == {}
-    assert appelé["valeur"] is False
-    assert client.budget_images_epuise is True
 
 
 # ---------------------------------------------------------------------------

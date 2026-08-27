@@ -104,18 +104,17 @@ régionale n'est JAMAIS considéré comme "français" -- seul le tag exact
 ### Volume de requêtes : cache + budget de repli
 
 Avec ~70 titres par dossier sur 43 dossiers, le nombre d'appels TMDB peut
-vite grimper. Deux protections en place :
+vite grimper. Une protection est en place :
 
 - **Cache** : un même titre (souvent présent dans plusieurs dossiers --
   ex: un blockbuster apparaît dans "Populaire", "Action" ET "Tendance") ne
   déclenche qu'un seul appel TMDB `/images` et un seul appel Fanart pour
   toute l'exécution, même s'il est rencontré plusieurs fois.
-- **Budget de repli** (`--limite-appels-tmdb-images`, défaut **300**) :
-  au-delà de ce nombre d'appels TMDB `/images` réussis sur l'exécution, le
-  script arrête d'interroger TMDB pour ce palier et bascule directement sur
-  Fanart (puis backdrop générique) pour tous les titres restants -- aucune
-  erreur, juste moins de vérifications côté TMDB. Un message s'affiche en
-  fin d'exécution si ce budget a été atteint.
+
+TMDB n'impose pas de quota fixe d'appels par run (juste une limitation de
+débit, gérée par des tentatives avec délai croissant en cas de réponse
+`429`) -- il n'y a donc pas de "budget" artificiel de repli sur Fanart à
+configurer.
 
 C'est le comportement **par défaut** (`--mosaique`, activé aussi dans le
 workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
@@ -214,7 +213,6 @@ Options utiles de `generer_backdrops.py` :
 |---|---|
 | `--dry-run` | Ne fait aucun appel réseau, affiche juste ce qui serait généré |
 | `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 6 titres) |
-| `--limite-appels-tmdb-images` | Budget d'appels TMDB `/images` avant repli Fanart seul (défaut 300) |
 | `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues (dont les listes MDBList ajoutées via l'addon) avec leurs vrais filtres/URLs |
 | `--cle-mdblist clé` | Clé API MDBList.com (ou variable `MDBLIST_API_KEY`) -- voir section MDBList ci-dessous |
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |

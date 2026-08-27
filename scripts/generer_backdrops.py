@@ -668,7 +668,6 @@ class ClientTMDB:
         cle_api: str,
         session: requests.Session | None = None,
         langue: str = "fr-FR",
-        limite_appels_images: int = 300,
     ):
         self.cle_api = cle_api
         self.session = session or requests.Session()
@@ -676,14 +675,10 @@ class ClientTMDB:
         self._cache_keyword: dict[str, int | None] = {}
         self._cache_images: dict[tuple[int, str], dict[str, Any]] = {}
         self._cache_tvdb_id: dict[int, int | None] = {}
-        self.limite_appels_images = limite_appels_images
-        self.compteur_appels_images = 0
-        self.budget_images_epuise = False  # exposé pour le résumé final (log utilisateur)
         # Ce client est partagé entre plusieurs threads (traitement de dossiers
         # en parallèle, chacun téléchargeant lui-même ses tuiles en parallèle) :
-        # sans verrou, le compteur de budget peut être légèrement dépassé avant
-        # que la limite soit détectée, et deux threads peuvent rater le cache
-        # au même instant et refaire le même appel en double.
+        # sans verrou, deux threads peuvent rater le cache au même instant et
+        # refaire le même appel en double.
         self._verrou = threading.Lock()
 
     def _get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -743,24 +738,11 @@ class ClientTMDB:
         Mis en cache par (tmdb_id, media_type) -- le même titre populaire
         revient souvent dans plusieurs dossiers/groupes durant une même
         exécution, inutile de le redemander à chaque fois.
-
-        Au-delà de `limite_appels_images` appels réussis sur CETTE
-        exécution, on arrête d'interroger TMDB pour cet enrichissement et
-        on bascule directement sur Fanart pour tous les candidats restants
-        -- protection contre la limitation de débit TMDB sur de gros runs.
         """
         cle_cache = (tmdb_id, media_type)
         with self._verrou:
             if cle_cache in self._cache_images:
                 return self._cache_images[cle_cache]
-            if self.compteur_appels_images >= self.limite_appels_images:
-                self.budget_images_epuise = True
-                return {}
-            # Réservé tout de suite, sous verrou : avec des dizaines de
-            # threads concurrents, incrémenter APRÈS l'appel laisserait
-            # passer plusieurs threads au-delà de la limite avant que
-            # celle-ci ne soit détectée.
-            self.compteur_appels_images += 1
 
         chemin = "movie" if media_type != "tv" else "tv"
         try:
@@ -1183,12 +1165,21 @@ class GenerateurBackdrops:
         dry_run: bool = False,
         mosaique: bool = False,
         langue_preferee: str = "fr",
-        limite_appels_tmdb_images: int = 300,
         cle_mdblist: str | None = None,
         catalogues_aiometadata: dict[str, dict[str, Any]] | None = None,
     ):
         self.session = requests.Session()
-        self.tmdb = ClientTMDB(cle_tmdb, session=self.session, limite_appels_images=limite_appels_tmdb_images)
+        # Le profil `mosaique` télécharge jusqu'à 12 tuiles en parallèle par
+        # dossier, potentiellement pour plusieurs dossiers en même temps
+        # (`--parallelisme`) : la taille de pool par défaut de `requests`
+        # (10) est vite dépassée sur les mêmes hôtes (TMDB/Fanart), ce qui
+        # fait fermer/rouvrir des connexions en boucle ("Connection pool is
+        # full, discarding connection") sans que ce soit une erreur, juste
+        # un gâchis de connexions TCP. On agrandit le pool en conséquence.
+        adaptateur = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=64)
+        self.session.mount("https://", adaptateur)
+        self.session.mount("http://", adaptateur)
+        self.tmdb = ClientTMDB(cle_tmdb, session=self.session)
         self.fanart = ClientFanart(cle_fanart, session=self.session)
         self.mdblist = ClientMDBList(cle_mdblist, session=self.session)
         self.repertoire_sortie = repertoire_sortie
@@ -1559,7 +1550,6 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="Simule sans appeler TMDB ni écrire d'image")
     parser.add_argument("--mosaique", action="store_true", help="Génère une mosaïque multi-titres + couleur d'accent au lieu d'un seul backdrop (repli automatique si pas assez d'images)")
     parser.add_argument("--langue-preferee", default="fr", help="Code langue Fanart.tv préféré pour les artworks avec titre incrusté (défaut: fr)")
-    parser.add_argument("--limite-appels-tmdb-images", type=int, default=300, help="Au-delà de ce nombre d'appels TMDB /images sur l'exécution, bascule sur Fanart uniquement (défaut: 300)")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -1579,7 +1569,6 @@ def main() -> int:
         dry_run=args.dry_run,
         mosaique=args.mosaique,
         langue_preferee=args.langue_preferee,
-        limite_appels_tmdb_images=args.limite_appels_tmdb_images,
         cle_mdblist=args.cle_mdblist or os.environ.get("MDBLIST_API_KEY"),
         catalogues_aiometadata=charger_catalogues_aiometadata(Path(args.aiometadata) if args.aiometadata else None),
     )
@@ -1588,12 +1577,6 @@ def main() -> int:
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
     )
     afficher_resume(resultats)
-    if generateur.tmdb.budget_images_epuise:
-        print(
-            f"\n⚠️  Budget d'appels TMDB /images atteint ({generateur.tmdb.limite_appels_images}) : "
-            "les derniers titres traités sont passés directement en résolution Fanart uniquement "
-            "(--limite-appels-tmdb-images pour ajuster)."
-        )
 
     return 0
 
