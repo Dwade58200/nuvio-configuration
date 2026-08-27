@@ -72,7 +72,7 @@ def calculer_couleur_accent(image: Image.Image) -> tuple[int, int, int]:
     prenant la couleur moyenne puis en boostant saturation/luminosité pour
     obtenir un ton exploitable en dégradé (jamais trop terne ni trop pâle).
     """
-    petite = image.convert("RGB").resize((16, 16), Image.BOX)
+    petite = image.convert("RGB").resize((16, 16), Image.Resampling.BOX)
     pixels = list(petite.getdata())
     r = sum(p[0] for p in pixels) / len(pixels)
     g = sum(p[1] for p in pixels) / len(pixels)
@@ -127,7 +127,7 @@ def composer_sur_fond(image_transparente: Image.Image, image_fond: Image.Image, 
         1.0,  # ne jamais agrandir l'artwork au-delà de sa taille d'origine
     )
     nouvelle_taille = (max(1, int(image_transparente.width * ratio)), max(1, int(image_transparente.height * ratio)))
-    artwork_redim = image_transparente.resize(nouvelle_taille, Image.LANCZOS)
+    artwork_redim = image_transparente.resize(nouvelle_taille, Image.Resampling.LANCZOS)
 
     x = (image_fond.width - artwork_redim.width) // 2
     y = (image_fond.height - artwork_redim.height) // 2
@@ -152,7 +152,7 @@ def recadrer_pour_tuile(image: Image.Image, largeur: int, hauteur: int) -> Image
         offset = (image.height - nouvelle_hauteur) // 2
         image = image.crop((0, offset, image.width, offset + nouvelle_hauteur))
 
-    return image.resize((largeur, hauteur), Image.LANCZOS)
+    return image.resize((largeur, hauteur), Image.Resampling.LANCZOS)
 
 
 def arrondir_coins(image: Image.Image, rayon: int) -> Image.Image:
@@ -225,7 +225,7 @@ def construire_grille_inclinee(
             y = ligne * (tuile_hauteur + ecart)
             grille.alpha_composite(tuile, (x, y))
 
-    pivotee = grille.rotate(INCLINAISON_DEG, expand=True, resample=Image.BICUBIC)
+    pivotee = grille.rotate(INCLINAISON_DEG, expand=True, resample=Image.Resampling.BICUBIC)
 
     canvas = Image.new("RGBA", (largeur_canvas, hauteur_canvas), (10, 10, 12, 255))
     x_centre = (largeur_canvas - pivotee.width) // 2
@@ -273,7 +273,7 @@ def _degrade_lineaire(largeur: int, hauteur: int, direction: str, couleur: tuple
                 if alpha:
                     pixels[x, y] = (*couleur, min(255, alpha))
 
-    return image.resize((largeur, hauteur), Image.BILINEAR)
+    return image.resize((largeur, hauteur), Image.Resampling.BILINEAR)
 
 
 def appliquer_degrade(canvas: Image.Image, accent: tuple[int, int, int]) -> Image.Image:
@@ -292,7 +292,7 @@ def appliquer_degrade(canvas: Image.Image, accent: tuple[int, int, int]) -> Imag
 
     # Lueur d'accent diffuse, coin haut-droite
     petite_lueur = _degrade_lineaire(largeur // 4, hauteur // 4, "coin_bas_gauche", couleur=accent)
-    lueur = petite_lueur.rotate(180).resize((largeur, hauteur), Image.BILINEAR)
+    lueur = petite_lueur.rotate(180).resize((largeur, hauteur), Image.Resampling.BILINEAR)
     lueur = lueur.filter(ImageFilter.GaussianBlur(radius=max(24, largeur // 70)))
     resultat = Image.alpha_composite(resultat, lueur)
 
