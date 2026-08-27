@@ -10,6 +10,7 @@ Lancer avec : pytest tests/ -v
 """
 
 import sys
+import json
 from datetime import date
 from pathlib import Path
 
@@ -27,11 +28,13 @@ from generer_backdrops import (  # noqa: E402
     _extraire_slug_thematique,
     _resoudre_genre_depuis_texte,
     charger_catalogues_aiometadata,
+    charger_collections,
     construire_requetes,
     dossier_actif,
     slugifier,
     normaliser,
     analyser_url_mdblist,
+    meilleur_backdrop_tmdb_langue,
     ClientMDBList,
 )
 
@@ -252,31 +255,23 @@ def test_source_francaise_seule_ne_laisse_aucune_requete_tmdb():
     assert any("langue-spécifique exclue" in raison for raison in ignorees)
 
 
-def test_source_trakt_avec_liste_produit_une_requete_trakt_liste():
+def test_source_trakt_est_toujours_explicitement_ignoree():
+    """Trakt n'est pas pris en charge (abonnement VIP requis pour créer une
+    application) -- toute source `provider: "trakt"` doit rester ignorée,
+    avec une raison explicite, jamais une tentative de résolution."""
     dossier = {
         "title": "007",
         "sources": [{"provider": "trakt", "traktListId": 11754060, "mediaType": "MOVIE"}],
     }
     requetes, ignorees = construire_requetes(GROUPE_FRANCHISES, dossier)
-    assert len(requetes) == 1
-    assert requetes[0].kind == "trakt_liste"
-    assert requetes[0].tmdb_id == 11754060
-    assert requetes[0].media_type == "movie"
-    assert ignorees == []
-
-
-def test_source_trakt_sans_liste_est_ignoree():
-    dossier = {
-        "title": "Recommandation",
-        "sources": [{"provider": "trakt", "mediaType": "MOVIE"}],  # pas de traktListId
-    }
-    requetes, ignorees = construire_requetes(GROUPE_DECOUVRIR, dossier)
     assert requetes == []
-    assert "traktListId" in ignorees[0]
+    assert len(ignorees) == 1
+    assert "trakt" in ignorees[0].lower()
+    assert "non pris en charge" in ignorees[0]
 
 
 # ---------------------------------------------------------------------------
-# Passerelle MDBList (alternative à Trakt, clé API simple sans OAuth)
+# Passerelle MDBList (clé API simple sans OAuth)
 # ---------------------------------------------------------------------------
 
 def test_analyser_url_mdblist_formats_courants():
@@ -492,18 +487,48 @@ def test_catalogid_non_tmdb_reste_ignore():
 # ---------------------------------------------------------------------------
 
 FIXTURE_AIOMETADATA = Path(__file__).resolve().parent / "fixtures" / "aiometadata-exemple.json"
+FIXTURE_AIOMETADATA_LEGACY = Path(__file__).resolve().parent / "fixtures" / "aiometadata-exemple-legacy-plat.json"
 
 
 def test_charger_catalogues_aiometadata():
+    """Régression du bug réel : le vrai export AIOMetadata (version 2.15.0)
+    range ses catalogues sous `config.catalogs`, pas à la racine du JSON --
+    l'ancien code (`data.get("catalogs")`) y lisait silencieusement un
+    index VIDE. Cette fixture reproduit la structure réelle."""
     catalogues = charger_catalogues_aiometadata(FIXTURE_AIOMETADATA)
-    # seuls les catalogues avec une config "discover" exacte sont indexés
+    # catalogues avec une config "discover" exacte -> indexés en kind="discover"
     assert "tmdb.discover.movie.global.mt49lr48" in catalogues
+    assert catalogues["tmdb.discover.movie.global.mt49lr48"]["kind"] == "discover"
     assert catalogues["tmdb.discover.movie.global.mt49lr48"]["media_type"] == "movie"
     assert catalogues["tmdb.discover.movie.global_copy.mt49lz6m"]["media_type"] == "tv"  # "series" normalisé en "tv"
-    # les catalogues sans config discover (trakt/mdblist/tmdb.top statique) sont exclus
+    # catalogues sans config discover ET sans source mdblist exploitable -> exclus
     assert "trakt.watchlist" not in catalogues
-    assert "mdblist.102554" not in catalogues
     assert "tmdb.top" not in catalogues
+    # mdblist.102554 n'a pas de metadata.url exportée -> pas résolvable, donc exclu
+    assert "mdblist.102554" not in catalogues
+    # mdblist "recommandation" personnalisée : jamais d'URL publique -> exclu
+    assert "mdblist.recommended.recommended.movies" not in catalogues
+
+
+def test_charger_catalogues_aiometadata_indexe_les_listes_mdblist_avec_url():
+    """Cas réel corrigé : un catalogue `source: "mdblist"` AVEC une URL de
+    liste publique exportée (ex: "Sitcom" -> mdblist.37087) doit être
+    indexé en kind="mdblist", exploitable ensuite par construire_requetes."""
+    catalogues = charger_catalogues_aiometadata(FIXTURE_AIOMETADATA)
+    assert "mdblist.37087" in catalogues
+    assert catalogues["mdblist.37087"] == {
+        "kind": "mdblist",
+        "media_type": "tv",
+        "mdblist_url": "https://mdblist.com/lists/polynomialproton/top-sitcoms",
+    }
+
+
+def test_charger_catalogues_aiometadata_accepte_aussi_l_ancien_format_a_plat():
+    """Compatibilité ascendante : un export où `catalogs` est à la racine
+    (sans niveau `config`) doit continuer à fonctionner."""
+    catalogues = charger_catalogues_aiometadata(FIXTURE_AIOMETADATA_LEGACY)
+    assert "tmdb.discover.movie.genre_horreur.global" in catalogues
+    assert catalogues["tmdb.discover.movie.genre_horreur.global"]["params"]["with_genres"] == "27"
 
 
 def test_charger_catalogues_aiometadata_fichier_absent():
@@ -578,6 +603,57 @@ def test_catalogue_absent_de_l_export_retombe_sur_heuristique():
     requetes, ignorees = construire_requetes(GROUPE_GENRES, dossier, catalogues)
     assert len(requetes) == 1
     assert requetes[0].params.get("with_genres") == 35  # repli heuristique par genre, toujours actif
+
+
+def test_catalogue_mdblist_de_l_export_produit_une_requete_mdblist_liste():
+    """Cas réel corrigé : "Sitcom" (catalogId mdblist.37087, ajouté via
+    l'addon aio-metadata, PAS via une source provider="mdblist" manuelle)
+    doit maintenant se résoudre grâce à l'URL publique de l'export."""
+    catalogues = charger_catalogues_aiometadata(FIXTURE_AIOMETADATA)
+    dossier = {
+        "title": "Sitcom",
+        "sources": [{"provider": "addon", "addonId": "aio-metadata", "catalogId": "mdblist.37087", "type": "series"}],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_THEMATIQUES, dossier, catalogues)
+    assert len(requetes) == 1
+    assert requetes[0].kind == "mdblist_liste"
+    assert requetes[0].media_type == "tv"
+    assert requetes[0].params == {"mdblist_user": "polynomialproton", "mdblist_slug": "top-sitcoms"}
+    assert ignorees == []
+
+
+def test_catalogue_mdblist_sans_export_reste_ignore():
+    """Sans export fourni (ou catalogue absent de l'export), un catalogId
+    'mdblist.<id>' opaque ne peut pas être deviné par heuristique -> reste
+    explicitement ignoré, jamais une exception."""
+    dossier = {
+        "title": "Sitcom",
+        "sources": [{"provider": "addon", "addonId": "aio-metadata", "catalogId": "mdblist.37087", "type": "series"}],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_THEMATIQUES, dossier)
+    assert requetes == []
+    assert "non résolu" in ignorees[0]
+
+
+def test_catalogue_mdblist_recommandation_personnalisee_reste_ignoree_avec_raison_claire():
+    """"Recommandation" (mdblist.recommended.*) n'a jamais d'URL publique
+    exportée (liste personnalisée liée au compte) -- doit rester ignoré,
+    mais avec un message explicite plutôt que le générique "non résolu"."""
+    catalogues = charger_catalogues_aiometadata(FIXTURE_AIOMETADATA)
+    dossier = {
+        "title": "Recommandation",
+        "sources": [
+            {
+                "provider": "addon",
+                "addonId": "aio-metadata",
+                "catalogId": "mdblist.recommended.recommended.movies",
+                "type": "movie",
+            }
+        ],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_DECOUVRIR, dossier, catalogues)
+    assert requetes == []
+    assert "personnalisée" in ignorees[0]
 
 
 def test_trakt_recommendations_ne_sont_plus_reconnues():
@@ -682,6 +758,56 @@ def test_chemin_backdrop_complet_utilise_la_nouvelle_arborescence():
         },
     )
     assert resultat.chemin == "Genres/Backdrops/Sci-Fi_Backdrop.jpg"
+
+
+# ---------------------------------------------------------------------------
+# meilleur_backdrop_tmdb_langue (fonction pure, cascade de résolution TMDB)
+# ---------------------------------------------------------------------------
+
+def test_meilleur_backdrop_tmdb_langue_retourne_le_mieux_note_pour_la_langue_demandee():
+    images_data = {
+        "backdrops": [
+            {"iso_639_1": "fr", "vote_average": 5.0, "file_path": "/moins-bon-fr.jpg"},
+            {"iso_639_1": "fr", "vote_average": 8.2, "file_path": "/meilleur-fr.jpg"},
+            {"iso_639_1": "en", "vote_average": 9.9, "file_path": "/meilleur-en.jpg"},
+        ]
+    }
+    assert meilleur_backdrop_tmdb_langue(images_data, "fr") == "/meilleur-fr.jpg"
+    assert meilleur_backdrop_tmdb_langue(images_data, "en") == "/meilleur-en.jpg"
+
+
+def test_meilleur_backdrop_tmdb_langue_untagged_correspond_a_langue_none():
+    images_data = {"backdrops": [{"iso_639_1": None, "vote_average": 3.0, "file_path": "/sans-langue.jpg"}]}
+    assert meilleur_backdrop_tmdb_langue(images_data, None) == "/sans-langue.jpg"
+
+
+def test_meilleur_backdrop_tmdb_langue_aucun_candidat_retourne_none():
+    images_data = {"backdrops": [{"iso_639_1": "en", "vote_average": 9.0, "file_path": "/x.jpg"}]}
+    assert meilleur_backdrop_tmdb_langue(images_data, "de") is None
+    assert meilleur_backdrop_tmdb_langue(None, "fr") is None
+    assert meilleur_backdrop_tmdb_langue({}, "fr") is None
+
+
+# ---------------------------------------------------------------------------
+# charger_collections
+# ---------------------------------------------------------------------------
+
+def test_charger_collections_lit_le_json_des_groupes(tmp_path):
+    chemin = tmp_path / "collections.json"
+    donnees = [{"title": "🎭 Genres", "folders": [{"title": "Action", "sources": []}]}]
+    chemin.write_text(json.dumps(donnees), encoding="utf-8")
+
+    resultat = charger_collections(chemin)
+
+    assert resultat == donnees
+
+
+def test_charger_collections_fichier_absent_leve_une_erreur_claire(tmp_path):
+    try:
+        charger_collections(tmp_path / "inexistant.json")
+        raise AssertionError("aurait dû lever FileNotFoundError")
+    except FileNotFoundError:
+        pass
 
 
 if __name__ == "__main__":

@@ -24,13 +24,21 @@ de résoudre une source TMDB fiable :
      rapproché d'un genre TMDB connu, ou utilisé comme recherche de
      mot-clé TMDB (endpoint /search/keyword) pour les thématiques.
 
-Tout ce qui n'est pas résoluble (Trakt sans clé API, FlixPatrol, Sports,
-etc.) est explicitement IGNORÉ et journalisé avec la raison -- jamais
-échoué en silence. Ces cas seront traités dans une phase ultérieure.
+Tout ce qui n'est pas résoluble (Trakt -- non pris en charge, voir plus
+bas --, FlixPatrol, Sports, etc.) est explicitement IGNORÉ et journalisé
+avec la raison -- jamais échoué en silence. Ces cas seront traités dans
+une phase ultérieure.
 
-Les sources `provider: "mdblist"` sont résolues via l'API MDBList.com
-(clé API simple, pas d'OAuth) -- voir la classe ClientMDBList plus bas
-pour le détail et les raisons de ce choix par rapport à Trakt.
+Les sources `provider: "mdblist"`, ainsi que les catalogues
+`provider: "addon"/aio-metadata` de type `source: "mdblist"` référencés
+dans un export AIOMetadata (voir `--aiometadata`), sont résolues via
+l'API MDBList.com (clé API simple, pas d'OAuth) -- voir la classe
+ClientMDBList plus bas.
+
+Trakt n'est PAS pris en charge : créer une application Trakt nécessite
+désormais un abonnement VIP (voir la discussion du 2 août 2026 sur
+forums.trakt.tv), ce qui n'est pas disponible pour ce projet. Toute
+source `provider: "trakt"` est explicitement ignorée et journalisée.
 
 Ce choix "honnête" fait qu'au lancement, certains dossiers n'auront pas
 de backdrop généré : c'est normal et voulu pour cette phase. Le résumé
@@ -45,6 +53,7 @@ import io
 import json
 import logging
 import math
+import os
 import re
 import sys
 import threading
@@ -53,7 +62,7 @@ import unicodedata
 from datetime import date as _date
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 try:
     import requests
@@ -77,7 +86,6 @@ import mosaique as mosaique_module  # module compagnon, scripts/mosaique.py
 TMDB_API_BASE = "https://api.themoviedb.org/3"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p"
 FANART_API_BASE = "https://webservice.fanart.tv/v3"
-TRAKT_API_BASE = "https://api.trakt.tv"
 
 # Titres EXACTS des groupes tels qu'ils existent réellement dans le JSON.
 # (le bug initial venait d'un mauvais mapping ici -> corrigé, puis reproduit
@@ -385,10 +393,23 @@ def _resoudre_placeholder_date(valeur: Any) -> Any:
 
 def charger_catalogues_aiometadata(chemin: "Path | None") -> dict[str, dict[str, Any]]:
     """Charge un export AIOMetadata (Réglages -> Export dans l'addon) et
-    construit un index {catalogId: {"media_type", "params"}} pour les
-    catalogues de type "discover" qui ont une config TMDB exacte exportée
-    -- permet de résoudre un catalogue (ex: Streaming, Genres...) avec les
-    VRAIS filtres plutôt qu'une heuristique de repli à partir du nom.
+    construit un index {catalogId: {...}} pour résoudre un catalogue (ex:
+    Streaming, Genres, MDBList...) avec ses VRAIS filtres/identifiants
+    plutôt qu'une heuristique de repli à partir du nom.
+
+    Deux formes de catalogues sont indexées, distinguées par la clé "kind" :
+      - {"kind": "discover", "media_type", "params"} : catalogue TMDB avec
+        une config "discover" exacte exportée (Streaming, Genres...).
+      - {"kind": "mdblist", "media_type", "mdblist_url"} : catalogue
+        `source: "mdblist"` avec une URL de liste publique exportée dans
+        `metadata.url` (ex: "Sitcom" -> mdblist.37087).
+
+    IMPORTANT : selon la version de l'export, la clé "catalogs" se trouve
+    soit à la racine du JSON, soit sous "config" (export réel observé --
+    `{"version", "exportedAt", "config": {"catalogs": [...]}, "metadata": {...}}`).
+    On accepte les deux, en préférant "config.catalogs" quand il existe,
+    pour ne PLUS silencieusement charger un index vide sur un vrai export.
+
     Retourne un dict vide si le fichier est absent/invalide (aucune erreur)."""
     if not chemin:
         return {}
@@ -398,16 +419,31 @@ def charger_catalogues_aiometadata(chemin: "Path | None") -> dict[str, dict[str,
     except (OSError, json.JSONDecodeError):
         return {}
 
+    catalogues_bruts = (data.get("config") or {}).get("catalogs")
+    if catalogues_bruts is None:
+        catalogues_bruts = data.get("catalogs")
+
     index: dict[str, dict[str, Any]] = {}
-    for entree in data.get("catalogs", []) or []:
+    for entree in catalogues_bruts or []:
+        catalog_id = entree.get("id")
+        if not catalog_id:
+            continue
+
         discover = ((entree.get("metadata") or {}).get("discover")) or {}
         params = discover.get("params")
         media_type_brut = discover.get("mediaType")
-        catalog_id = entree.get("id")
-        if not (catalog_id and params and media_type_brut):
+        if catalog_id and params and media_type_brut:
+            media_type = "tv" if media_type_brut in ("tv", "series") else "movie"
+            index[catalog_id] = {"kind": "discover", "media_type": media_type, "params": dict(params)}
             continue
-        media_type = "tv" if media_type_brut in ("tv", "series") else "movie"
-        index[catalog_id] = {"media_type": media_type, "params": dict(params)}
+
+        if entree.get("source") == "mdblist":
+            url_liste = (entree.get("metadata") or {}).get("url")
+            if url_liste and analyser_url_mdblist(url_liste):
+                media_type_brut = (entree.get("type") or (entree.get("metadata") or {}).get("mediatype") or "movie")
+                media_type = "tv" if media_type_brut in ("tv", "series", "show", "shows") else "movie"
+                index[catalog_id] = {"kind": "mdblist", "media_type": media_type, "mdblist_url": url_liste}
+
     return index
 
 
@@ -460,16 +496,39 @@ def construire_requetes(
             media_type = "movie" if source.get("type") == "movie" else "tv"
 
             # Priorité absolue : si un export AIOMetadata a été fourni et
-            # connaît ce catalogue exact, on utilise ses VRAIS filtres TMDB
-            # plutôt qu'une heuristique de repli à partir du nom/hash.
+            # connaît ce catalogue exact, on utilise ses VRAIS filtres/
+            # identifiants plutôt qu'une heuristique de repli à partir du
+            # nom/hash.
             info_aiometadata = (catalogues_aiometadata or {}).get(catalog_id)
-            if info_aiometadata:
+            if info_aiometadata and info_aiometadata.get("kind") == "mdblist":
+                user_slug = analyser_url_mdblist(info_aiometadata["mdblist_url"])
+                if user_slug:
+                    requetes.append(
+                        RequeteTMDB(
+                            kind="mdblist_liste",
+                            media_type=info_aiometadata["media_type"],
+                            params={"mdblist_user": user_slug[0], "mdblist_slug": user_slug[1]},
+                        )
+                    )
+                    continue
+            if info_aiometadata and info_aiometadata.get("kind", "discover") == "discover":
                 params_reels = {
                     cle: _resoudre_placeholder_date(valeur) for cle, valeur in info_aiometadata["params"].items()
                 }
                 params_reels.setdefault("sort_by", "popularity.desc")
                 requetes.append(
                     RequeteTMDB(kind="discover", media_type=info_aiometadata["media_type"], params=params_reels)
+                )
+                continue
+
+            # Repli MDBList : certains catalogId "mdblist.<id>" n'ont pas
+            # d'URL exportée exploitable (ex: "mdblist.recommended.*",
+            # personnalisé par compte -- non résolvable via l'API publique)
+            # -- explicitement journalisé plutôt que noyé dans le message
+            # générique "catalogId non résolu".
+            if catalog_id.startswith("mdblist.recommended."):
+                ignorees.append(
+                    f"mdblist recommandation personnalisée non résolvable sans compte lié ({catalog_id})"
                 )
                 continue
 
@@ -533,12 +592,10 @@ def construire_requetes(
             ignorees.append(f"addon/aio-metadata catalogId non résolu ({catalog_id})")
 
         elif provider == "trakt":
-            trakt_list_id = source.get("traktListId")
-            if trakt_list_id:
-                media_type_trakt = "movie" if source.get("mediaType") == "MOVIE" else "tv"
-                requetes.append(RequeteTMDB(kind="trakt_liste", media_type=media_type_trakt, tmdb_id=trakt_list_id))
-            else:
-                ignorees.append("trakt sans traktListId exploitable")
+            # Trakt n'est plus pris en charge (créer une application Trakt
+            # nécessite désormais un abonnement VIP, voir MDBList plus haut) :
+            # on journalise proprement plutôt que de tenter une résolution.
+            ignorees.append("trakt non pris en charge (application Trakt indisponible sans abonnement VIP)")
 
         elif provider == "mdblist":
             # Trois façons équivalentes d'identifier une liste MDBList dans
@@ -902,121 +959,6 @@ class ClientFanart:
         return meilleur.get("url")
 
 
-class ClientTrakt:
-    """Accès aux listes Trakt (publiques via Client ID seul, privées via
-    authentification OAuth complète).
-
-    - Sans access_token : seules les listes PUBLIQUES (traktListId) fonctionnent.
-    - Avec access_token (+ refresh_token + client_secret) : accès aussi
-      aux listes PRIVÉES du compte authentifié.
-
-    Voir scripts/trakt_auth.py pour obtenir un access_token/refresh_token
-    (flux "device code" OAuth, à faire une fois en local).
-
-    NOTE : `/recommendations/movies|shows` n'est volontairement PAS
-    implémenté -- ça nécessiterait un compte avec un vrai historique de
-    visionnage pour donner des résultats pertinents, ce qui n'est pas le
-    cas d'un compte secondaire dédié à ce pipeline.
-    """
-
-    def __init__(
-        self,
-        client_id: str | None,
-        session: requests.Session | None = None,
-        client_secret: str | None = None,
-        access_token: str | None = None,
-        refresh_token: str | None = None,
-    ):
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.access_token = access_token
-        self.refresh_token = refresh_token
-        self.session = session or requests.Session()
-        self._cache_liste: dict[int, list[tuple[int, str]]] = {}
-        self._verrou = threading.Lock()  # ce client est partagé entre threads (voir ClientTMDB)
-        self.tokens_ont_change = False  # True si rafraichir_token() a produit de nouveaux tokens
-
-    def _headers(self) -> dict[str, str]:
-        entetes = {
-            "Content-Type": "application/json",
-            "trakt-api-key": self.client_id or "",
-            "trakt-api-version": "2",
-        }
-        if self.access_token:
-            entetes["Authorization"] = f"Bearer {self.access_token}"
-        return entetes
-
-    def rafraichir_token(self) -> bool:
-        """Échange le refresh_token contre un nouvel access_token (+ un
-        NOUVEAU refresh_token -- celui-ci est à usage unique côté Trakt).
-        À appeler une fois en début d'exécution : les access_token Trakt
-        ne durent que 7 jours, donc un cron mensuel/hebdomadaire doit
-        quasi systématiquement rafraîchir. Met à jour self.access_token/
-        self.refresh_token et positionne self.tokens_ont_change=True en
-        cas de succès (pour que l'appelant sache qu'il faut les
-        re-sauvegarder, ex: en secret GitHub)."""
-        if not (self.refresh_token and self.client_id and self.client_secret):
-            return False
-        try:
-            r = self.session.post(
-                f"{TRAKT_API_BASE}/oauth/token",
-                json={
-                    "refresh_token": self.refresh_token,
-                    "client_id": self.client_id,
-                    "client_secret": self.client_secret,
-                    "grant_type": "refresh_token",
-                },
-                timeout=15,
-            )
-            if r.status_code != 200:
-                return False
-            data = r.json()
-            nouvel_access = data.get("access_token")
-            nouveau_refresh = data.get("refresh_token")
-            if not (nouvel_access and nouveau_refresh):
-                return False
-            self.access_token = nouvel_access
-            self.refresh_token = nouveau_refresh
-            self.tokens_ont_change = True
-            return True
-        except requests.RequestException:
-            return False
-
-    def recuperer_items_liste(self, trakt_list_id: int, limite: int = 50) -> list[tuple[int, str]]:
-        """Retourne une liste de (tmdb_id, media_type) pour les items d'une
-        liste Trakt. Fonctionne pour une liste PUBLIQUE avec juste un
-        Client ID ; pour une liste PRIVÉE, il faut un access_token valide
-        pour le compte propriétaire (ou collaborateur) de la liste.
-        Liste vide si pas de clé, liste inaccessible, ou erreur réseau --
-        jamais d'exception."""
-        with self._verrou:
-            if trakt_list_id in self._cache_liste:
-                return self._cache_liste[trakt_list_id]
-
-        resultat: list[tuple[int, str]] = []
-        if self.client_id:
-            try:
-                r = self.session.get(
-                    f"{TRAKT_API_BASE}/lists/{trakt_list_id}/items",
-                    headers=self._headers(),
-                    params={"limit": limite},
-                    timeout=15,
-                )
-                if r.status_code == 200:
-                    for item in r.json() or []:
-                        type_item = item.get("type")  # "movie" ou "show"
-                        bloc = item.get(type_item) or {}
-                        tmdb_id = (bloc.get("ids") or {}).get("tmdb")
-                        if tmdb_id:
-                            resultat.append((tmdb_id, "movie" if type_item == "movie" else "tv"))
-            except requests.RequestException:
-                pass
-
-        with self._verrou:
-            self._cache_liste[trakt_list_id] = resultat
-        return resultat
-
-
 def analyser_url_mdblist(url: str) -> tuple[str, str] | None:
     """Extrait (username, slug) d'une URL de liste MDBList telle que collée
     depuis le navigateur, ex:
@@ -1045,14 +987,16 @@ def analyser_url_mdblist(url: str) -> tuple[str, str] | None:
 
 class ClientMDBList:
     """Accès en lecture aux listes MDBList.com via une simple clé API
-    (pas d'OAuth, pas de renouvellement de jeton -- contrairement à Trakt).
+    (pas d'OAuth, pas de renouvellement de jeton).
 
-    Pourquoi MDBList plutôt que Trakt : créer une application Trakt
-    nécessite désormais un abonnement VIP (voir discussion du 2 août 2026
-    sur forums.trakt.tv). MDBList permet de se connecter avec un compte
-    Trakt gratuit ("Login with Trakt" sur mdblist.com, via LEUR application
-    déjà enregistrée) puis délivre sa PROPRE clé API MDBList, gratuite
-    (1000 requêtes/jour), sans jamais toucher à l'API Trakt directement.
+    Pourquoi MDBList : créer une application Trakt nécessite désormais un
+    abonnement VIP (voir discussion du 2 août 2026 sur forums.trakt.tv),
+    ce qui est indisponible pour ce projet -- Trakt n'est donc pas pris en
+    charge (voir plus haut). MDBList permet de se connecter avec un
+    compte Trakt gratuit ("Login with Trakt" sur mdblist.com, via LEUR
+    application déjà enregistrée) puis délivre sa PROPRE clé API MDBList,
+    gratuite (1000 requêtes/jour), sans jamais toucher à l'API Trakt
+    directement.
 
     Deux stratégies de récupération, dans cet ordre :
       1. API officielle authentifiée par clé (`api.mdblist.com/lists/...`).
@@ -1064,7 +1008,7 @@ class ClientMDBList:
          Utile si la clé API est absente/épuisée, ou si l'endpoint exact de
          l'API officielle change.
 
-    Ne lève jamais d'exception : liste vide en cas d'échec, comme ClientTrakt.
+    Ne lève jamais d'exception : liste vide en cas d'échec.
     """
 
     API_BASE = "https://api.mdblist.com"
@@ -1074,7 +1018,7 @@ class ClientMDBList:
         self.api_key = api_key
         self.session = session or requests.Session()
         self._cache_liste: dict[str, list[tuple[int, str]]] = {}
-        self._verrou = threading.Lock()  # client partagé entre threads, comme ClientTrakt
+        self._verrou = threading.Lock()  # client partagé entre threads, comme ClientTMDB/ClientFanart
 
     @staticmethod
     def _items_depuis_reponse(data: Any) -> list[tuple[int, str]]:
@@ -1192,7 +1136,6 @@ def meilleur_backdrop_tmdb_langue(images_data: dict[str, Any] | None, langue: st
     return meilleur.get("file_path")
 
 
-
 # ---------------------------------------------------------------------------
 
 PROFILS_QUALITE = {
@@ -1243,23 +1186,12 @@ class GenerateurBackdrops:
         mosaique: bool = False,
         langue_preferee: str = "fr",
         limite_appels_tmdb_images: int = 300,
-        cle_trakt: str | None = None,
         cle_mdblist: str | None = None,
         catalogues_aiometadata: dict[str, dict[str, Any]] | None = None,
-        trakt_client_secret: str | None = None,
-        trakt_access_token: str | None = None,
-        trakt_refresh_token: str | None = None,
     ):
         self.session = requests.Session()
         self.tmdb = ClientTMDB(cle_tmdb, session=self.session, limite_appels_images=limite_appels_tmdb_images)
         self.fanart = ClientFanart(cle_fanart, session=self.session)
-        self.trakt = ClientTrakt(
-            cle_trakt,
-            session=self.session,
-            client_secret=trakt_client_secret,
-            access_token=trakt_access_token,
-            refresh_token=trakt_refresh_token,
-        )
         self.mdblist = ClientMDBList(cle_mdblist, session=self.session)
         self.repertoire_sortie = repertoire_sortie
         self.profil = profil
@@ -1411,14 +1343,7 @@ class GenerateurBackdrops:
     def _resoudre_liste_candidats(self, requete: RequeteTMDB, cible: int, pages: int) -> list[tuple[str, int, str, str | None]]:
         """Résout une requête en liste de candidats (backdrop_path, tmdb_id,
         media_type, langue_originale) -- gère aussi bien les requêtes TMDB
-        classiques que les listes Trakt (`kind == "trakt_liste"`, publiques
-        ou privées selon l'authentification disponible)."""
-        if requete.kind == "trakt_liste":
-            items = self.trakt.recuperer_items_liste(requete.tmdb_id, limite=cible)
-            # backdrop_path/langue inconnus à ce stade -- la cascade de
-            # résolution de tuile (TMDB /images -> Fanart) n'en a pas besoin,
-            # ils ne servent que de tout dernier repli.
-            return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
+        classiques que les listes MDBList (`kind == "mdblist_liste"`)."""
         if requete.kind == "mdblist_liste":
             if "mdblist_id" in requete.params:
                 items = self.mdblist.recuperer_items_liste_par_id(requete.params["mdblist_id"], limite=cible)
@@ -1625,11 +1550,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Génère les backdrops des collections Nuvio.")
     parser.add_argument("--cle-tmdb", default=None, help="Clé API TMDB (ou variable TMDB_API_KEY)")
     parser.add_argument("--cle-fanart", default=None, help="Clé API Fanart.tv (optionnel)")
-    parser.add_argument("--cle-trakt", default=None, help="Client ID Trakt.tv, pour résoudre les traktListId publiques (optionnel)")
     parser.add_argument("--cle-mdblist", default=None, help="Clé API MDBList.com, pour résoudre les sources provider=mdblist (optionnel, ou variable MDBLIST_API_KEY)")
-    parser.add_argument("--trakt-client-secret", default=None, help="Client Secret Trakt.tv (nécessaire pour l'auth OAuth complète, optionnel)")
-    parser.add_argument("--trakt-access-token", default=None, help="Access token OAuth Trakt.tv (optionnel, voir scripts/trakt_auth.py)")
-    parser.add_argument("--trakt-refresh-token", default=None, help="Refresh token OAuth Trakt.tv (optionnel, voir scripts/trakt_auth.py)")
     parser.add_argument("--aiometadata", default=None, help="Chemin vers un export AIOMetadata (JSON) pour résoudre les catalogues avec leurs vrais filtres TMDB (optionnel)")
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
     parser.add_argument("--sortie", default=NOM_DOSSIER_RACINE)
@@ -1641,13 +1562,10 @@ def main() -> int:
     parser.add_argument("--mosaique", action="store_true", help="Génère une mosaïque multi-titres + couleur d'accent au lieu d'un seul backdrop (repli automatique si pas assez d'images)")
     parser.add_argument("--langue-preferee", default="fr", help="Code langue Fanart.tv préféré pour les artworks avec titre incrusté (défaut: fr)")
     parser.add_argument("--limite-appels-tmdb-images", type=int, default=300, help="Au-delà de ce nombre d'appels TMDB /images sur l'exécution, bascule sur Fanart uniquement (défaut: 300)")
-    parser.add_argument("--fichier-tokens-trakt", default=None, help="Si fourni, écrit ici les tokens Trakt actualisés après rafraîchissement (JSON), pour qu'un step CI puisse les re-sauvegarder en secrets")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO, format="%(message)s")
-
-    import os
 
     cle_tmdb = args.cle_tmdb or os.environ.get("TMDB_API_KEY")
     if not cle_tmdb and not args.dry_run:
@@ -1664,28 +1582,9 @@ def main() -> int:
         mosaique=args.mosaique,
         langue_preferee=args.langue_preferee,
         limite_appels_tmdb_images=args.limite_appels_tmdb_images,
-        cle_trakt=args.cle_trakt or os.environ.get("TRAKT_CLIENT_ID"),
         cle_mdblist=args.cle_mdblist or os.environ.get("MDBLIST_API_KEY"),
         catalogues_aiometadata=charger_catalogues_aiometadata(Path(args.aiometadata) if args.aiometadata else None),
-        trakt_client_secret=args.trakt_client_secret or os.environ.get("TRAKT_CLIENT_SECRET"),
-        trakt_access_token=args.trakt_access_token or os.environ.get("TRAKT_ACCESS_TOKEN"),
-        trakt_refresh_token=args.trakt_refresh_token or os.environ.get("TRAKT_REFRESH_TOKEN"),
     )
-
-    # Les access_token Trakt ne durent que 7 jours : sur un cron peu
-    # fréquent, on a quasi toujours besoin de rafraîchir. On le fait une
-    # fois ici (pas par thread/dossier) pour éviter des rafraîchissements
-    # concurrents (le refresh_token est à usage unique côté Trakt).
-    if not args.dry_run and generateur.trakt.refresh_token:
-        rafraichi = generateur.trakt.rafraichir_token()
-        if rafraichi:
-            print("🔑 Token Trakt rafraîchi.")
-        else:
-            print(
-                "⚠️  Échec du rafraîchissement du token Trakt -- les listes privées "
-                "privées ne seront pas disponibles cette fois. Refaire l'authentification "
-                "avec scripts/trakt_auth.py si besoin."
-            )
 
     resultats = generateur.generer_tout(
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
@@ -1697,21 +1596,6 @@ def main() -> int:
             "les derniers titres traités sont passés directement en résolution Fanart uniquement "
             "(--limite-appels-tmdb-images pour ajuster)."
         )
-
-    if generateur.trakt.tokens_ont_change:
-        print("\n🔑 Nouveaux tokens Trakt générés (le refresh_token précédent est maintenant invalide).")
-        if args.fichier_tokens_trakt:
-            with open(args.fichier_tokens_trakt, "w", encoding="utf-8") as f:
-                json.dump(
-                    {
-                        "access_token": generateur.trakt.access_token,
-                        "refresh_token": generateur.trakt.refresh_token,
-                    },
-                    f,
-                )
-            print(f"   -> écrits dans {args.fichier_tokens_trakt} pour sauvegarde en secrets GitHub.")
-        else:
-            print("   Pense à les re-sauvegarder (TRAKT_ACCESS_TOKEN / TRAKT_REFRESH_TOKEN) si tu veux que ça continue de fonctionner au prochain run.")
 
     return 0
 

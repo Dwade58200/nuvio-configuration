@@ -6,77 +6,47 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
-## 🔴 Priorité 1 — sécuriser ce qui existe déjà
+## ✅ Fait (session du 27 août 2026)
 
-### Aucune CI n'exécute les tests automatiquement
-104 tests existent et sont de bonne qualité, mais rien ne les fait tourner
-avant qu'un changement parte en prod. Un commit qui casse un test peut
-directement écraser de vrais backdrops sans que personne ne le sache avant
-le prochain lancement réel.
-
-- [ ] Créer `.github/workflows/tests.yml`, déclenché sur `push` et
-      `pull_request` (séparé du workflow mensuel de génération)
-- [ ] Étapes : `pip install -r requirements-dev.txt` puis `pytest tests/ -v`
-- [ ] Ajouter aussi un `python3 scripts/generer_backdrops.py --dry-run`
-      dans ce workflow, pour vérifier que le pipeline complet s'importe et
-      s'exécute sans erreur (au-delà des tests unitaires)
-
----
-
-## 🟡 Priorité 2 — hygiène des dépendances
-
-### Les dépendances CI et les dépendances déclarées peuvent diverger
-Le workflow de génération installe `pillow requests` écrit en dur,
-séparément de `requirements-dev.txt`. Rien ne signale si les deux
-divergent un jour.
-
-- [ ] Créer `requirements.txt` (juste `requests` + `Pillow`, ce dont le
-      pipeline a besoin en prod)
-- [ ] Garder `requirements-dev.txt` pour `pytest` en plus (ex: via
-      `-r requirements.txt` en première ligne, pour ne pas dupliquer)
-- [ ] Faire pointer le workflow vers `pip install -r requirements.txt`
-      au lieu de la liste écrite en dur
-
-### Dépendance inutilisée
-- [ ] Retirer `PyYAML>=6.0` de `requirements-dev.txt` — aucun `import yaml`
-      nulle part dans `scripts/` ou `tests/`
+- [x] `.github/workflows/tests.yml` créé, déclenché sur `push` (toutes
+      branches) et `pull_request` : `pip install -r requirements-dev.txt`,
+      `ruff check`, `mypy` (informatif), `pytest tests/ -v`
+- [x] `requirements.txt` créé (`requests` + `Pillow` seulement, ce dont le
+      pipeline a besoin en prod) ; `requirements-dev.txt` réduit à
+      `-r requirements.txt` + `pytest`/`ruff`/`mypy`
+- [x] `PyYAML` retiré de `requirements-dev.txt` (toujours inutilisé)
+- [x] `pyproject.toml` ajouté (config `ruff`/`mypy`/`pytest`)
+- [x] `Iterable` retiré de l'import `typing` (toujours inutilisé)
+- [x] `import os` déplacé en haut de `generer_backdrops.py`
+- [x] `.gitignore` ajouté
+- [x] Tests ajoutés pour `meilleur_backdrop_tmdb_langue` et
+      `charger_collections` (fonctions pures jusque-là non testées
+      directement)
+- [x] **Bug corrigé** : `charger_catalogues_aiometadata()` lisait
+      `catalogs` à la racine du JSON alors que le vrai export (v2.15.0)
+      les range sous `config.catalogs` -- l'index était silencieusement
+      vide sur un vrai export. Corrigé avec repli sur l'ancien format.
+- [x] Les catalogues `source: "mdblist"` de l'export AIOMetadata (ajoutés
+      via l'addon, ex: "Sitcom") sont maintenant résolus via leur URL
+      publique exportée, au lieu de tomber en "catalogId non résolu"
+- [x] Trakt entièrement retiré (`ClientTrakt`, `trakt_auth.py`, CLI, CI,
+      secrets, docs) -- voir section "Explicitement écarté" plus bas
 
 ---
 
-## 🟢 Priorité 3 — qualité de code automatisée
+## 🔵 Reste à faire
 
-Le code a déjà une bonne discipline de typage (`from __future__ import
-annotations`, type hints quasi partout) — ajouter les outils qui
-vérifient ça automatiquement serait presque gratuit.
-
-- [ ] Ajouter un `ruff.toml` (ou `pyproject.toml`) minimal, avec une
-      config par défaut
-- [ ] Optionnel : ajouter `mypy`
-- [ ] Faire tourner l'un ou l'autre (voire les deux) dans le même
-      `tests.yml` proposé en priorité 1
-
----
-
-## 🔵 Priorité 4 — petits résidus de code
-
-Rien de cassé, juste des restes accumulés au fil des sessions.
-
-- [ ] Retirer `Iterable` de l'import `typing` en haut de
-      `generer_backdrops.py` (jamais utilisé)
-- [ ] Déplacer `import os` (actuellement fait localement dans `main()`)
-      vers les imports en haut du fichier, par cohérence avec le reste
-- [ ] Écrire quelques tests pour `detecter_branche_courante()` et
-      `creer_session_http()` (ajoutées récemment, jamais testées)
-- [ ] Ajouter un `.gitignore` (aucun trouvé actuellement — évite qu'un
-      `__pycache__/` ou un fichier local de test finisse commité par
-      accident)
+- [ ] Écrire des tests pour la détection automatique de la branche Git
+      courante et la création de session HTTP dans les scripts annexes,
+      si/quand ces fonctions sont ajoutées (pas encore présentes dans le
+      code actuel malgré une mention dans une version antérieure de cette
+      liste)
 
 ---
 
 ## ⚪ Idées plus lointaines (pas de demande explicite pour l'instant)
 
 - Intégrer les Animés dans le Aiometadata puis dans les backdrops.
-- Changer les catalogues Trakt par des MDBList.
 - Modifié le AIOStream pour intégrer les animés (avec regex et/ou filtres propres) et modifier le le style du texte du lien. 
 - Validation du JSON de collections par un schéma en CI, pour attraper une erreur de structure avant qu'elle ne casse l'import Nuvio
 - Faciliter les modifications du style des Backdrop en créant un modificateur avec un visuel.
@@ -84,7 +54,12 @@ Rien de cassé, juste des restes accumulés au fil des sessions.
 
 ## ❌ Explicitement écarté (ne pas reproposer)
 
-- **Recommandations Trakt personnalisées** (`trakt.recommendations.*`) —
-  retiré volontairement : nécessiterait un compte avec un vrai historique
-  de visionnage pour être pertinent, ce qui n'est pas le cas du compte
-  secondaire dédié à ce pipeline
+- **Trakt** — retiré entièrement du projet (voir `BACKDROPS_SETUP.md`) :
+  créer une application Trakt nécessite désormais un abonnement VIP,
+  indisponible pour ce compte. MDBList couvre le même besoin sans ce
+  problème.
+- **Recommandations MDBList personnalisées** (`mdblist.recommended.*`,
+  anciennement `trakt.recommendations.*`) — pas de solution possible :
+  liste calculée à partir de l'historique de visionnage du compte lié,
+  sans URL publique fixe à interroger.
+

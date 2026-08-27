@@ -80,7 +80,7 @@ actuels :
 
 Pour chaque dossier, le JSON précise :
 - **`sources` / `catalogSources`** : quel(s) catalogue(s) AIOMetadata
-  alimentent ce dossier (ex : un genre TMDB, une recherche Trakt, un
+  alimentent ce dossier (ex : un genre TMDB, une liste MDBList, un
   catalogue "discover"…).
 - **`titleLogoUrl`** / **`coverImageUrl`** : le logo et la couverture
   affichés dans Nuvio.
@@ -151,8 +151,8 @@ par manque d'intégration :
 
 | Groupe | Résolu | Raison si non résolu |
 |---|---|---|
-| Genres, Vibe, Années | 100% | — |
-| Découvrir, Thématiques | Presque | 1-3 dossiers nécessitent Trakt (non intégré) |
+| Genres, Vibe, Années, Thématiques | 100% | — |
+| Découvrir | Presque | "Recommandation" est une liste MDBList personnalisée au compte, sans URL publique |
 | Services de Streaming | 0% | Sources FlixPatrol, non compatibles TMDB |
 | Franchises, Sports | 0% | Désactivés volontairement (peu pertinent / trop de dossiers) |
 

@@ -142,10 +142,10 @@ Sur les collections actuelles, la couverture est :
 
 | Groupe | Dossiers résolus | Notes |
 |---|---|---|
-| 🔭 Découvrir | 3 / 6 | "Recommandation" nécessite Trakt (non géré) |
+| 🔭 Découvrir | 3 / 6 | "Recommandation" est une liste MDBList personnalisée au compte, sans URL publique -- non résolvable |
 | 🎬 Streaming | 0 / 9 | volontairement désactivé (sources FlixPatrol, non-TMDB) |
 | 🎭 Genres | 15 / 15 | ✅ |
-| 🎨 Thématiques | 13 / 14 | 1 dossier nécessite Trakt |
+| 🎨 Thématiques | 14 / 14 | ✅ (résolu via l'export AIOMetadata + MDBList) |
 | Vibe | 4 / 4 | ✅ |
 | 📅 Années | 8 / 8 | ✅ |
 | Franchises | 0 / 158 | volontairement désactivé (à la demande de l'utilisateur) |
@@ -163,7 +163,7 @@ backdrop dépend uniquement du chemin du fichier (groupe + titre du
 dossier), qui ne change pas d'un mois à l'autre — seule l'image derrière
 cette URL est remplacée. Il suffit donc de le lancer une fois pour les
 dossiers déjà résolus, puis de le relancer uniquement quand de *nouveaux*
-dossiers deviennent résolvables (ex : après l'intégration de Trakt).
+dossiers deviennent résolvables (ex : après l'ajout d'un nouveau catalogue).
 
 ## ✅ Configuration requise
 
@@ -180,10 +180,12 @@ dossiers deviennent résolvables (ex : après l'intégration de Trakt).
 Dans **Settings → Secrets and variables → Actions** du dépôt, créez :
 - `TMDB_API_KEY`
 - `FANART_API_KEY` (recommandé -- sans lui, les mosaïques n'ont pas de titre visible)
-- `TRAKT_CLIENT_ID` (optionnel -- résout les Franchises/Thématiques basées sur une liste Trakt publique)
-- `TRAKT_CLIENT_SECRET`, `TRAKT_ACCESS_TOKEN`, `TRAKT_REFRESH_TOKEN` (optionnels -- pour "Recommandation" et les listes privées, voir section Trakt ci-dessous)
-- `GH_PAT_SECRETS` (optionnel -- permet le renouvellement automatique des tokens Trakt, voir section Trakt ci-dessous)
-- `MDBLIST_API_KEY` (optionnel -- alternative à Trakt pour les sources de type liste, voir section MDBList ci-dessous)
+- `MDBLIST_API_KEY` (optionnel -- voir section MDBList ci-dessous ; sans lui, seules les listes MDBList *publiques* fonctionnent, ce qui couvre la quasi-totalité des cas)
+
+Trakt n'est **pas pris en charge** (créer une application Trakt nécessite
+désormais un abonnement VIP) -- toute source `provider: "trakt"` est
+explicitement ignorée et journalisée, jamais une erreur. MDBList (voir
+plus bas) couvre le même besoin sans ce problème.
 
 ## 📝 Utilisation
 
@@ -213,8 +215,7 @@ Options utiles de `generer_backdrops.py` :
 | `--dry-run` | Ne fait aucun appel réseau, affiche juste ce qui serait généré |
 | `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 6 titres) |
 | `--limite-appels-tmdb-images` | Budget d'appels TMDB `/images` avant repli Fanart seul (défaut 300) |
-| `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues avec leurs vrais filtres TMDB |
-| `--fichier-tokens-trakt chemin.json` | Écrit les tokens Trakt renouvelés ici (pour un step CI qui les re-sauvegarde) |
+| `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues (dont les listes MDBList ajoutées via l'addon) avec leurs vrais filtres/URLs |
 | `--cle-mdblist clé` | Clé API MDBList.com (ou variable `MDBLIST_API_KEY`) -- voir section MDBList ci-dessous |
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
@@ -251,15 +252,15 @@ nuvio-configuration/
 │   ├── generer_backdrops.py         # Script principal
 │   ├── mosaique.py                  # Composition de la grille + couleur d'accent
 │   ├── mettre_a_jour_urls.py        # Met à jour heroBackdropUrl vers le CDN du repo
-│   ├── trakt_auth.py                # Authentification OAuth Trakt (à lancer 1x en local)
+│   ├── mdblist_recherche.py         # Recherche de listes MDBList publiques (usage local)
 │   └── purger_cache.py              # Purge du cache CDN jsDelivr
 ├── tests/
 │   ├── test_generer_backdrops.py    # Tests de la logique de résolution
 │   ├── test_mosaique.py             # Tests du module de mosaïque (hors-ligne)
 │   ├── test_mosaique_integration.py # Test bout-en-bout du mode mosaïque
 │   ├── test_mettre_a_jour_urls.py   # Tests de la mise à jour des URLs
-│   ├── test_trakt_auth.py           # Tests du script d'authentification Trakt
-│   ├── fixtures/aiometadata-exemple.json  # Fixture pour les tests AIOMetadata
+│   ├── fixtures/aiometadata-exemple.json          # Fixture AIOMetadata (format réel, config.catalogs)
+│   ├── fixtures/aiometadata-exemple-legacy-plat.json  # Fixture ancien format (catalogs à la racine)
 │   └── test_pipeline_integration.py # Test bout-en-bout (HTTP simulé)
 └── BACKDROPS_SETUP.md               # Ce fichier
 ```
@@ -270,9 +271,10 @@ nuvio-configuration/
 
 **Un dossier n'a pas de backdrop après une exécution réelle** → regarde la
 section "Dossiers ignorés, par raison" dans le résumé : c'est très souvent
-une source Trakt (non gérée pour l'instant) ou un catalogue "addon" propre
-à ta configuration Stremio qu'on ne peut pas résoudre sans son fichier de
-définition.
+une source `provider: "trakt"` (non prise en charge, voir plus bas), une
+liste MDBList personnalisée sans URL publique (ex: "Recommandation"), ou
+un catalogue "addon" propre à ta configuration Stremio qu'on ne peut pas
+résoudre sans son fichier de définition (`--aiometadata`).
 
 **Les images ne se mettent pas à jour sur Nuvio** → jsDelivr cache les
 fichiers ~7 jours ; le workflow purge automatiquement le cache après chaque
@@ -328,112 +330,37 @@ une config obsolète pour les anciens.
 Les catalogues FlixPatrol/`streaming.*`/`custom.*` (non-TMDB, ex: Top 10
 France) restent non résolus -- ils n'ont pas d'équivalent TMDB direct.
 
-## 🎬 Trakt (listes publiques uniquement)
+## 🎬 Trakt (non pris en charge)
 
-Certaines Franchises et Thématiques référencent une liste Trakt
-(`traktListId`) plutôt qu'un catalogue TMDB direct. Avec une clé Trakt
-configurée, ces listes sont désormais résolues (à condition d'être
-**publiques** sur Trakt).
+Créer une application Trakt nécessite désormais un abonnement Trakt VIP
+(voir la discussion du 2 août 2026 sur forums.trakt.tv), ce qui n'est
+pas disponible pour ce projet. Toute source `provider: "trakt"` dans le
+JSON de collections est donc explicitement **ignorée et journalisée**
+avec la raison -- jamais une erreur. **MDBList (ci-dessous) couvre le
+même besoin** (listes de films/séries) sans ce problème : la connexion à
+MDBList se fait via un compte Trakt **gratuit** ("Login with Trakt" --
+c'est l'application *de MDBList*, pas la tienne, qui est déjà
+enregistrée), et MDBList délivre ensuite sa propre clé API, gratuite,
+sans OAuth ni renouvellement de jeton.
 
-### Configuration (optionnelle)
+## 📋 MDBList
 
-1. Crée un compte sur https://trakt.tv, puis une application sur
-   https://trakt.tv/oauth/applications ("New Application") -- Redirect
-   URI : `urn:ietf:wg:oauth:2.0:oob` suffit pour cet usage.
-2. Récupère le **Client ID** (pas besoin du Client Secret, ni de connexion
-   OAuth complète -- les listes publiques ne demandent que ça).
-3. Secret GitHub `TRAKT_CLIENT_ID` (Settings → Secrets and variables → Actions).
+Les sources `provider: "mdblist"` dans le JSON de collections, ainsi que
+les catalogues **ajoutés via l'addon AIOMetadata** (`provider: "addon"`
+avec un `catalogId` du type `mdblist.<id>`, ex : "Sitcom") sont
+résolus via l'API MDBList.com -- ces derniers nécessitent de fournir
+`--aiometadata Templates/aiometadata-setup.json` (déjà fait
+automatiquement par le workflow GitHub Actions s'il trouve ce fichier).
 
-Sans cette clé, les sources Trakt restent simplement ignorées (comportement
-identique à avant), aucune erreur.
+⚠️ **Cas non résolvable : les listes "Recommandation" personnalisées**
+(`mdblist.recommended.*`). Ce sont des recommandations calculées à partir
+de l'historique de visionnage du compte MDBList/Trakt lié, sans URL
+publique fixe -- MDBList ne fait que lire des listes existantes (les
+tiennes ou des listes publiques), pas générer des recommandations à
+partir d'un historique. Ce catalogue reste explicitement ignoré, message
+à l'appui, plutôt que traité en silence.
 
-### ✅ Listes privées Trakt -- authentification OAuth
-
-Contrairement aux listes publiques (Client ID seul), l'accès aux **listes
-privées** d'un compte (ex: ton second compte Trakt dédié à ce pipeline)
-nécessite un vrai jeton OAuth Trakt (access_token + refresh_token) --
-c'est pris en charge, moyennant une configuration en 2 étapes.
-
-⚠️ Ceci ne couvre PAS le dossier "Recommandation"
-(`trakt.recommendations.movies/shows`) : les recommandations Trakt sont
-calculées à partir de l'historique de visionnage du compte authentifié --
-un compte secondaire dédié à ce pipeline n'en a pas, donc ce catalogue
-n'est pas pertinent ici et reste volontairement ignoré (comme avant).
-
-#### Étape 1 -- Créer une application Trakt
-
-1. Connecte-toi sur https://trakt.tv avec le compte que tu veux utiliser
-   pour ce pipeline (ex: ton second compte dédié, pour ne pas mélanger tes
-   listes personnelles avec celles de l'automatisation).
-2. Crée une application sur https://trakt.tv/oauth/applications
-   ("New Application"). Redirect URI : `urn:ietf:wg:oauth:2.0:oob`.
-3. Note le **Client ID** et le **Client Secret**.
-
-#### Étape 2 -- Authentification (une fois, en LOCAL, pas dans GitHub Actions)
-
-```bash
-pip install requests
-python3 scripts/trakt_auth.py --client-id TON_CLIENT_ID --client-secret TON_CLIENT_SECRET
-```
-
-Le script affiche un code à saisir sur https://trakt.tv/activate --
-connecte-toi avec le compte concerné dans le navigateur avant de saisir
-le code. Une fois autorisé, il affiche 4 valeurs à ajouter comme secrets
-GitHub (Settings → Secrets and variables → Actions) :
-
-- `TRAKT_CLIENT_ID`
-- `TRAKT_CLIENT_SECRET`
-- `TRAKT_ACCESS_TOKEN`
-- `TRAKT_REFRESH_TOKEN`
-
-#### ⚠️ Le point important : le renouvellement automatique
-
-L'access_token Trakt n'est valide que **7 jours**. Le pipeline le
-rafraîchit automatiquement à chaque exécution -- mais le refresh_token
-Trakt est à **usage unique** : chaque rafraîchissement en génère un
-nouveau et invalide l'ancien. Il faut donc que le nouveau soit sauvegardé
-quelque part, sinon l'exécution suivante échouera à se rafraîchir.
-
-Deux façons de gérer ça :
-
-**Option A (recommandée) -- laisser le workflow mettre à jour les secrets automatiquement**
-
-Crée un Personal Access Token GitHub avec le droit d'écrire les secrets
-du repo :
-1. https://github.com/settings/tokens?type=beta → "Generate new token"
-2. Restreins-le à CE repo, permission "Secrets" en **Read and write**
-3. Ajoute-le comme secret : `GH_PAT_SECRETS`
-
-Avec ça configuré, le workflow met à jour `TRAKT_ACCESS_TOKEN` et
-`TRAKT_REFRESH_TOKEN` tout seul après chaque exécution où un
-rafraîchissement a eu lieu -- rien d'autre à faire ensuite.
-
-**Option B -- sans PAT, renouvellement manuel occasionnel**
-
-Sans `GH_PAT_SECRETS`, le rafraîchissement fonctionne toujours PENDANT
-une exécution (en mémoire), mais le nouveau refresh_token n'est jamais
-re-sauvegardé -- l'exécution suivante réutilisera l'ancien, déjà
-invalidé, et l'authentification échouera (le reste du pipeline continue
-de fonctionner normalement, seuls Recommandation/listes privées seront
-ignorés à nouveau). Il faudra alors relancer `scripts/trakt_auth.py` en
-local pour renouveler l'accès. Un message clair s'affiche dans les logs
-du workflow si ça arrive.
-
-## 📋 MDBList (alternative à Trakt, recommandée)
-
-Depuis août 2026, créer une application Trakt nécessite un abonnement
-Trakt VIP -- ce qui bloque la section Trakt ci-dessus pour un compte
-gratuit. **MDBList.com** est une alternative qui évite complètement ce
-problème : la connexion à MDBList se fait via ton compte Trakt gratuit
-("Login with Trakt" -- c'est l'application *de MDBList*, pas la tienne,
-qui est déjà enregistrée), et MDBList délivre ensuite sa **propre** clé
-API, gratuite, sans OAuth ni renouvellement de jeton.
-
-Les sources `provider: "mdblist"` dans le JSON de collections sont
-résolues de la même façon que les sources `trakt` (même logique de
-cascade d'images ensuite), mais lues depuis MDBList.
-
-### Configuration (optionnelle)
+### Configuration (optionnelle mais recommandée)
 
 1. Va sur https://mdblist.com, clique sur **Login**, puis **with Trakt.tv**
    -- connecte-toi avec ton compte Trakt habituel (gratuit, aucun VIP requis).
@@ -442,13 +369,19 @@ cascade d'images ensuite), mais lues depuis MDBList.
 3. Secret GitHub `MDBLIST_API_KEY` (Settings → Secrets and variables → Actions).
 
 Palier gratuit : 1000 requêtes/jour (largement suffisant pour une
-exécution périodique du pipeline). Sans cette clé, les sources `mdblist`
-sont simplement ignorées, comme pour Trakt.
+exécution périodique du pipeline). **Sans cette clé**, les listes
+MDBList **publiques** référencées par une URL (ce qui couvre la quasi-
+totalité des cas, y compris tous les catalogues ajoutés via l'addon
+AIOMetadata) continuent de fonctionner via le repli JSON public de
+MDBList (voir plus bas) -- la clé n'est vraiment utile que pour les
+listes référencées uniquement par un identifiant numérique opaque, ou
+pour éviter les limites de débit du repli public.
 
-### Comment référencer une liste MDBList dans le JSON
+### Comment référencer une liste MDBList manuellement dans le JSON
 
-Trois formats acceptés pour une source, du plus simple au plus explicite
-(un seul suffit) :
+Trois formats acceptés pour une source `provider: "mdblist"` ajoutée à la
+main (indépendamment de l'addon AIOMetadata), du plus simple au plus
+explicite (un seul suffit) :
 
 ```json
 { "provider": "mdblist", "mdblistUrl": "https://mdblist.com/lists/ton-pseudo/nom-de-la-liste" }
@@ -487,15 +420,7 @@ snippet JSON prêt à coller directement dans une source `mdblist` :
 ```
 
 Ce script est à lancer en local uniquement (pas besoin dans le workflow
-GitHub Actions) -- il sert juste à préparer tes remplacements manuels de
-sources `trakt` vers `mdblist` dans le JSON de collections.
-
-⚠️ **Recommandations exclues** : comme pour Trakt, les catalogues de
-recommandations personnalisées (`trakt.recommendations.*`) ne sont pas
-concernés par cette passerelle -- MDBList ne fait que lire des listes
-existantes (les tiennes ou des listes publiques), pas générer de
-recommandations à partir d'un historique de visionnage. Ces catalogues
-restent à retirer manuellement du JSON de collections.
+GitHub Actions).
 
 ### Repli sans clé API
 
@@ -529,9 +454,11 @@ phase prévue). Pistes possibles si tu veux reprendre un jour :
 
 - ~~Intégrer l'API Trakt pour résoudre les ~28 dossiers restants~~ --
   Trakt nécessite désormais un compte VIP pour créer une application ;
-  utiliser la passerelle **MDBList** à la place (voir section dédiée
-  ci-dessus) en remplaçant manuellement les sources `trakt` du JSON par
-  des sources `mdblist` équivalentes (hors "Recommandation", non couvert)
+  **retiré du projet**. La quasi-totalité de ces dossiers est maintenant
+  résolue automatiquement via MDBList (catalogues ajoutés dans l'addon
+  AIOMetadata + `--aiometadata`, voir section dédiée ci-dessus) ; seule
+  "Recommandation" (liste personnalisée sans URL publique) reste hors
+  d'atteinte.
 - Génération de variantes `.webp` en plus du `.jpg`
 
 ---
