@@ -37,7 +37,6 @@ from generer_backdrops import (  # noqa: E402
     slugifier,
 )
 
-
 # ---------------------------------------------------------------------------
 # Le bug historique : mapping des titres de groupes
 # ---------------------------------------------------------------------------
