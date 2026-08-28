@@ -1136,7 +1136,7 @@ def telecharger_et_traiter(
     largeur_cible = reglages["largeur"]
     if image.width > largeur_cible:
         ratio = largeur_cible / image.width
-        image = image.resize((largeur_cible, int(image.height * ratio)), Image.LANCZOS)
+        image = image.resize((largeur_cible, int(image.height * ratio)), Image.Resampling.LANCZOS)
 
     chemin_sortie.parent.mkdir(parents=True, exist_ok=True)
     image.save(chemin_sortie, "JPEG", quality=reglages["qualite"], optimize=True)
