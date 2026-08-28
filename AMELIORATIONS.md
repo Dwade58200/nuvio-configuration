@@ -31,6 +31,28 @@ de qualité professionnelle, pas des correctifs urgents.
       publique exportée, au lieu de tomber en "catalogId non résolu"
 - [x] Trakt entièrement retiré (`ClientTrakt`, `trakt_auth.py`, CLI, CI,
       secrets, docs) -- voir section "Explicitement écarté" plus bas
+- [x] Nettoyage `ruff` complet (35 erreurs -- imports non triés,
+      annotations entre guillemets redondantes, variable ambiguë,
+      `assert False`, etc.) et `mypy` complet (13 erreurs -- constantes
+      `Image.LANCZOS`/`BOX`/`BICUBIC`/`BILINEAR` remplacées par
+      `Image.Resampling.*`, types `str | None` corrigés)
+- [x] Pool de connexions HTTP agrandi (`HTTPAdapter(pool_maxsize=64)`) --
+      le mode mosaïque + `--parallelisme` dépassait le pool par défaut de
+      `requests` (10), d'où des warnings `Connection pool is full` en
+      boucle dans les logs d'exécution réelle
+- [x] "Budget" artificiel d'appels TMDB `/images` (`--limite-appels-tmdb-images`,
+      300 par défaut) entièrement retiré -- ce n'était pas une vraie
+      limite de l'API TMDB (qui n'a pas de quota fixe par run), juste une
+      protection auto-imposée par une session précédente
+- [x] Validation du JSON de collections par un schéma JSON (Draft-07),
+      en CI (`scripts/valider_collections.py` + `schema/nuvio-collections.schema.json`)
+      -- attrape une erreur de structure avant qu'elle ne casse l'import
+      Nuvio. La branche `mdblist` du schéma a été corrigée au passage :
+      elle exigeait `catalogId` (qui n'existe que pour `provider: "addon"`)
+      au lieu de `mdblistUrl`/`mdblistId`/`mdblistUser`+`mdblistSlug`
+      (le format réellement lu par le code pour ce provider) -- aurait
+      fait échouer la CI sur tout ajout manuel suivant la doc
+      `BACKDROPS_SETUP.md`
 
 ---
 
@@ -48,7 +70,6 @@ de qualité professionnelle, pas des correctifs urgents.
 
 - Intégrer les Animés dans le Aiometadata puis dans les backdrops.
 - Modifié le AIOStream pour intégrer les animés (avec regex et/ou filtres propres) et modifier le le style du texte du lien. 
-- Validation du JSON de collections par un schéma en CI, pour attraper une erreur de structure avant qu'elle ne casse l'import Nuvio
 - Faciliter les modifications du style des Backdrop en créant un modificateur avec un visuel.
 
 

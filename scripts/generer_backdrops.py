@@ -766,6 +766,7 @@ class ClientTMDB:
                 return backdrop, requete.tmdb_id, "collection"
 
             if requete.kind == "endpoint":
+                assert requete.endpoint is not None  # garanti par construire_requetes() pour ce kind
                 data = self._get(requete.endpoint)
                 for item in data.get("results", []):
                     if item.get("backdrop_path"):
@@ -817,6 +818,7 @@ class ClientTMDB:
                 return resultats
 
             if requete.kind == "endpoint":
+                assert requete.endpoint is not None  # garanti par construire_requetes() pour ce kind
                 for page in range(1, pages + 1):
                     data = self._get(requete.endpoint, {"page": page})
                     items = data.get("results", [])
@@ -1221,7 +1223,7 @@ class GenerateurBackdrops:
             return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path_repli}")
         return None
 
-    def _resoudre_image_tuile(self, candidat: tuple[str, int, str, str | None]) -> Image.Image | None:
+    def _resoudre_image_tuile(self, candidat: tuple[str | None, int, str, str | None]) -> Image.Image | None:
         """Cascade de résolution pour une tuile, dans l'ordre demandé :
 
         Pour chaque langue en (français, anglais) :
@@ -1311,7 +1313,7 @@ class GenerateurBackdrops:
         return None
 
     def _telecharger_images_pour_mosaique(
-        self, candidats: list[tuple[str, int, str, str | None]]
+        self, candidats: list[tuple[str | None, int, str, str | None]]
     ) -> list[Image.Image]:
         """Résout (cascade TMDB langue -> Fanart -> sans texte) et
         télécharge en parallèle les images des candidats ; retourne les
@@ -1329,7 +1331,7 @@ class GenerateurBackdrops:
 
         return [images[i] for i in sorted(images)]
 
-    def _resoudre_liste_candidats(self, requete: RequeteTMDB, cible: int, pages: int) -> list[tuple[str, int, str, str | None]]:
+    def _resoudre_liste_candidats(self, requete: RequeteTMDB, cible: int, pages: int) -> list[tuple[str | None, int, str, str | None]]:
         """Résout une requête en liste de candidats (backdrop_path, tmdb_id,
         media_type, langue_originale) -- gère aussi bien les requêtes TMDB
         classiques que les listes MDBList (`kind == "mdblist_liste"`)."""

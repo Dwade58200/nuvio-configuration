@@ -246,6 +246,7 @@ def _degrade_lineaire(largeur: int, hauteur: int, direction: str, couleur: tuple
     petite_hauteur = max(1, hauteur // 4)
     image = Image.new("RGBA", (petite_largeur, petite_hauteur), (0, 0, 0, 0))
     pixels = image.load()
+    assert pixels is not None  # toujours vrai pour une image fraîchement créée avec Image.new()
 
     if direction == "gauche":
         for x in range(petite_largeur):

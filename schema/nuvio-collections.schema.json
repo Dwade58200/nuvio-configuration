@@ -88,9 +88,16 @@
             "properties": { "provider": { "const": "mdblist" } }
           },
           "then": {
-            "required": ["catalogId"],
+            "anyOf": [
+              { "required": ["mdblistUrl"] },
+              { "required": ["mdblistId"] },
+              { "required": ["mdblistUser", "mdblistSlug"] }
+            ],
             "properties": {
-              "catalogId": { "type": "string", "minLength": 1 }
+              "mdblistUrl": { "type": "string", "minLength": 1 },
+              "mdblistId": { "type": "integer" },
+              "mdblistUser": { "type": "string", "minLength": 1 },
+              "mdblistSlug": { "type": "string", "minLength": 1 }
             }
           }
         }
