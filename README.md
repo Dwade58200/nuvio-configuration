@@ -151,10 +151,12 @@ par manque d'intégration :
 
 | Groupe | Résolu | Raison si non résolu |
 |---|---|---|
-| Genres, Vibe, Années, Thématiques | 100% | — |
+| Genres, Vibe, Années, Thématiques, Services de Streaming | 100% | — |
 | Découvrir | Presque | "Recommandation" est une liste MDBList personnalisée au compte, sans URL publique |
-| Services de Streaming | 0% | Sources FlixPatrol, non compatibles TMDB |
 | Franchises, Sports | 0% | Désactivés volontairement (peu pertinent / trop de dossiers) |
+
+Détail complet (dont pourquoi Streaming est passé de 0% à 100%) dans
+`BACKDROPS_SETUP.md`, section "Couverture actuelle".
 
 ---
 
