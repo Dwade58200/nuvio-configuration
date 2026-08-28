@@ -28,6 +28,9 @@ jobs:
       - name: Lint (ruff)
         run: ruff check scripts/ tests/
 
+      - name: Valider la structure du JSON de collections
+        run: python3 scripts/valider_collections.py
+
       - name: Vérification des types (mypy)
         run: mypy scripts/ --ignore-missing-imports
         continue-on-error: true # informatif pour l'instant, pas bloquant
