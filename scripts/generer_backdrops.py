@@ -891,9 +891,32 @@ class ClientFanart:
                 params={"api_key": self.cle_api},
                 timeout=15,
             )
-            resultat = r.json() if r.status_code == 200 else None
-        except requests.RequestException:
+            logging.debug("[FANART] GET %s/%s -> HTTP %s", chemin, tmdb_ou_tvdb_id, r.status_code)
+            if r.status_code == 200:
+                resultat = r.json()
+                # Quirk connu de l'API Fanart : une clé invalide/quota dépassé
+                # renvoie parfois un statut HTTP 200 avec un corps d'erreur
+                # JSON, pas un code 4xx/5xx. Sans ce log, ce cas est
+                # indiscernable d'un 200 "aucun artwork" : le diagnostic ici
+                # ne change PAS le comportement (le dict d'erreur ne contient
+                # de toute façon aucune des clés attendues par
+                # _candidats_par_type, donc le résultat final est déjà
+                # "aucun candidat" -- on documente juste la vraie cause).
+                if isinstance(resultat, dict) and resultat.get("status") == "error":
+                    logging.warning(
+                        "[FANART] Réponse 200 mais corps d'erreur pour %s/%s : %s",
+                        chemin, tmdb_ou_tvdb_id, resultat.get("error message") or resultat,
+                    )
+            else:
+                resultat = None
+                if r.status_code != 404:
+                    # 404 = pas de fiche Fanart pour ce titre, c'est un cas normal et fréquent.
+                    logging.warning(
+                        "[FANART] Statut HTTP inattendu %s pour %s/%s", r.status_code, chemin, tmdb_ou_tvdb_id,
+                    )
+        except requests.RequestException as exc:
             resultat = None
+            logging.warning("[FANART] Erreur réseau/timeout pour %s/%s : %s", chemin, tmdb_ou_tvdb_id, exc)
 
         with self._verrou:
             self._cache_donnees[cle_cache] = resultat
@@ -1238,8 +1261,10 @@ class GenerateurBackdrops:
         du candidat en tout dernier recours.
         """
         backdrop_path, tmdb_id, media_type, _langue_originale_ignoree = candidat
+        logging.debug("[TUILE] Résolution pour tmdb_id=%s (%s), langue préférée=%s", tmdb_id, media_type, self.langue_preferee)
 
         if not tmdb_id:
+            logging.debug("[TUILE] Pas de tmdb_id -> backdrop brut du candidat directement")
             return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path}") if backdrop_path else None
 
         # Chargement paresseux des données Fanart : on ne les récupère que
@@ -1250,10 +1275,18 @@ class GenerateurBackdrops:
         def obtenir_fanart_data() -> dict[str, Any] | None:
             if "valeur" not in cache_fanart:
                 valeur = None
-                if self.fanart.cle_api:
+                if not self.fanart.cle_api:
+                    logging.debug("[TUILE] tmdb_id=%s : pas de clé Fanart configurée, palier Fanart sauté", tmdb_id)
+                else:
                     identifiant = self.tmdb.recuperer_tvdb_id(tmdb_id) if media_type == "tv" else tmdb_id
-                    if identifiant:
+                    if not identifiant:
+                        logging.warning(
+                            "[TUILE] tmdb_id=%s (tv) : échec de conversion tmdb_id->tvdb_id, Fanart sauté entièrement", tmdb_id,
+                        )
+                    else:
                         valeur = self.fanart.donnees(identifiant, media_type)
+                        if valeur is None:
+                            logging.debug("[TUILE] tmdb_id=%s : Fanart n'a renvoyé aucune donnée exploitable (voir logs [FANART] ci-dessus)", tmdb_id)
                 cache_fanart["valeur"] = valeur
             return cache_fanart["valeur"]
 
@@ -1267,7 +1300,9 @@ class GenerateurBackdrops:
             if chemin:
                 image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin}")
                 if image:
+                    logging.debug("[TUILE] tmdb_id=%s -> retenu : TMDB backdrop tagué '%s'", tmdb_id, langue)
                     return image
+                logging.debug("[TUILE] tmdb_id=%s : TMDB backdrop '%s' trouvé mais téléchargement échoué", tmdb_id, langue)
 
             fanart_data = obtenir_fanart_data()
             if fanart_data:
@@ -1276,6 +1311,7 @@ class GenerateurBackdrops:
                     if url:
                         image = self._telecharger_une_image(url)
                         if image:
+                            logging.debug("[TUILE] tmdb_id=%s -> retenu : Fanart '%s' langue '%s'", tmdb_id, type_nom, langue)
                             return image
 
                 url_clearart = self.fanart.url_par_type_et_langue(fanart_data, media_type, "clearart", langue)
@@ -1283,6 +1319,7 @@ class GenerateurBackdrops:
                     clearart = self._telecharger_une_image(url_clearart)
                     if clearart:
                         fond = self._obtenir_fond_pour_clearart(fanart_data, media_type, backdrop_path)
+                        logging.debug("[TUILE] tmdb_id=%s -> retenu : Fanart clearart langue '%s' composé sur fond", tmdb_id, langue)
                         return mosaique_module.composer_sur_fond(clearart, fond) if fond else clearart
 
         # Dernier recours : sans texte
@@ -1293,6 +1330,7 @@ class GenerateurBackdrops:
                 if url:
                     image = self._telecharger_une_image(url)
                     if image:
+                        logging.info("[TUILE] tmdb_id=%s -> REPLI SANS TEXTE : Fanart '%s' non taggué", tmdb_id, type_nom)
                         return image
 
             url_clearart = self.fanart.url_par_type_et_langue(fanart_data, media_type, "clearart", None)
@@ -1300,16 +1338,20 @@ class GenerateurBackdrops:
                 clearart = self._telecharger_une_image(url_clearart)
                 if clearart:
                     fond = self._obtenir_fond_pour_clearart(fanart_data, media_type, backdrop_path)
+                    logging.info("[TUILE] tmdb_id=%s -> REPLI SANS TEXTE : Fanart clearart non taggué", tmdb_id)
                     return mosaique_module.composer_sur_fond(clearart, fond) if fond else clearart
 
         chemin_generique = meilleur_backdrop_tmdb_langue(images_tmdb, None)
         if chemin_generique:
             image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin_generique}")
             if image:
+                logging.info("[TUILE] tmdb_id=%s -> REPLI SANS TEXTE : backdrop TMDB générique non taggué", tmdb_id)
                 return image
 
         if backdrop_path:
+            logging.info("[TUILE] tmdb_id=%s -> DERNIER RECOURS : backdrop brut du candidat (aucune cascade n'a abouti)", tmdb_id)
             return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path}")
+        logging.warning("[TUILE] tmdb_id=%s -> ÉCHEC TOTAL : aucune image trouvée", tmdb_id)
         return None
 
     def _telecharger_images_pour_mosaique(
