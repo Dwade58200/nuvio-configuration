@@ -25,6 +25,14 @@ on:
         description: "Mettre à jour heroBackdropUrl dans le JSON (à activer seulement quand de nouveaux dossiers viennent d'être résolus, pas à chaque run)"
         type: boolean
         default: false
+      verbose:
+        description: "Diagnostic : logs détaillés (Fanart/TMDB, palier de cascade par tuile) exportés en artefact téléchargeable"
+        type: boolean
+        default: false
+      commiter:
+        description: "Commiter et pousser les images générées (décoche pour un run de diagnostic pur, sans effet sur le repo)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -68,14 +76,26 @@ jobs:
           GROUPE: ${{ inputs.groupe }}
           LIMITE: ${{ inputs.limite }}
           DESACTIVER_MOSAIQUE: ${{ inputs.desactiver_mosaique }}
+          VERBOSE: ${{ inputs.verbose }}
         run: |
+          set -o pipefail
           ARGS=(--collections Templates/Nuvio-Collections-Dwade58200.json --sortie Collections --profil compresse --parallelisme 3)
           if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run); fi
           if [ -n "$GROUPE" ]; then ARGS+=(--groupe "$GROUPE"); fi
           if [ -n "$LIMITE" ]; then ARGS+=(--limite "$LIMITE"); fi
           if [ "$DESACTIVER_MOSAIQUE" != "true" ]; then ARGS+=(--mosaique); fi
+          if [ "$VERBOSE" = "true" ]; then ARGS+=(--verbose); fi
           if [ -f "Templates/aiometadata-setup.json" ]; then ARGS+=(--aiometadata "Templates/aiometadata-setup.json"); fi
-          python3 -B scripts/generer_backdrops.py "${ARGS[@]}"
+          python3 -B scripts/generer_backdrops.py "${ARGS[@]}" 2>&1 | tee generer_backdrops.log
+
+      - name: Publier le log de diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generer-backdrops-log
+          path: generer_backdrops.log
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Mettre à jour heroBackdropUrl vers les images générées
         if: ${{ inputs.dry_run != true && inputs.mettre_a_jour_urls == true }}
@@ -92,7 +112,7 @@ jobs:
 
       - name: Commiter et pousser les changements
         id: publication
-        if: ${{ inputs.dry_run != true }}
+        if: ${{ inputs.dry_run != true && inputs.commiter != false }}
         run: |
           git add Collections/ Templates/
           if git diff --cached --quiet; then
