@@ -183,7 +183,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Decouvertes/Backdrops/Tendance_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Decouvertes/Backdrops/Tendance_Backdrop.jpg"
       },
       {
         "id": "3a6c3b3b-3cd9-42c9-b746-6bde47a88a98",
@@ -252,7 +252,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Decouvertes/Backdrops/Populaire_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Decouvertes/Backdrops/Populaire_Backdrop.jpg"
       },
       {
         "id": "88145671-0640-44c9-b4da-c7d6432fb029",
@@ -360,7 +360,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Decouvertes/Backdrops/Top_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Decouvertes/Backdrops/Top_Backdrop.jpg"
       },
       {
         "id": "41b5c194-a78c-4b81-a8ad-16f0263f662c",
@@ -499,7 +499,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Services%20de%20Streaming/Backdrops/Netflix_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Netflix_Backdrop.jpg"
       },
       {
         "id": "folder-e07599df",
@@ -568,7 +568,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Services%20de%20Streaming/Backdrops/Prime_Video_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Prime_Video_Backdrop.jpg"
       },
       {
         "id": "folder-df6d88cc",
@@ -637,7 +637,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Services%20de%20Streaming/Backdrops/HBO_Max_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/HBO_Max_Backdrop.jpg"
       },
       {
         "id": "folder-50412b35",
@@ -706,7 +706,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Services%20de%20Streaming/Backdrops/Apple_TV_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Apple_TV_Backdrop.jpg"
       },
       {
         "id": "folder-6308b715",
@@ -775,7 +775,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Services%20de%20Streaming/Backdrops/Disney%2B_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Disney%2B_Backdrop.jpg"
       },
       {
         "id": "folder-2a809268",
@@ -844,7 +844,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Services%20de%20Streaming/Backdrops/Paramount_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Paramount_Backdrop.jpg"
       },
       {
         "id": "folder-27e8f810",
@@ -913,7 +913,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Services%20de%20Streaming/Backdrops/Canal%2B_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Canal%2B_Backdrop.jpg"
       },
       {
         "id": "folder-71d5bdad",
@@ -943,7 +943,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Services%20de%20Streaming/Backdrops/TF1_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/TF1_Backdrop.jpg"
       },
       {
         "id": "folder-c878faf1",
@@ -973,7 +973,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Services%20de%20Streaming/Backdrops/M6_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/M6_Backdrop.jpg"
       }
     ],
     "pinToTop": false,
@@ -1095,7 +1095,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Action_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Action_Backdrop.jpg"
       },
       {
         "id": "02b17ed2-2937-41e3-9525-2e94b83c6a08",
@@ -1194,7 +1194,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Aventure_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Aventure_Backdrop.jpg"
       },
       {
         "id": "folder-832ab72c",
@@ -1305,7 +1305,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Comedie_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Comedie_Backdrop.jpg"
       },
       {
         "id": "folder-ac4123c1",
@@ -1416,7 +1416,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Drame_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Drame_Backdrop.jpg"
       },
       {
         "id": "351e88e6-6f53-4f66-866f-b945a3076534",
@@ -1503,7 +1503,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Fantastique_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Fantastique_Backdrop.jpg"
       },
       {
         "id": "620a7ea4-70c9-40cd-8391-fb16aad22804",
@@ -1590,7 +1590,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Guerre_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Guerre_Backdrop.jpg"
       },
       {
         "id": "folder-ded2342f",
@@ -1725,7 +1725,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Horreur_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Horreur_Backdrop.jpg"
       },
       {
         "id": "09c0f7ee-67a6-4b95-99cf-32cf9e63268e",
@@ -1836,7 +1836,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Mystere_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Mystere_Backdrop.jpg"
       },
       {
         "id": "60146cc3-c890-4081-ae45-1f9911ace25c",
@@ -1947,7 +1947,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Policier_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Policier_Backdrop.jpg"
       },
       {
         "id": "folder-1eb5a207",
@@ -2022,7 +2022,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Romance_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Romance_Backdrop.jpg"
       },
       {
         "id": "folder-60eed6b5",
@@ -2133,7 +2133,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Sci-Fi_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Sci-Fi_Backdrop.jpg"
       },
       {
         "id": "folder-82185962",
@@ -2208,7 +2208,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Thriller_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Thriller_Backdrop.jpg"
       },
       {
         "id": "8320885c-15e7-4cef-bc38-5292c7739ccf",
@@ -2247,7 +2247,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Western_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Western_Backdrop.jpg"
       },
       {
         "id": "folder-3df43338",
@@ -2358,7 +2358,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Animation_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Animation_Backdrop.jpg"
       },
       {
         "id": "folder-af3d785d",
@@ -2469,7 +2469,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Genres/Backdrops/Documentaires_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Documentaires_Backdrop.jpg"
       }
     ],
     "pinToTop": false,
@@ -2523,7 +2523,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Adolescence_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Adolescence_Backdrop.jpg"
       },
       {
         "id": "folder-c0fc484a",
@@ -2566,7 +2566,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Arts_Martiaux_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Arts_Martiaux_Backdrop.jpg"
       },
       {
         "id": "folder-77a930e9",
@@ -2609,7 +2609,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Chasse_au_Tresor_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Chasse_au_Tresor_Backdrop.jpg"
       },
       {
         "id": "folder-7bf48884",
@@ -2652,7 +2652,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Comedie_Romantique_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Comedie_Romantique_Backdrop.jpg"
       },
       {
         "id": "folder-29c00bfe",
@@ -2695,7 +2695,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Espionnage_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Espionnage_Backdrop.jpg"
       },
       {
         "id": "folder-2be0b409",
@@ -2738,7 +2738,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Espace_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Espace_Backdrop.jpg"
       },
       {
         "id": "folder-6dc9b629",
@@ -2907,7 +2907,7 @@
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Grands_Realisateurs.png?raw=true",
         "catalogSources": [],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Grands_Realisateurs_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Grands_Realisateurs_Backdrop.jpg"
       },
       {
         "id": "folder-cafccf4a",
@@ -2950,7 +2950,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Faits_Reels_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Faits_Reels_Backdrop.jpg"
       },
       {
         "id": "folder-4ba5b053",
@@ -2993,7 +2993,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Magie_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Magie_Backdrop.jpg"
       },
       {
         "id": "folder-ab579d48",
@@ -3023,7 +3023,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://i.postimg.cc/2ygwGWSp/Backdrop-Sitcom.png"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Sitcom_Backdrop.jpg"
       },
       {
         "id": "folder-3caf1e76",
@@ -3066,7 +3066,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Super-Heros_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Super-Heros_Backdrop.jpg"
       },
       {
         "id": "folder-84266947",
@@ -3109,7 +3109,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Vampire_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Vampire_Backdrop.jpg"
       },
       {
         "id": "folder-a45d4aca",
@@ -3152,7 +3152,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Vengeance_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Vengeance_Backdrop.jpg"
       },
       {
         "id": "folder-15982f33",
@@ -3195,7 +3195,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Thematiques/Backdrops/Voyage_Temporel_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Voyage_Temporel_Backdrop.jpg"
       }
     ],
     "pinToTop": false,
@@ -3301,7 +3301,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Vibes/Backdrops/Joyeux_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Vibes/Backdrops/Joyeux_Backdrop.jpg"
       },
       {
         "id": "folder-4144a892",
@@ -3383,7 +3383,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Vibes/Backdrops/Reconfort_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Vibes/Backdrops/Reconfort_Backdrop.jpg"
       },
       {
         "id": "folder-22235ff2",
@@ -3491,7 +3491,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Vibes/Backdrops/Retournent_Cerveau_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Vibes/Backdrops/Retournent_Cerveau_Backdrop.jpg"
       },
       {
         "id": "folder-30e5ff34",
@@ -3599,7 +3599,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Vibes/Backdrops/Tristesse_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Vibes/Backdrops/Tristesse_Backdrop.jpg"
       }
     ],
     "pinToTop": false,
@@ -3674,7 +3674,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Annees/Backdrops/2020s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/2020s_Backdrop.jpg"
       },
       {
         "id": "folder-f3ab961e",
@@ -3738,7 +3738,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Annees/Backdrops/2010s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/2010s_Backdrop.jpg"
       },
       {
         "id": "folder-7fa0328f",
@@ -3802,7 +3802,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Annees/Backdrops/2000s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/2000s_Backdrop.jpg"
       },
       {
         "id": "folder-0c9b3b55",
@@ -3866,7 +3866,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Annees/Backdrops/1990s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1990s_Backdrop.jpg"
       },
       {
         "id": "folder-35018e2a",
@@ -3930,7 +3930,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Annees/Backdrops/1980s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1980s_Backdrop.jpg"
       },
       {
         "id": "folder-8d5999ba",
@@ -3970,7 +3970,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Annees/Backdrops/1970s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1970s_Backdrop.jpg"
       },
       {
         "id": "folder-68c4af5e",
@@ -4010,7 +4010,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Annees/Backdrops/1960s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1960s_Backdrop.jpg"
       },
       {
         "id": "folder-1078e6b3",
@@ -4050,7 +4050,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@feature/backdrops-automation/Collections/Annees/Backdrops/1950s_Avant_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1950s_Avant_Backdrop.jpg"
       }
     ],
     "pinToTop": false,
