@@ -23,66 +23,65 @@
           },
           {
             "type": "movie",
-            "genre": "",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
+            "genre": "None",
+            "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "aicat_list_118229"
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118229"
           },
           {
             "type": "series",
-            "genre": "",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
+            "genre": "None",
+            "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "aicat_list_118230"
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118230"
           },
           {
             "type": "movie",
-            "genre": "",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
+            "genre": "None",
+            "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "aicat_list_118225"
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118225"
           },
           {
             "type": "series",
-            "genre": "",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
+            "genre": "None",
+            "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "aicat_list_118226"
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118226"
           },
           {
             "type": "movie",
-            "genre": "",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
+            "genre": "None",
+            "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "aicat_random_public_movie"
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_random_public_movie"
           },
           {
             "type": "series",
-            "genre": "",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
+            "genre": "None",
+            "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "aicat_random_public_series"
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_random_public_series"
           },
           {
             "type": "movie",
-            "genre": "",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
+            "genre": "None",
+            "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "aicat_list_118227"
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118227"
           },
           {
             "type": "series",
-            "genre": "",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
+            "genre": "None",
+            "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "aicat_list_118228"
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118228"
           }
         ],
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🫵",
         "focusGifUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/focused/recommended.webp",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Recommandation_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Recommandation.png?raw=true",
         "catalogSources": [
@@ -100,43 +99,51 @@
           },
           {
             "type": "movie",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
-            "catalogId": "aicat_list_118229"
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118229"
           },
           {
             "type": "series",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
-            "catalogId": "aicat_list_118230"
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118230"
           },
           {
             "type": "movie",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
-            "catalogId": "aicat_list_118225"
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118225"
           },
           {
             "type": "series",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
-            "catalogId": "aicat_list_118226"
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118226"
           },
           {
             "type": "movie",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
-            "catalogId": "aicat_random_public_movie"
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_random_public_movie"
           },
           {
             "type": "series",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
-            "catalogId": "aicat_random_public_series"
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_random_public_series"
           },
           {
             "type": "movie",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
-            "catalogId": "aicat_list_118227"
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118227"
           },
           {
             "type": "series",
-            "addonId": "com.aicat.ace6ec91-449a-4f74-928a-3243ac4d3fc1.nuvio",
-            "catalogId": "aicat_list_118228"
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118228"
           }
         ],
         "focusGifEnabled": true,
@@ -165,7 +172,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "⬆️",
         "focusGifUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/discover/focused/trending.gif?raw=true",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Tendance_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Tendance.png?raw=true",
         "catalogSources": [
@@ -183,7 +189,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Decouvertes/Backdrops/Tendance_Backdrop.jpg"
+        "heroBackdropUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/discover/backdrop/trending.jpg?raw=true"
       },
       {
         "id": "3a6c3b3b-3cd9-42c9-b746-6bde47a88a98",
@@ -222,7 +228,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔥",
         "focusGifUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/focused/popular.webp",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Populaire_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Populaire.png?raw=true",
         "catalogSources": [
@@ -252,7 +257,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Decouvertes/Backdrops/Populaire_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/backdrop/popular.webp"
       },
       {
         "id": "88145671-0640-44c9-b4da-c7d6432fb029",
@@ -312,7 +317,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏆",
         "focusGifUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/focused/top-rated.webp",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/TOP_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/TOP.png?raw=true",
         "catalogSources": [
@@ -360,7 +364,7 @@
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Decouvertes/Backdrops/Top_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/backdrop/top-rated.webp"
       },
       {
         "id": "41b5c194-a78c-4b81-a8ad-16f0263f662c",
@@ -368,7 +372,7 @@
         "sources": [
           {
             "type": "tv",
-            "genre": "",
+            "genre": "None",
             "addonId": "com.tvmio.iptv",
             "provider": "addon",
             "catalogId": "tvmio-fr"
@@ -377,13 +381,12 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📺",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/TV_Logo.jpg?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/TV.webp?raw=true",
         "catalogSources": [
           {
             "type": "tv",
+            "genre": "None",
             "addonId": "com.tvmio.iptv",
             "catalogId": "tvmio-fr"
           }
@@ -406,8 +409,6 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧲",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Magnet_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Magnet.png?raw=true",
         "catalogSources": [
@@ -418,14 +419,12 @@
             "catalogId": "custom.community_stremio_intell_debrid_search.other.IntellDebridSearch"
           }
         ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": ""
+        "focusGifEnabled": false
       }
     ],
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
-    "backdropImageUrl": "",
     "focusGlowEnabled": true
   },
   {
@@ -469,7 +468,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔴",
         "focusGifUrl": "https://i.ibb.co/hRjnbqtb/netflix-gif.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/streaming/cover/netflix.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Netflix.jpg?raw=true",
         "catalogSources": [
@@ -498,8 +496,7 @@
             "catalogId": "tmdb.discover.movie.global_copy.mt49lz6m"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Netflix_Backdrop.jpg"
+        "focusGifEnabled": true
       },
       {
         "id": "folder-e07599df",
@@ -538,7 +535,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📦",
         "focusGifUrl": "https://i.ibb.co/DPSHQGdY/youtube-video-gif.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/streaming/cover/prime-video.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Prime_Video.jpg?raw=true",
         "catalogSources": [
@@ -567,8 +563,7 @@
             "catalogId": "tmdb.discover.series.global_v2_copy.mt4eqcbi"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Prime_Video_Backdrop.jpg"
+        "focusGifEnabled": true
       },
       {
         "id": "folder-df6d88cc",
@@ -607,7 +602,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔘",
         "focusGifUrl": "https://i.ibb.co/TMt4Z3HN/youtube-video-gif-7.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/HBO_Max_Logo.webp?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/HBO_Max.jpeg?raw=true",
         "catalogSources": [
@@ -636,8 +630,7 @@
             "catalogId": "tmdb.discover.series.populaire_copy.mt4eybcy"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/HBO_Max_Backdrop.jpg"
+        "focusGifEnabled": true
       },
       {
         "id": "folder-50412b35",
@@ -676,7 +669,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🍎",
         "focusGifUrl": "https://i.ibb.co/Wpx1PFtJ/youtube-video-gif-4.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/apple-tv.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Apple_TV.jpg?raw=true",
         "catalogSources": [
@@ -705,8 +697,7 @@
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezduf"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Apple_TV_Backdrop.jpg"
+        "focusGifEnabled": true
       },
       {
         "id": "folder-6308b715",
@@ -745,7 +736,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏰",
         "focusGifUrl": "https://i.ibb.co/8vXcWzY/youtube-video-gif-8.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/Disney+_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Disney+.jpg?raw=true",
         "catalogSources": [
@@ -774,8 +764,7 @@
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezf49"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Disney%2B_Backdrop.jpg"
+        "focusGifEnabled": true
       },
       {
         "id": "folder-2a809268",
@@ -814,7 +803,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🗻",
         "focusGifUrl": "https://i.ibb.co/yc8v51Zr/youtube-video-gif-3.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/paramount-plus.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Paramount.jpg?raw=true",
         "catalogSources": [
@@ -843,8 +831,7 @@
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezgou"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Paramount_Backdrop.jpg"
+        "focusGifEnabled": true
       },
       {
         "id": "folder-27e8f810",
@@ -883,7 +870,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📡",
         "focusGifUrl": "https://i.ibb.co/nqJJVy5C/youtube-video-gif-2.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/Canal+_Logo.webp?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Covers/Canal+.jpeg?raw=true",
         "catalogSources": [
@@ -912,8 +898,7 @@
             "catalogId": "tmdb.discover.series.populaire_copy_copy.mt4ezcjx"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/Canal%2B_Backdrop.jpg"
+        "focusGifEnabled": true
       },
       {
         "id": "folder-71d5bdad",
@@ -931,7 +916,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "1️⃣",
         "focusGifUrl": "https://i.postimg.cc/fR1hxRsD/GIF-20260412-151326-249.gif",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/TF1.jpg?raw=true",
         "coverImageUrl": "https://raw.githubusercontent.com/Dwade58200/nuvio-configuration/refs/heads/main/Collections/Services%20de%20Streaming/Covers/TF1.jfif",
         "catalogSources": [
@@ -942,8 +926,7 @@
             "catalogId": "tmdb.discover.series.m6_et_tf1.mofqqcct"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/TF1_Backdrop.jpg"
+        "focusGifEnabled": true
       },
       {
         "id": "folder-c878faf1",
@@ -961,7 +944,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "6️⃣",
         "focusGifUrl": "https://i.postimg.cc/RChV2Bxw/GIF-20260412-185620-545.gif?dl=1",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Services%20de%20Streaming/Logos/M6_Logo.png?raw=true",
         "coverImageUrl": "https://raw.githubusercontent.com/Dwade58200/nuvio-configuration/refs/heads/main/Collections/Services%20de%20Streaming/Covers/M6.avif",
         "catalogSources": [
@@ -972,8 +954,7 @@
             "catalogId": "tmdb.discover.series.m6_et_tf1_copy.mokc55cm"
           }
         ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Services%20de%20Streaming/Backdrops/M6_Backdrop.jpg"
+        "focusGifEnabled": true
       }
     ],
     "pinToTop": false,
@@ -991,57 +972,57 @@
         "title": "Action",
         "sources": [
           {
-            "type": "movie",
-            "genre": "",
+            "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "trakt.list.33123064"
+            "catalogId": "mdblist.128037"
           },
           {
-            "type": "series",
-            "genre": "",
+            "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "trakt.list.33122883"
+            "catalogId": "mdblist.128029"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_action.global"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.action_copy.mokbfuip"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.action_aventure_copy.mokbk464"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.top_fr.mo2tk0ej"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.fr"
@@ -1050,52 +1031,62 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "💥",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Action_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Action.png?raw=true",
         "catalogSources": [
           {
-            "type": "movie",
+            "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "trakt.list.33123064"
+            "catalogId": "mdblist.128037"
           },
           {
-            "type": "series",
+            "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "trakt.list.33122883"
+            "catalogId": "mdblist.128029"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_action.global"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.action_copy.mokbfuip"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.action_aventure_copy.mokbk464"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.top_fr.mo2tk0ej"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Action_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/action.webp"
       },
       {
         "id": "02b17ed2-2937-41e3-9525-2e94b83c6a08",
@@ -1103,49 +1094,49 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.top_aventure_copy.mokbpqb8"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.action_copy.mokb176x"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.aventure_copy.mokblxvs"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.action_aventure_copy.mokbk464"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.action_copy.mokb1a8r"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.fr"
@@ -1154,104 +1145,113 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧭",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Aventure_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Aventure.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.top_aventure_copy.mokbpqb8"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.action_copy.mokb176x"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.aventure_copy.mokblxvs"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.action_aventure_copy.mokbk464"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.action_copy.mokb1a8r"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_action_and_aventure.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Aventure_Backdrop.jpg"
+        "heroBackdropUrl": "https://i.ibb.co/bRGVf09R/aventure.webp"
       },
       {
         "id": "folder-832ab72c",
         "title": "Comédie",
         "sources": [
           {
-            "type": "movie",
-            "genre": "",
+            "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "trakt.list.33123123"
+            "catalogId": "mdblist.128040"
           },
           {
-            "type": "series",
-            "genre": "",
+            "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "trakt.list.33123136"
+            "catalogId": "mdblist.128041"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_comedie.global"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_comedie.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.com_die_copy.mokbrgql"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.com_die_copy.mokbtxpl"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_comedie.fr"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_comedie.fr"
@@ -1260,109 +1260,119 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😆",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Comedie_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Com%C3%A9die.png?raw=true",
         "catalogSources": [
           {
-            "type": "movie",
+            "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "trakt.list.33123123"
+            "catalogId": "mdblist.128040"
           },
           {
-            "type": "series",
+            "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "trakt.list.33123136"
+            "catalogId": "mdblist.128041"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_comedie.global"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_comedie.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.com_die_copy.mokbrgql"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.com_die_copy.mokbtxpl"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_comedie.fr"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_comedie.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Comedie_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/comedy.webp"
       },
       {
         "id": "folder-ac4123c1",
         "title": "Drame",
         "sources": [
           {
-            "type": "movie",
-            "genre": "",
+            "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "trakt.list.33123210"
+            "catalogId": "mdblist.128043"
           },
           {
-            "type": "series",
-            "genre": "",
+            "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "trakt.list.33123222"
+            "catalogId": "mdblist.128044"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_drame.global"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_drame.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.drame_copy.mokby75k"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.drame_copy.mokby9kf"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_drame.fr"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_drame.fr"
@@ -1371,52 +1381,62 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😭",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Drame_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Drame.png?raw=true",
         "catalogSources": [
           {
-            "type": "movie",
+            "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "trakt.list.33123210"
+            "catalogId": "mdblist.128043"
           },
           {
-            "type": "series",
+            "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "trakt.list.33123222"
+            "catalogId": "mdblist.128044"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_drame.global"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_drame.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.drame_copy.mokby75k"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.drame_copy.mokby9kf"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_drame.fr"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_drame.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Drame_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/drama.webp"
       },
       {
         "id": "351e88e6-6f53-4f66-866f-b945a3076534",
@@ -1424,42 +1444,42 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.fantastique_copy.molqhtjb"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genres.popular.fantasy"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.fantastique_copy.molqhipa"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.sci_fi_fantastique_copy.molq1svy"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.fr"
@@ -1468,42 +1488,50 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🐉",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Fantastique_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Fantastique.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.fantastique_copy.molqhtjb"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.popular.fantasy"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.fantastique_copy.molqhipa"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.sci_fi_fantastique_copy.molq1svy"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Fantastique_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/fantasy.webp"
       },
       {
         "id": "620a7ea4-70c9-40cd-8391-fb16aad22804",
@@ -1511,42 +1539,42 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.guerre_copy.molqt5k7"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.guerre_politique_copy.molqtbz5"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genres.popular.war"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genres.popular.war-politics"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.guerre_copy.molqt6j5"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.guerre_politique_copy.molqtcqa"
@@ -1555,42 +1583,50 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🪖",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Guerre_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Guerre.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.guerre_copy.molqt5k7"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.guerre_politique_copy.molqtbz5"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.popular.war"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.popular.war-politics"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.guerre_copy.molqt6j5"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.guerre_politique_copy.molqtcqa"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Guerre_Backdrop.jpg"
+        "heroBackdropUrl": "https://i.postimg.cc/gj9XNTJy/Guerre.png"
       },
       {
         "id": "folder-ded2342f",
@@ -1598,70 +1634,70 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.102554"
           },
           {
-            "type": "movie",
-            "genre": "",
+            "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "trakt.list.33123250"
+            "catalogId": "mdblist.128045"
           },
           {
-            "type": "series",
-            "genre": "",
+            "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "trakt.list.33123257"
+            "catalogId": "mdblist.128046"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_horreur.global"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.horreur_copy.molpqgh8"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.horreur_copy.molpv36g"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.horreur_copy.molpuols"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_horreur.fr"
           },
           {
             "type": "all",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.28015387"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.59551"
@@ -1670,62 +1706,74 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "👻",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Horreur_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Horreur.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.102554"
           },
           {
-            "type": "movie",
+            "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "trakt.list.33123250"
+            "catalogId": "mdblist.128045"
           },
           {
-            "type": "series",
+            "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "trakt.list.33123257"
+            "catalogId": "mdblist.128046"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_horreur.global"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.horreur_copy.molpqgh8"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.horreur_copy.molpv36g"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.horreur_copy.molpuols"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_horreur.fr"
           },
           {
             "type": "all",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.28015387"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.59551"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Horreur_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/horror.webp"
       },
       {
         "id": "09c0f7ee-67a6-4b95-99cf-32cf9e63268e",
@@ -1733,56 +1781,56 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.myst_re_copy.molqkg0x"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqkmwo"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.myst_re_copy.molqkf1p"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genres.popular.mystery"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genres.popular.mystery"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqklz5"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.myst_re_copy_copy.molqksp8"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqkpus"
@@ -1791,52 +1839,62 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧩",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Mystere_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Mystere.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.myst_re_copy.molqkg0x"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqkmwo"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.myst_re_copy.molqkf1p"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.popular.mystery"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.popular.mystery"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqklz5"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.myst_re_copy_copy.molqksp8"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqkpus"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Mystere_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/mystery.webp"
       },
       {
         "id": "60146cc3-c890-4081-ae45-1f9911ace25c",
@@ -1844,56 +1902,56 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.policier_copy.molqb2ec"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.policier_copy.molqdkfo"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.crime_copy.moj3vcnx"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genres.popular.crime"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.new_policier_copy.molqbo5z"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.policier_copy.molqdlf5"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.policier_copy.molqc8w1"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.policier_copy.molqdmb0"
@@ -1902,52 +1960,62 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🚔",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Policier_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Policier.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.policier_copy.molqb2ec"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.policier_copy.molqdkfo"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.crime_copy.moj3vcnx"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.popular.crime"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.new_policier_copy.molqbo5z"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.policier_copy.molqdlf5"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.policier_copy.molqc8w1"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.policier_copy.molqdmb0"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Policier_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/crime.webp"
       },
       {
         "id": "folder-1eb5a207",
@@ -1955,35 +2023,35 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33132629"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33132707"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_romance.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.romance_copy.molqzu2d"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_romance.fr"
@@ -1992,37 +2060,44 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "💕",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Romance_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Romance.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33132629"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33132707"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_romance.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.romance_copy.molqzu2d"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_romance.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Romance_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/romance.webp"
       },
       {
         "id": "folder-60eed6b5",
@@ -2030,56 +2105,56 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33123270"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33123276"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_science_fiction.global"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.sci_fi_copy.molq0yrp"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.sci_fi_fantastique_copy.molq1svy"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_science_fiction.fr"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.fr"
@@ -2088,52 +2163,62 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "👽",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Sci-Fi_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Sci-Fi.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123270"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123276"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_science_fiction.global"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.sci_fi_copy.molq0yrp"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.sci_fi_fantastique_copy.molq1svy"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_science_fiction.fr"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Sci-Fi_Backdrop.jpg"
+        "heroBackdropUrl": "https://github.com/bramst0ne/prism-wallpapers/blob/main/collections/genres/878-science-fiction/backdrops/t2_flat_1080p.jpg?raw=true"
       },
       {
         "id": "folder-82185962",
@@ -2141,35 +2226,35 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33123316"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33123324"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_thriller.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.thriller_copy.molq4zra"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_thriller.fr"
@@ -2178,37 +2263,44 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔪",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Thriller_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Thriller.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123316"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123324"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_thriller.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.thriller_copy.molq4zra"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_thriller.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Thriller_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/thriller.webp"
       },
       {
         "id": "8320885c-15e7-4cef-bc38-5292c7739ccf",
@@ -2216,14 +2308,14 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genres.popular.western"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genres.popular.western"
@@ -2232,22 +2324,26 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🤠",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Western_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Western.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.popular.western"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.popular.western"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Western_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/western.webp"
       },
       {
         "id": "folder-3df43338",
@@ -2255,56 +2351,56 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33123094"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33123092"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_animation.global"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_animation.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.animation_copy.molq6v0q"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.animation_copy.molq7s6h"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_animation.fr"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_animation.fr"
@@ -2313,52 +2409,62 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎨",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Animation_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Animation.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123094"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33123092"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_animation.global"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_animation.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.animation_copy.molq6v0q"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.animation_copy.molq7s6h"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_animation.fr"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_animation.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Animation_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/animation.webp"
       },
       {
         "id": "folder-af3d785d",
@@ -2366,56 +2472,56 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33122833"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.33122848"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_documentaire.global"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_documentaire.global"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.documentaire_copy.molq9500"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.documentaire_copy.molqa38v"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.genre_documentaire.fr"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genre_documentaire.fr"
@@ -2424,52 +2530,62 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📽️",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Documentaires_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Documentaires.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33122833"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.33122848"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_documentaire.global"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_documentaire.global"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.documentaire_copy.molq9500"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.documentaire_copy.molqa38v"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_documentaire.fr"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genre_documentaire.fr"
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Documentaires_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/genres/backdrop/documentary.webp"
       }
     ],
     "pinToTop": false,
@@ -2504,8 +2620,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧑‍🎓",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Adolescence_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Adolescence.png?raw=true",
         "catalogSources": [
@@ -2523,7 +2637,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Adolescence_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/coming-of-age.webp"
       },
       {
         "id": "folder-c0fc484a",
@@ -2547,8 +2661,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🥋",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Arts_Martiaux_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Arts_Martiaux.png?raw=true",
         "catalogSources": [
@@ -2566,7 +2678,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Arts_Martiaux_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/martial-arts.webp"
       },
       {
         "id": "folder-77a930e9",
@@ -2590,8 +2702,6 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "💰",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Chasse_au_Tresor_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Chasse_au_Tresor.png?raw=true",
         "catalogSources": [
@@ -2609,7 +2719,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Chasse_au_Tresor_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/treasure-hunt.webp"
       },
       {
         "id": "folder-7bf48884",
@@ -2633,8 +2743,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🥰",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Comedie_Romantique_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Comedie_Romantique.png?raw=true",
         "catalogSources": [
@@ -2652,7 +2760,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Comedie_Romantique_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/romantic-comedy.webp"
       },
       {
         "id": "folder-29c00bfe",
@@ -2676,8 +2784,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🕵️",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Espionnage_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Espionnage.png?raw=true",
         "catalogSources": [
@@ -2695,7 +2801,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Espionnage_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/spy.webp"
       },
       {
         "id": "folder-2be0b409",
@@ -2719,8 +2825,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🌌",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Espace_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Espace.png?raw=true",
         "catalogSources": [
@@ -2738,7 +2842,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Espace_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/space.webp"
       },
       {
         "id": "folder-6dc9b629",
@@ -2901,13 +3005,10 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎬",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Grands_Realisateurs_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Grands_Realisateurs.png?raw=true",
         "catalogSources": [],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Grands_Realisateurs_Backdrop.jpg"
+        "focusGifEnabled": false
       },
       {
         "id": "folder-cafccf4a",
@@ -2931,8 +3032,6 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📖",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Faits-Reels_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Faits-Reels.png?raw=true",
         "catalogSources": [
@@ -2949,8 +3048,7 @@
             "catalogId": "tmdb.discover.series.inspire_de_faits_reels.0e8x59op"
           }
         ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Faits_Reels_Backdrop.jpg"
+        "focusGifEnabled": false
       },
       {
         "id": "folder-4ba5b053",
@@ -2974,8 +3072,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🪄",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Magie_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Magie.png?raw=true",
         "catalogSources": [
@@ -2993,7 +3089,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Magie_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/magic.webp"
       },
       {
         "id": "folder-ab579d48",
@@ -3010,8 +3106,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎉",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Sitcoms_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Sitcoms.png?raw=true",
         "catalogSources": [
@@ -3023,7 +3117,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Sitcom_Backdrop.jpg"
+        "heroBackdropUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Backdrops/Sitcom_Backdrop.jpg?raw=true"
       },
       {
         "id": "folder-3caf1e76",
@@ -3047,8 +3141,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🦸",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Super-Heros_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Super-Heros.png?raw=true",
         "catalogSources": [
@@ -3066,7 +3158,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Super-Heros_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/superhero.webp"
       },
       {
         "id": "folder-84266947",
@@ -3090,8 +3182,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧛",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Vampires_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Vampires.png?raw=true",
         "catalogSources": [
@@ -3109,7 +3199,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Vampire_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/vampire.webp"
       },
       {
         "id": "folder-a45d4aca",
@@ -3133,8 +3223,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😈",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Vengeance_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Vengeance.png?raw=true",
         "catalogSources": [
@@ -3152,7 +3240,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Vengeance_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/revenge.webp"
       },
       {
         "id": "folder-15982f33",
@@ -3176,8 +3264,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🕰️",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Voyage_Temporel_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Voyage_Temporel.png?raw=true",
         "catalogSources": [
@@ -3195,13 +3281,12 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Thematiques/Backdrops/Voyage_Temporel_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/themes/backdrop/time-travel.webp"
       }
     ],
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
-    "backdropImageUrl": "",
     "focusGlowEnabled": true
   },
   {
@@ -3258,8 +3343,6 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🌞",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Joyeux_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Joyeux.png?raw=true",
         "catalogSources": [
@@ -3300,8 +3383,7 @@
             "catalogId": "tmdb.discover.movie.recent_heureux.gky0ql1o"
           }
         ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Vibes/Backdrops/Joyeux_Backdrop.jpg"
+        "focusGifEnabled": false
       },
       {
         "id": "folder-4144a892",
@@ -3346,8 +3428,6 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😌",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Reconfort_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Reconfort.png?raw=true",
         "catalogSources": [
@@ -3382,8 +3462,7 @@
             "catalogId": "tmdb.discover.movie.reconfortant_recent.3wsmkjlz"
           }
         ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Vibes/Backdrops/Reconfort_Backdrop.jpg"
+        "focusGifEnabled": false
       },
       {
         "id": "folder-22235ff2",
@@ -3442,8 +3521,6 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🤯",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Retourne_Cerveau_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Retourne_Cerveau.png?raw=true",
         "catalogSources": [
@@ -3490,8 +3567,7 @@
             "catalogId": "tmdb.discover.movie.recentes_sorties_deconcertants.nw155pvz"
           }
         ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Vibes/Backdrops/Retournent_Cerveau_Backdrop.jpg"
+        "focusGifEnabled": false
       },
       {
         "id": "folder-30e5ff34",
@@ -3550,8 +3626,6 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😢",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Tristesse_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Tristesse.png?raw=true",
         "catalogSources": [
@@ -3598,14 +3672,12 @@
             "catalogId": "tmdb.discover.movie.recent_emotion.rqrtvc9t"
           }
         ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Vibes/Backdrops/Tristesse_Backdrop.jpg"
+        "focusGifEnabled": false
       }
     ],
     "pinToTop": false,
     "viewMode": "TABBED_GRID",
     "showAllTab": true,
-    "backdropImageUrl": "",
     "focusGlowEnabled": false
   },
   {
@@ -3618,28 +3690,28 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_2020s.8bmysbb2"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_2020s.s6d01b20"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_2020s.rtyvsyzs"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_2020s.vicssr4c"
@@ -3654,27 +3726,31 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_2020s.8bmysbb2"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_2020s.s6d01b20"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_2020s.rtyvsyzs"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_2020s.vicssr4c"
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/2020s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/decades/backdrop/2020s.webp"
       },
       {
         "id": "folder-f3ab961e",
@@ -3682,28 +3758,28 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_2010s.au4tdbye"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_2010s.w611fysp"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_2010s.u9awxjha"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_2010s.4dvjk5zj"
@@ -3718,27 +3794,31 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_2010s.au4tdbye"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_2010s.w611fysp"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_2010s.u9awxjha"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_2010s.4dvjk5zj"
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/2010s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/decades/backdrop/2010s.webp"
       },
       {
         "id": "folder-7fa0328f",
@@ -3746,28 +3826,28 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_2000s.akgbhuk7"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_2000s.4gnx2ilc"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_2000s.rbb8pocl"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_2000s.dhmbl2z1"
@@ -3782,27 +3862,31 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_2000s.akgbhuk7"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_2000s.4gnx2ilc"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_2000s.rbb8pocl"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_2000s.dhmbl2z1"
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/2000s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/decades/backdrop/2000s.webp"
       },
       {
         "id": "folder-0c9b3b55",
@@ -3810,28 +3894,28 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_1990s.8y1li936"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_1990s.exl0s2r9"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_1990s.uiggj2dh"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_1990s.1dt8jozw"
@@ -3846,27 +3930,31 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_1990s.8y1li936"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_1990s.exl0s2r9"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_1990s.uiggj2dh"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_1990s.1dt8jozw"
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1990s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/decades/backdrop/1990s.webp"
       },
       {
         "id": "folder-35018e2a",
@@ -3874,28 +3962,28 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_1980s.46ud0ox2"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_1980s.qotbibea"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_1980s.1vexn70r"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.series_1980s.ihu0qjln"
@@ -3910,27 +3998,31 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_1980s.46ud0ox2"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_1980s.qotbibea"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_1980s.1vexn70r"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.series_1980s.ihu0qjln"
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1980s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/decades/backdrop/1980s.webp"
       },
       {
         "id": "folder-8d5999ba",
@@ -3938,14 +4030,14 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_1970s.7e6t4ydm"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_1970s.h5tnit2g"
@@ -3960,17 +4052,19 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_1970s.7e6t4ydm"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_1970s.h5tnit2g"
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1970s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/decades/backdrop/1970s.webp"
       },
       {
         "id": "folder-68c4af5e",
@@ -3978,14 +4072,14 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_1960s.ik14ei3l"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.films_1960s.l6lc9otk"
@@ -4000,17 +4094,19 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_1960s.ik14ei3l"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.films_1960s.l6lc9otk"
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1960s_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/decades/backdrop/1960s.webp"
       },
       {
         "id": "folder-1078e6b3",
@@ -4018,14 +4114,14 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.1950s_avant.w7qqp9z3"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.1950s_avant.nhaaa626"
@@ -4040,17 +4136,19 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.1950s_avant.w7qqp9z3"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.1950s_avant.nhaaa626"
           }
         ],
         "focusGifEnabled": true,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Annees/Backdrops/1950s_Avant_Backdrop.jpg"
+        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/decades/backdrop/1950s.webp"
       }
     ],
     "pinToTop": false,
@@ -4069,35 +4167,35 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.11754060"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.11754031"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.11754010"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.11753990"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.11753899"
@@ -4110,26 +4208,31 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.11754060"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.11754031"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.11754010"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.11753990"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.11753899"
           }
@@ -4531,7 +4634,7 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.11214609"
@@ -4571,6 +4674,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.11214609"
           }
@@ -4848,7 +4952,7 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.11332405"
@@ -4861,6 +4965,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.11332405"
           }
@@ -4896,21 +5001,21 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.dceu.w2pgrqp0"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.3989015"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.6363557"
@@ -4923,16 +5028,19 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.dceu.w2pgrqp0"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.3989015"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.6363557"
           }
@@ -5290,7 +5398,7 @@
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.25290452"
@@ -5303,6 +5411,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.25290452"
           }
@@ -5435,7 +5544,7 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.813849"
@@ -5448,6 +5557,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.813849"
           }
@@ -5505,7 +5615,7 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.24589341"
@@ -5536,6 +5646,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.24589341"
           }
@@ -5602,7 +5713,7 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.10883711"
@@ -5615,6 +5726,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.10883711"
           }
@@ -5826,7 +5938,7 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.11214494"
@@ -5839,6 +5951,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.11214494"
           }
@@ -6160,35 +6273,35 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.mcu.gvjm8vmx"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.3989011"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.3989032"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.3989013"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.3989016"
@@ -6201,26 +6314,31 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.mcu.gvjm8vmx"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.3989011"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.3989032"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.3989013"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.3989016"
           }
@@ -6824,7 +6942,7 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.3243250"
@@ -6837,6 +6955,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.3243250"
           }
@@ -7451,7 +7570,7 @@
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.3989032.spider_man_films.qdx80f6z"
@@ -7464,6 +7583,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.3989032.spider_man_films.qdx80f6z"
           }
@@ -7517,14 +7637,14 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.22202556"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.22757470"
@@ -7537,11 +7657,13 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.22202556"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.22757470"
           }
@@ -7938,7 +8060,7 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "trakt.list.3989013.x_men_films.18dypw3x"
@@ -7978,6 +8100,7 @@
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "trakt.list.3989013.x_men_films.18dypw3x"
           }
@@ -8077,14 +8200,14 @@
         "sources": [
           {
             "type": "sport",
-            "genre": "",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "provider": "addon",
             "catalogId": "sports_live"
           },
           {
             "type": "sport",
-            "genre": "",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "provider": "addon",
             "catalogId": "sports_today"
@@ -8098,11 +8221,13 @@
         "catalogSources": [
           {
             "type": "sport",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "catalogId": "sports_live"
           },
           {
             "type": "sport",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "catalogId": "sports_today"
           }
@@ -8116,7 +8241,7 @@
         "sources": [
           {
             "type": "sport",
-            "genre": "",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "provider": "addon",
             "catalogId": "sports_football"
@@ -8137,6 +8262,7 @@
         "catalogSources": [
           {
             "type": "sport",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "catalogId": "sports_football"
           },
@@ -8156,7 +8282,7 @@
         "sources": [
           {
             "type": "sport",
-            "genre": "",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "provider": "addon",
             "catalogId": "sports_basketball"
@@ -8177,6 +8303,7 @@
         "catalogSources": [
           {
             "type": "sport",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "catalogId": "sports_basketball"
           },
@@ -8224,7 +8351,7 @@
         "sources": [
           {
             "type": "sport",
-            "genre": "",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "provider": "addon",
             "catalogId": "sports_motor_sports"
@@ -8252,6 +8379,7 @@
         "catalogSources": [
           {
             "type": "sport",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "catalogId": "sports_motor_sports"
           },
@@ -8277,7 +8405,7 @@
         "sources": [
           {
             "type": "sport",
-            "genre": "",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "provider": "addon",
             "catalogId": "sports_fight"
@@ -8298,6 +8426,7 @@
         "catalogSources": [
           {
             "type": "sport",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "catalogId": "sports_fight"
           },
@@ -8317,7 +8446,7 @@
         "sources": [
           {
             "type": "sport",
-            "genre": "",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "provider": "addon",
             "catalogId": "sports_american_football"
@@ -8331,6 +8460,7 @@
         "catalogSources": [
           {
             "type": "sport",
+            "genre": "None",
             "addonId": "community.sports.fly",
             "catalogId": "sports_american_football"
           }
