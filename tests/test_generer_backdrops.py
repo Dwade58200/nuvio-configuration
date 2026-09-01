@@ -795,6 +795,39 @@ def test_meilleur_backdrop_tmdb_langue_correspondance_stricte_jamais_de_variante
     assert meilleur_backdrop_tmdb_langue(images_data, None) is None
 
 
+def test_meilleur_backdrop_tmdb_langue_exclut_le_pays_via_iso_3166_1_si_demande():
+    """Cas réel (série 'Supernatural', tmdb 1622) : TMDB tague ce backdrop
+    iso_639_1='fr' MAIS iso_3166_1='CA' -- deux champs distincts. Sans
+    filtrer sur le pays, ce backdrop québécois passe la vérification de
+    langue alors qu'il ne s'agit pas de fr-FR."""
+    images_data = {
+        "backdrops": [
+            {"iso_639_1": "fr", "iso_3166_1": "CA", "vote_average": 3.334, "file_path": "/fEAvMbTQUtDtO5c6lNYAafjJxoc.jpg"},
+        ]
+    }
+    assert meilleur_backdrop_tmdb_langue(images_data, "fr") == "/fEAvMbTQUtDtO5c6lNYAafjJxoc.jpg"
+    assert meilleur_backdrop_tmdb_langue(images_data, "fr", pays_autorises={"FR"}) is None
+
+
+def test_meilleur_backdrop_tmdb_langue_accepte_fr_de_france_avec_filtre_pays():
+    images_data = {
+        "backdrops": [
+            {"iso_639_1": "fr", "iso_3166_1": "CA", "vote_average": 9.0, "file_path": "/quebec-mieux-note.jpg"},
+            {"iso_639_1": "fr", "iso_3166_1": "FR", "vote_average": 1.0, "file_path": "/france.jpg"},
+        ]
+    }
+    assert meilleur_backdrop_tmdb_langue(images_data, "fr", pays_autorises={"FR"}) == "/france.jpg"
+
+
+def test_meilleur_backdrop_tmdb_langue_accepte_pays_non_renseigne_avec_filtre_pays():
+    """Un backdrop tagué langue='fr' sans pays renseigné (iso_3166_1=None)
+    n'est pas explicitement québécois -- il reste accepté."""
+    images_data = {
+        "backdrops": [{"iso_639_1": "fr", "iso_3166_1": None, "vote_average": 5.0, "file_path": "/fr-sans-pays.jpg"}],
+    }
+    assert meilleur_backdrop_tmdb_langue(images_data, "fr", pays_autorises={"FR"}) == "/fr-sans-pays.jpg"
+
+
 class _FausseReponseHTTP:
     def __init__(self, payload):
         self._payload = payload
