@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-08-31T17:00:32.236Z",
+  "exportedAt": "2026-09-01T07:14:15.366Z",
   "catalogs": [
     {
       "id": "mdblist.22390",
@@ -2949,7 +2949,7 @@
             "include_adult": true,
             "with_genres": "35",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -2987,7 +2987,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -3204,7 +3204,7 @@
             "include_adult": true,
             "with_genres": "35",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -3242,7 +3242,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -3456,7 +3456,7 @@
             "include_adult": true,
             "with_genres": "18",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -3494,7 +3494,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -3712,7 +3712,7 @@
             "include_adult": true,
             "with_genres": "18",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -3750,7 +3750,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -3964,7 +3964,7 @@
             "include_adult": true,
             "with_genres": "27",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -4002,7 +4002,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -4222,7 +4222,7 @@
             "with_keywords": "315058",
             "with_status": "0|3|4|5",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -4261,7 +4261,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -5697,7 +5697,7 @@
             "include_adult": true,
             "with_genres": "16",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -5735,7 +5735,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -5953,7 +5953,7 @@
             "include_adult": true,
             "with_genres": "16",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -5991,7 +5991,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -6205,7 +6205,7 @@
             "include_adult": true,
             "with_genres": "99",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -6243,7 +6243,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -6461,7 +6461,7 @@
             "include_adult": true,
             "with_genres": "99",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 150,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -6499,7 +6499,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 150,
             "runtimeRange": [
               0,
               400
@@ -10408,7 +10408,7 @@
           "params": {
             "sort_by": "popularity.desc",
             "include_adult": true,
-            "vote_count.gte": 100,
+            "vote_count.gte": 250,
             "with_keywords": "9672",
             "vote_average.gte": 4,
             "vote_average.lte": 9.9
@@ -10451,7 +10451,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 250,
             "runtimeRange": [
               0,
               400
@@ -10487,7 +10487,7 @@
           "params": {
             "sort_by": "popularity.desc",
             "include_adult": true,
-            "vote_count.gte": 100,
+            "vote_count.gte": 250,
             "with_keywords": "9672",
             "vote_average.gte": 4,
             "vote_average.lte": 9.9
@@ -10530,7 +10530,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 250,
             "runtimeRange": [
               0,
               400
@@ -10558,6 +10558,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -10566,7 +10567,7 @@
           "params": {
             "sort_by": "popularity.desc",
             "include_adult": true,
-            "vote_count.gte": 100,
+            "vote_count.gte": 200,
             "with_keywords": "193171",
             "vote_average.gte": 4,
             "vote_average.lte": 9.9
@@ -10609,7 +10610,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 200,
             "runtimeRange": [
               0,
               400
@@ -10913,7 +10914,7 @@
             "sort_by": "popularity.desc",
             "include_adult": true,
             "with_genres": "35",
-            "vote_count.gte": 100,
+            "vote_count.gte": 200,
             "with_keywords": "7312",
             "vote_average.gte": 4,
             "vote_average.lte": 9.9
@@ -10961,7 +10962,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 200,
             "runtimeRange": [
               0,
               400
@@ -11578,7 +11579,7 @@
           "params": {
             "sort_by": "popularity.desc",
             "include_adult": true,
-            "vote_count.gte": 100,
+            "vote_count.gte": 300,
             "with_keywords": "275311",
             "vote_average.gte": 4,
             "vote_average.lte": 9.9
@@ -11621,7 +11622,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 300,
             "runtimeRange": [
               0,
               400
@@ -11902,7 +11903,7 @@
           "params": {
             "sort_by": "popularity.desc",
             "include_adult": true,
-            "vote_count.gte": 100,
+            "vote_count.gte": 200,
             "with_keywords": "10854|4565",
             "vote_average.gte": 4,
             "vote_average.lte": 9.9
@@ -11949,7 +11950,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 200,
             "runtimeRange": [
               0,
               400
@@ -12150,7 +12151,7 @@
             "include_adult": true,
             "with_keywords": "156924",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
+            "vote_count.gte": 200,
             "vote_average.lte": 9.9
           },
           "formState": {
@@ -12191,7 +12192,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 200,
             "runtimeRange": [
               0,
               400
@@ -12311,7 +12312,7 @@
             "sort_by": "popularity.desc",
             "include_adult": true,
             "with_genres": "18",
-            "vote_count.gte": 100,
+            "vote_count.gte": 200,
             "with_keywords": "156924|10614|9872",
             "vote_average.gte": 4,
             "vote_average.lte": 9.9
@@ -12367,7 +12368,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 200,
             "runtimeRange": [
               0,
               400
@@ -12487,7 +12488,7 @@
             "sort_by": "popularity.desc",
             "include_adult": true,
             "with_genres": "18",
-            "vote_count.gte": 100,
+            "vote_count.gte": 200,
             "with_keywords": "9872",
             "vote_average.gte": 4,
             "vote_average.lte": 9.9
@@ -12535,7 +12536,7 @@
               4,
               9.9
             ],
-            "voteCountMin": 100,
+            "voteCountMin": 200,
             "runtimeRange": [
               0,
               400
@@ -14863,518 +14864,6 @@
       "randomizePerPage": false
     },
     {
-      "id": "streaming.nfx",
-      "name": "🔴 Netflix (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.nfx",
-      "name": "🔴 Netflix (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.nfk",
-      "name": "🔴 Netflix Kids (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.nfk",
-      "name": "🔴 Netflix Kids (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hbm",
-      "name": "🔘 HBO Max (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hbm",
-      "name": "🔘 HBO Max (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.dnp",
-      "name": "🏰 Disney+ (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.dnp",
-      "name": "🏰 Disney+ (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.amp",
-      "name": "📦 Prime Video (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.amp",
-      "name": "📦 Prime Video (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.atp",
-      "name": "🍎 Apple TV+ (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.atp",
-      "name": "🍎 Apple TV+ (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.pmp",
-      "name": "🗻 Paramount+ (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.pmp",
-      "name": "🗻 Paramount+ (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.pcp",
-      "name": "🦚 Peacock Premium (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.pcp",
-      "name": "🦚 Peacock Premium (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hlu",
-      "name": "💚 Hulu (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hlu",
-      "name": "💚 Hulu (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.cts",
-      "name": "🔭 Curiosity Stream (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.cts",
-      "name": "🔭 Curiosity Stream (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.mgl",
-      "name": "🌍 MagellanTV (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.mgl",
-      "name": "🌍 MagellanTV (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.cru",
-      "name": "🍥 Crunchyroll (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.cru",
-      "name": "🍥 Crunchyroll (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hay",
-      "name": "💅 Hayu (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hay",
-      "name": "💅 Hayu (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.clv",
-      "name": "📺 Clarovideo (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.clv",
-      "name": "📺 Clarovideo (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.gop",
-      "name": "🌴 Globoplay (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.gop",
-      "name": "🌴 Globoplay (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hst",
-      "name": "🇮🇳 JioHotstar (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hst",
-      "name": "🇮🇳 JioHotstar (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.slv",
-      "name": "📡 Sony Liv (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.slv",
-      "name": "📡 Sony Liv (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.zee",
-      "name": "🎬 Zee5 (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.zee",
-      "name": "🎬 Zee5 (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.nlz",
-      "name": "🇳🇱 NLZIET (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.nlz",
-      "name": "🇳🇱 NLZIET (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.vil",
-      "name": "🏞️ Videoland (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.vil",
-      "name": "🏞️ Videoland (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.sst",
-      "name": "🌤️ SkyShowtime (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.sst",
-      "name": "🌤️ SkyShowtime (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.sky",
-      "name": "📡 Sky Go (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.sky",
-      "name": "📡 Sky Go (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.wow",
-      "name": "💥 WOW (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.wow",
-      "name": "💥 WOW (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.blv",
-      "name": "🔵 BluTV (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.blv",
-      "name": "🔵 BluTV (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.cpd",
-      "name": "📡 Canal+ (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.cpd",
-      "name": "📡 Canal+ (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.crv",
-      "name": "🍁 Crave (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.crv",
-      "name": "🍁 Crave (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.dpe",
-      "name": "🔎 Discovery+ (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.dpe",
-      "name": "🔎 Discovery+ (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.bet",
-      "name": "✊🏾 Bet+ (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.bet",
-      "name": "✊🏾 Bet+ (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.mub",
-      "name": "🎞️ MUBI (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.mub",
-      "name": "🎞️ MUBI (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.sta",
-      "name": "⭐ Starz (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.sta",
-      "name": "⭐ Starz (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.crc",
-      "name": "🎞️ Criterion Channel (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.crc",
-      "name": "🎞️ Criterion Channel (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hid",
-      "name": "🍥 HIDIVE (Movies)",
-      "type": "movie",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
-      "id": "streaming.hid",
-      "name": "🍥 HIDIVE (Series)",
-      "type": "series",
-      "source": "streaming",
-      "enabled": false,
-      "showInHome": false
-    },
-    {
       "id": "mdblist.29909",
       "type": "series",
       "name": "📈 Les plus tendances (Anime)",
@@ -16615,6 +16104,346 @@
           "tt",
           "alldebrid"
         ]
+      }
+    },
+    {
+      "id": "trakt.list.28015387",
+      "type": "all",
+      "name": "🔪😨 New Slasher",
+      "enabled": true,
+      "showInHome": false,
+      "source": "trakt",
+      "sort": "released",
+      "sortDirection": "asc",
+      "metadata": {
+        "description": "Slasher movies are films that typically feature a masked killer systematically stalking and brutally murdering a group of victims, often with a focus on graphic violence and suspenseful chase sequence\r\nThis list is maintained by mdblist.com\r\nCreate your own: https://mdblist.com/lists/siskourso/slasher-movies\r\nUpdated at 2026-05-14 18:08:50",
+        "itemCount": 250,
+        "url": "https://trakt.tv/lists/28015387",
+        "author": "SiskoUrso"
+      },
+      "cacheTTL": 86400,
+      "displayType": "all"
+    },
+    {
+      "id": "trakt.list.11754060",
+      "name": "Collection: James Bond - Sean Connery",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/11754060"
+      }
+    },
+    {
+      "id": "trakt.list.11754031",
+      "name": "Collection: James Bond - Roger Moore",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/11754031"
+      }
+    },
+    {
+      "id": "trakt.list.11754010",
+      "name": "Collection: James Bond - Timothy Dalton",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/11754010"
+      }
+    },
+    {
+      "id": "trakt.list.11753990",
+      "name": "Collection: James Bond - Pierce Brosnan",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/11753990"
+      }
+    },
+    {
+      "id": "trakt.list.11753899",
+      "name": "Collection: James Bond - Daniel Craig",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/11753899"
+      }
+    },
+    {
+      "id": "trakt.list.11214609",
+      "name": "Batman Collection",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/11214609"
+      }
+    },
+    {
+      "id": "trakt.list.11332405",
+      "name": "Conjuring Collection",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/11332405"
+      }
+    },
+    {
+      "id": "trakt.list.3989015",
+      "name": "DC Films",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/3989015"
+      }
+    },
+    {
+      "id": "trakt.list.6363557",
+      "name": "DC Séries",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "series",
+      "metadata": {
+        "url": "https://trakt.tv/lists/6363557"
+      }
+    },
+    {
+      "id": "trakt.list.25290452",
+      "name": "Evil Dead reboot collection",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/25290452"
+      }
+    },
+    {
+      "id": "trakt.list.813849",
+      "name": "Freddy Les Griffes de la Nuit Collection",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/813849"
+      }
+    },
+    {
+      "id": "trakt.list.24589341",
+      "name": "King Kong / Godzilla Collection",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/24589341"
+      }
+    },
+    {
+      "id": "trakt.list.10883711",
+      "name": "Hannibal Lecter Collection",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/10883711"
+      }
+    },
+    {
+      "id": "trakt.list.11214494",
+      "name": "John Wick Collection",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/11214494"
+      }
+    },
+    {
+      "id": "trakt.list.3989011",
+      "name": "Autres Marvel Films",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/3989011"
+      }
+    },
+    {
+      "id": "trakt.list.3989032",
+      "name": "Spider-Man Films",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/3989032"
+      }
+    },
+    {
+      "id": "trakt.list.3989013",
+      "name": "X-Men Films",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/3989013"
+      }
+    },
+    {
+      "id": "trakt.list.3989016",
+      "name": "Marvel Séries TV",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/3989016"
+      }
+    },
+    {
+      "id": "trakt.list.3243250",
+      "name": "Pokemon",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/3243250"
+      }
+    },
+    {
+      "id": "trakt.list.3989032.spider_man_films.qdx80f6z",
+      "name": "Spider-Man Films",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/3989032"
+      }
+    },
+    {
+      "id": "trakt.list.22202556",
+      "name": "Star Wars Collection",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/22202556"
+      }
+    },
+    {
+      "id": "trakt.list.22757470",
+      "name": "Star Wars Séries",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "series",
+      "metadata": {
+        "url": "https://trakt.tv/lists/22757470"
+      }
+    },
+    {
+      "id": "trakt.list.3989013.x_men_films.18dypw3x",
+      "name": "X-Men Films",
+      "sort": "rank",
+      "type": "all",
+      "source": "trakt",
+      "enabled": true,
+      "showInHome": false,
+      "sortDirection": "asc",
+      "displayType": "movie",
+      "metadata": {
+        "url": "https://trakt.tv/lists/3989013"
       }
     }
   ]
