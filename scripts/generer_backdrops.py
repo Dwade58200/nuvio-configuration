@@ -746,7 +746,12 @@ class ClientTMDB:
 
         chemin = "movie" if media_type != "tv" else "tv"
         try:
-            resultat = self._get(f"/{chemin}/{tmdb_id}/images", {"include_image_language": "fr,en,null"})
+            # NB : "fr-CA" est explicitement demandé en plus de "fr" -- TMDB
+            # tague parfois des backdrops avec un code régional (ex: contenu
+            # au marché québécois) au lieu du code ISO 639-1 pur "fr". Sans
+            # ce paramètre, l'API elle-même exclut ces images de la réponse,
+            # même si elles existent et contiennent bien un titre en français.
+            resultat = self._get(f"/{chemin}/{tmdb_id}/images", {"include_image_language": "fr,fr-CA,en,null"})
         except requests.RequestException:
             resultat = {}
 
@@ -1130,14 +1135,35 @@ class ClientMDBList:
 
 def meilleur_backdrop_tmdb_langue(images_data: dict[str, Any] | None, langue: str | None) -> str | None:
     """`images_data` = réponse de /movie|tv/{id}/images. Retourne le
-    meilleur backdrop_path tagué EXACTEMENT `langue` (None = untagged)."""
+    meilleur backdrop_path pour `langue` (None = untagged).
+
+    Accepte aussi bien une correspondance EXACTE (ex: "fr") qu'une variante
+    régionale du même sous-tag (ex: "fr-CA" pour la cible "fr") -- TMDB
+    tague parfois des backdrops avec un code régional au lieu du code
+    ISO 639-1 pur (cas observé pour du contenu au marché québécois, ex:
+    séries "From" et "Supernatural"). Si les deux existent, la correspondance
+    exacte "fr" est préférée ; sinon on se replie sur la variante régionale."""
     if not images_data:
         return None
     langue_norm = langue.lower() if langue else None
-    candidats = [b for b in (images_data.get("backdrops") or []) if (b.get("iso_639_1") or None) == langue_norm]
+    backdrops = images_data.get("backdrops") or []
+
+    def _sous_tag(tag: str | None) -> str | None:
+        return tag.split("-")[0] if tag else tag
+
+    if langue_norm is None:
+        candidats = [b for b in backdrops if (b.get("iso_639_1") or None) is None]
+    else:
+        candidats = [
+            b for b in backdrops
+            if _sous_tag((b.get("iso_639_1") or "").lower() or None) == langue_norm
+        ]
     if not candidats:
         return None
-    meilleur = sorted(candidats, key=lambda b: -(b.get("vote_average") or 0))[0]
+
+    exacts = [b for b in candidats if (b.get("iso_639_1") or "").lower() == langue_norm]
+    pool = exacts if exacts else candidats
+    meilleur = sorted(pool, key=lambda b: -(b.get("vote_average") or 0))[0]
     return meilleur.get("file_path")
 
 
@@ -1300,7 +1326,7 @@ class GenerateurBackdrops:
             if chemin:
                 image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin}")
                 if image:
-                    logging.debug("[TUILE] tmdb_id=%s -> retenu : TMDB backdrop tagué '%s'", tmdb_id, langue)
+                    logging.debug("[TUILE] tmdb_id=%s -> retenu : TMDB backdrop tagué '%s' (ou variante régionale, ex: fr-CA)", tmdb_id, langue)
                     return image
                 logging.debug("[TUILE] tmdb_id=%s : TMDB backdrop '%s' trouvé mais téléchargement échoué", tmdb_id, langue)
 
