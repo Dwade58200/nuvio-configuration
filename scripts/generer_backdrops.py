@@ -1315,9 +1315,21 @@ class GenerateurBackdrops:
 
             chemin = meilleur_backdrop_tmdb_langue(images_tmdb, langue)
             if chemin:
+                # On relit le tag BRUT tel que renvoyé par l'API TMDB (et pas
+                # juste la langue qu'on cherchait) : en cas de doute sur un
+                # mauvais tag source (ex: image réellement fr-CA mais taguée
+                # 'fr' par erreur côté TMDB), ce log donne la valeur exacte
+                # reçue, pas une supposition.
+                tag_brut = next(
+                    (b.get("iso_639_1") for b in (images_tmdb.get("backdrops") or []) if b.get("file_path") == chemin),
+                    None,
+                )
                 image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin}")
                 if image:
-                    logging.debug("[TUILE] tmdb_id=%s -> retenu : TMDB backdrop tagué '%s'", tmdb_id, langue)
+                    logging.info(
+                        "[TUILE] tmdb_id=%s -> retenu : TMDB backdrop %s (recherché='%s', tag brut API='%s')",
+                        tmdb_id, chemin, langue, tag_brut,
+                    )
                     return image
                 logging.debug("[TUILE] tmdb_id=%s : TMDB backdrop '%s' trouvé mais téléchargement échoué", tmdb_id, langue)
 
