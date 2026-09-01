@@ -729,15 +729,20 @@ class ClientTMDB:
             self._cache_tvdb_id[tmdb_id] = resultat
         return resultat
 
-    def recuperer_images(self, tmdb_id: int, media_type: str) -> dict[str, Any]:
+    def recuperer_images(self, tmdb_id: int, media_type: str, langue_originale: str | None = None) -> dict[str, Any]:
         """Backdrops TMDB avec leur langue taguée (`iso_639_1`) -- certains
         titres ont des backdrops spécifiquement envoyés pour un marché
         (ex: France), qui incluent parfois un titre local incrusté. On ne
-        demande que les langues qui nous intéressent pour rester léger.
+        demande que les langues qui nous intéressent pour rester léger :
+        fr, en, et la langue originale du titre (`langue_originale`, ex:
+        "ko" pour un drama coréen) si elle diffère des deux premières --
+        utilisée en dernier repli texté avant le "sans texte".
 
         Mis en cache par (tmdb_id, media_type) -- le même titre populaire
         revient souvent dans plusieurs dossiers/groupes durant une même
-        exécution, inutile de le redemander à chaque fois.
+        exécution, inutile de le redemander à chaque fois. La langue
+        originale d'un titre TMDB donné ne change jamais, donc ignorer ce
+        paramètre lors d'un cache hit est sans risque.
         """
         cle_cache = (tmdb_id, media_type)
         with self._verrou:
@@ -745,13 +750,12 @@ class ClientTMDB:
                 return self._cache_images[cle_cache]
 
         chemin = "movie" if media_type != "tv" else "tv"
+        langues = ["fr", "en"]
+        if langue_originale and langue_originale.lower() not in ("fr", "en"):
+            langues.append(langue_originale)
+        langues.append("null")
         try:
-            # NB : "fr-CA" est explicitement demandé en plus de "fr" -- TMDB
-            # tague parfois des backdrops avec un code régional (ex: contenu
-            # au marché québécois) au lieu du code ISO 639-1 pur "fr". Sans
-            # ce paramètre, l'API elle-même exclut ces images de la réponse,
-            # même si elles existent et contiennent bien un titre en français.
-            resultat = self._get(f"/{chemin}/{tmdb_id}/images", {"include_image_language": "fr,fr-CA,en,null"})
+            resultat = self._get(f"/{chemin}/{tmdb_id}/images", {"include_image_language": ",".join(langues)})
         except requests.RequestException:
             resultat = {}
 
@@ -1135,35 +1139,16 @@ class ClientMDBList:
 
 def meilleur_backdrop_tmdb_langue(images_data: dict[str, Any] | None, langue: str | None) -> str | None:
     """`images_data` = réponse de /movie|tv/{id}/images. Retourne le
-    meilleur backdrop_path pour `langue` (None = untagged).
-
-    Accepte aussi bien une correspondance EXACTE (ex: "fr") qu'une variante
-    régionale du même sous-tag (ex: "fr-CA" pour la cible "fr") -- TMDB
-    tague parfois des backdrops avec un code régional au lieu du code
-    ISO 639-1 pur (cas observé pour du contenu au marché québécois, ex:
-    séries "From" et "Supernatural"). Si les deux existent, la correspondance
-    exacte "fr" est préférée ; sinon on se replie sur la variante régionale."""
+    meilleur backdrop_path tagué EXACTEMENT `langue` (None = untagged).
+    Correspondance stricte uniquement -- pas de variante régionale (ex:
+    "fr" ne matche jamais "fr-CA", exclu explicitement à la demande)."""
     if not images_data:
         return None
     langue_norm = langue.lower() if langue else None
-    backdrops = images_data.get("backdrops") or []
-
-    def _sous_tag(tag: str | None) -> str | None:
-        return tag.split("-")[0] if tag else tag
-
-    if langue_norm is None:
-        candidats = [b for b in backdrops if (b.get("iso_639_1") or None) is None]
-    else:
-        candidats = [
-            b for b in backdrops
-            if _sous_tag((b.get("iso_639_1") or "").lower() or None) == langue_norm
-        ]
+    candidats = [b for b in (images_data.get("backdrops") or []) if (b.get("iso_639_1") or None) == langue_norm]
     if not candidats:
         return None
-
-    exacts = [b for b in candidats if (b.get("iso_639_1") or "").lower() == langue_norm]
-    pool = exacts if exacts else candidats
-    meilleur = sorted(pool, key=lambda b: -(b.get("vote_average") or 0))[0]
+    meilleur = sorted(candidats, key=lambda b: -(b.get("vote_average") or 0))[0]
     return meilleur.get("file_path")
 
 
@@ -1281,12 +1266,18 @@ class GenerateurBackdrops:
           3. Fanart "thumb" dans cette langue ;
           4. Fanart "clearart"/"hdclearart" dans cette langue, composé sur
              un vrai fond (jamais une couleur plate).
-        Si rien trouvé dans aucune des deux langues : même cascade
-        Fanart (background/thumb/clearart) en version SANS TEXTE, puis un
-        backdrop TMDB générique (non tagué), puis le backdrop brut connu
-        du candidat en tout dernier recours.
+        Si rien trouvé dans aucune des deux langues : un backdrop TMDB tagué
+        avec la langue ORIGINALE du titre (ex: coréen pour un drama coréen),
+        puis même cascade Fanart (background/thumb/clearart) en version SANS
+        TEXTE, puis un backdrop TMDB générique (non tagué), puis le backdrop
+        brut connu du candidat en tout dernier recours.
+
+        NB : une variante régionale du français (ex: "fr-CA", contenu tagué
+        au marché québécois) n'est JAMAIS acceptée à la place d'un vrai
+        "fr-FR", à la demande explicite -- voir meilleur_backdrop_tmdb_langue
+        qui fait une correspondance stricte.
         """
-        backdrop_path, tmdb_id, media_type, _langue_originale_ignoree = candidat
+        backdrop_path, tmdb_id, media_type, langue_originale = candidat
         logging.debug("[TUILE] Résolution pour tmdb_id=%s (%s), langue préférée=%s", tmdb_id, media_type, self.langue_preferee)
 
         if not tmdb_id:
@@ -1316,7 +1307,7 @@ class GenerateurBackdrops:
                 cache_fanart["valeur"] = valeur
             return cache_fanart["valeur"]
 
-        images_tmdb = self.tmdb.recuperer_images(tmdb_id, media_type)
+        images_tmdb = self.tmdb.recuperer_images(tmdb_id, media_type, langue_originale)
 
         for langue in (self.langue_preferee, "en"):
             if not langue:
@@ -1326,7 +1317,7 @@ class GenerateurBackdrops:
             if chemin:
                 image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin}")
                 if image:
-                    logging.debug("[TUILE] tmdb_id=%s -> retenu : TMDB backdrop tagué '%s' (ou variante régionale, ex: fr-CA)", tmdb_id, langue)
+                    logging.debug("[TUILE] tmdb_id=%s -> retenu : TMDB backdrop tagué '%s'", tmdb_id, langue)
                     return image
                 logging.debug("[TUILE] tmdb_id=%s : TMDB backdrop '%s' trouvé mais téléchargement échoué", tmdb_id, langue)
 
@@ -1347,6 +1338,19 @@ class GenerateurBackdrops:
                         fond = self._obtenir_fond_pour_clearart(fanart_data, media_type, backdrop_path)
                         logging.debug("[TUILE] tmdb_id=%s -> retenu : Fanart clearart langue '%s' composé sur fond", tmdb_id, langue)
                         return mosaique_module.composer_sur_fond(clearart, fond) if fond else clearart
+
+        # Repli texté supplémentaire : backdrop TMDB tagué avec la langue
+        # ORIGINALE du titre (ex: coréen pour un drama coréen), si elle
+        # diffère de fr/en et qu'aucun des deux n'a abouti ci-dessus.
+        if langue_originale and langue_originale.lower() not in {(self.langue_preferee or "").lower(), "en"}:
+            chemin_natif = meilleur_backdrop_tmdb_langue(images_tmdb, langue_originale)
+            if chemin_natif:
+                image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin_natif}")
+                if image:
+                    logging.info(
+                        "[TUILE] tmdb_id=%s -> retenu (après échec fr/en) : TMDB backdrop langue native '%s'", tmdb_id, langue_originale,
+                    )
+                    return image
 
         # Dernier recours : sans texte
         fanart_data = obtenir_fanart_data()
