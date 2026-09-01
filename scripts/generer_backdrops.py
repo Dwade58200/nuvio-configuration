@@ -1137,15 +1137,30 @@ class ClientMDBList:
 # Résolution TMDB /images (backdrops tagués par langue)
 # ---------------------------------------------------------------------------
 
-def meilleur_backdrop_tmdb_langue(images_data: dict[str, Any] | None, langue: str | None) -> str | None:
+def meilleur_backdrop_tmdb_langue(
+    images_data: dict[str, Any] | None,
+    langue: str | None,
+    pays_autorises: set[str] | None = None,
+) -> str | None:
     """`images_data` = réponse de /movie|tv/{id}/images. Retourne le
     meilleur backdrop_path tagué EXACTEMENT `langue` (None = untagged).
-    Correspondance stricte uniquement -- pas de variante régionale (ex:
-    "fr" ne matche jamais "fr-CA", exclu explicitement à la demande)."""
+
+    `pays_autorises` : si fourni, exclut les candidats dont le pays
+    (`iso_3166_1`) est renseigné et absent de cet ensemble -- les images
+    sans pays renseigné restent acceptées. Sert à distinguer un vrai
+    backdrop français de France d'un backdrop tagué langue "fr" mais pays
+    "CA" (contenu québécois) : ce sont deux champs DISTINCTS renvoyés par
+    l'API TMDB (confirmé sur des réponses réelles, ex: séries "From" et
+    "Supernatural"), et seule la langue était vérifiée jusqu'ici."""
     if not images_data:
         return None
     langue_norm = langue.lower() if langue else None
     candidats = [b for b in (images_data.get("backdrops") or []) if (b.get("iso_639_1") or None) == langue_norm]
+    if pays_autorises:
+        candidats = [
+            b for b in candidats
+            if (b.get("iso_3166_1") or None) is None or b.get("iso_3166_1") in pays_autorises
+        ]
     if not candidats:
         return None
     meilleur = sorted(candidats, key=lambda b: -(b.get("vote_average") or 0))[0]
@@ -1313,22 +1328,27 @@ class GenerateurBackdrops:
             if not langue:
                 continue
 
-            chemin = meilleur_backdrop_tmdb_langue(images_tmdb, langue)
+            # Pour le français spécifiquement : on exige un pays FR ou non
+            # renseigné, jamais un autre pays explicite (ex: CA -- contenu
+            # québécois, tagué langue="fr" mais pays="CA" par TMDB, deux
+            # champs distincts). Pas de restriction équivalente pour "en" :
+            # pas demandée, et moins problématique (l'anglais ne varie pas
+            # de la même façon selon le pays pour un titre).
+            pays_autorises = {"FR"} if langue.lower() == "fr" else None
+            chemin = meilleur_backdrop_tmdb_langue(images_tmdb, langue, pays_autorises=pays_autorises)
             if chemin:
-                # On relit le tag BRUT tel que renvoyé par l'API TMDB (et pas
-                # juste la langue qu'on cherchait) : en cas de doute sur un
-                # mauvais tag source (ex: image réellement fr-CA mais taguée
-                # 'fr' par erreur côté TMDB), ce log donne la valeur exacte
-                # reçue, pas une supposition.
-                tag_brut = next(
-                    (b.get("iso_639_1") for b in (images_tmdb.get("backdrops") or []) if b.get("file_path") == chemin),
-                    None,
+                # On relit les tags BRUTS tels que renvoyés par l'API TMDB
+                # (langue ET pays), pas juste ce qu'on cherchait -- utile
+                # pour repérer un futur cas mal classé sans deviner.
+                brut = next(
+                    (b for b in (images_tmdb.get("backdrops") or []) if b.get("file_path") == chemin),
+                    {},
                 )
                 image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin}")
                 if image:
                     logging.info(
-                        "[TUILE] tmdb_id=%s -> retenu : TMDB backdrop %s (recherché='%s', tag brut API='%s')",
-                        tmdb_id, chemin, langue, tag_brut,
+                        "[TUILE] tmdb_id=%s -> retenu : TMDB backdrop %s (recherché='%s', tag brut API : langue='%s' pays='%s')",
+                        tmdb_id, chemin, langue, brut.get("iso_639_1"), brut.get("iso_3166_1"),
                     )
                     return image
                 logging.debug("[TUILE] tmdb_id=%s : TMDB backdrop '%s' trouvé mais téléchargement échoué", tmdb_id, langue)
