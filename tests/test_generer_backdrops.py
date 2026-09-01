@@ -787,25 +787,11 @@ def test_meilleur_backdrop_tmdb_langue_aucun_candidat_retourne_none():
     assert meilleur_backdrop_tmdb_langue({}, "fr") is None
 
 
-def test_meilleur_backdrop_tmdb_langue_variante_regionale_fr_ca_acceptee_pour_fr():
-    """Cas réel : séries 'From' (tmdb 124364) et 'Supernatural' (tmdb 1622),
-    dont les backdrops TMDB sont tagués 'fr-CA' et non 'fr'."""
+def test_meilleur_backdrop_tmdb_langue_correspondance_stricte_jamais_de_variante_regionale():
+    """À la demande explicite : "fr" ne doit JAMAIS matcher "fr-CA" (ni
+    aucune autre variante régionale), dans aucune circonstance."""
     images_data = {"backdrops": [{"iso_639_1": "fr-CA", "vote_average": 7.0, "file_path": "/quebec.jpg"}]}
-    assert meilleur_backdrop_tmdb_langue(images_data, "fr") == "/quebec.jpg"
-
-
-def test_meilleur_backdrop_tmdb_langue_prefere_fr_exact_a_fr_ca_si_les_deux_existent():
-    images_data = {
-        "backdrops": [
-            {"iso_639_1": "fr-CA", "vote_average": 9.9, "file_path": "/quebec-mieux-note.jpg"},
-            {"iso_639_1": "fr", "vote_average": 1.0, "file_path": "/france-moins-bien-note.jpg"},
-        ]
-    }
-    assert meilleur_backdrop_tmdb_langue(images_data, "fr") == "/france-moins-bien-note.jpg"
-
-
-def test_meilleur_backdrop_tmdb_langue_variante_regionale_ne_pollue_pas_untagged():
-    images_data = {"backdrops": [{"iso_639_1": "fr-CA", "vote_average": 7.0, "file_path": "/quebec.jpg"}]}
+    assert meilleur_backdrop_tmdb_langue(images_data, "fr") is None
     assert meilleur_backdrop_tmdb_langue(images_data, None) is None
 
 
@@ -833,20 +819,43 @@ class _FausseSessionHTTP:
         return _FausseReponseHTTP(self._payload)
 
 
-def test_recuperer_images_demande_explicitement_fr_ca_a_tmdb():
-    """Sans 'fr-CA' dans include_image_language, TMDB exclut ces backdrops
-    de la réponse (filtrage côté serveur) même s'ils existent et affichent
-    bien un titre en français -- cas réel : "From" (124364), "Supernatural"
-    (1622)."""
+def test_recuperer_images_ne_demande_jamais_fr_ca_a_tmdb():
+    """À la demande explicite : fr-CA ne doit plus jamais être demandé ni
+    utilisé, dans aucune situation."""
     fausse_session = _FausseSessionHTTP({"backdrops": []})
     client = ClientTMDB(cle_api="fake", session=fausse_session)
 
-    client.recuperer_images(124364, "tv")
+    client.recuperer_images(124364, "tv", langue_originale="en")
 
     langues_demandees = fausse_session.derniers_params["include_image_language"].split(",")
-    assert "fr-CA" in langues_demandees
+    assert "fr-CA" not in langues_demandees
     assert "fr" in langues_demandees
+    assert "en" in langues_demandees
 
+
+def test_recuperer_images_ajoute_la_langue_originale_si_differente_de_fr_et_en():
+    """Cas 'drama coréen' : la langue originale du titre doit être demandée
+    explicitement à TMDB (sinon l'API la filtre côté serveur), pour pouvoir
+    servir de repli texté après fr/en (palier "natif")."""
+    fausse_session = _FausseSessionHTTP({"backdrops": []})
+    client = ClientTMDB(cle_api="fake", session=fausse_session)
+
+    client.recuperer_images(999, "tv", langue_originale="ko")
+
+    langues_demandees = fausse_session.derniers_params["include_image_language"].split(",")
+    assert "ko" in langues_demandees
+    assert "fr" in langues_demandees
+    assert "en" in langues_demandees
+
+
+def test_recuperer_images_n_ajoute_pas_de_doublon_si_langue_originale_est_fr_ou_en():
+    fausse_session = _FausseSessionHTTP({"backdrops": []})
+    client = ClientTMDB(cle_api="fake", session=fausse_session)
+
+    client.recuperer_images(1622, "tv", langue_originale="en")
+
+    langues_demandees = fausse_session.derniers_params["include_image_language"].split(",")
+    assert langues_demandees.count("en") == 1
 
 
 # ---------------------------------------------------------------------------
