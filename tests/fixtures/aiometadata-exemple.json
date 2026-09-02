@@ -130,6 +130,22 @@
         "enabled": true,
         "source": "mdblist",
         "metadata": {}
+      },
+      {
+        "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118227",
+        "type": "movie",
+        "name": "AI Recommendations",
+        "enabled": true,
+        "source": "custom",
+        "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/movie/aicat_list_118227.json"
+      },
+      {
+        "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118228",
+        "type": "series",
+        "name": "AI Recommendations",
+        "enabled": true,
+        "source": "custom",
+        "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/series/aicat_list_118228.json"
       }
     ]
   },
