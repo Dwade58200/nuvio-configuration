@@ -71,25 +71,33 @@ Par-dessus : un dégradé sombre en vignette, et une lueur diffuse d'une
 C'est le comportement **par défaut** (`--mosaique`, activé aussi dans le
 workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
 de 3 titres distincts résolus, le script repasse automatiquement sur
-l'ancien mode "1 seul backdrop TMDB/Fanart", sans erreur. Si un dossier a
-réellement moins de titres disponibles que de cases (catalogue
-restreint), les images sont répétées (cycle) en dernier recours pour
-compléter la grille -- mais uniquement dans ce cas.
+l'ancien mode "1 seul backdrop TMDB/Fanart" (une cascade plus simple et
+**différente** de celle détaillée ci-dessous pour le mode mosaïque --
+Fanart y est encore interrogé en français ET anglais, background et
+thumb), sans erreur. Si un dossier a réellement moins de titres
+disponibles que de cases (catalogue restreint), les images sont répétées
+(cycle) en dernier recours pour compléter la grille -- mais uniquement
+dans ce cas.
 
 Pour forcer l'ancien comportement (debug, comparaison) : lance sans
 `--mosaique`, ou coche **desactiver_mosaique** au déclenchement manuel
 depuis GitHub Actions.
 
-### ⚠️ Important : le titre affiché sur chaque tuile dépend de Fanart.tv
+### D'où vient le titre visible sur chaque tuile ?
 
-Le script n'écrit **aucun texte** lui-même. Les titres/logos visibles sur
-les tuiles viennent des artworks **"thumb"** de [Fanart.tv](https://fanart.tv)
-(`moviethumb`/`tvthumb`) -- des visuels communautaires qui incluent déjà le
-titre stylisé. **Sans clé `FANART_API_KEY` configurée, les tuiles utilisent
-le backdrop TMDB brut (sans aucun texte)** : la mosaïque reste jolie mais
-sans titre visible.
+Le script n'écrit **aucun texte** lui-même : que ce soit du texte ou pas,
+tout vient directement de l'image téléchargée. **TMDB est la source
+principale** (backdrops tagués français, anglais, ou langue originale du
+titre) -- Fanart.tv n'intervient qu'en second, et seulement pour
+l'anglais. **Aucune des deux sources ne garantit un titre incrusté** :
+TMDB déconseille officiellement les logos/sous-titres sur ses backdrops
+(règle pas toujours respectée par les contributeurs), et un artwork
+Fanart "thumb" n'en a pas non plus systématiquement. **Sans clé
+`FANART_API_KEY` configurée**, seul le palier 2 ci-dessous est sauté --
+les paliers TMDB (1, 3, 4, 5) continuent de fonctionner normalement,
+donc des titres restent tout à fait possibles sans cette clé.
 
-Pour avoir les titres :
+Pour compléter la couverture côté Fanart (facultatif) :
 1. Crée un compte sur https://fanart.tv/profile/api-access/ et récupère une clé.
 2. Ajoute-la comme secret GitHub `FANART_API_KEY` (voir « Configuration requise »).
 
@@ -105,8 +113,9 @@ le plus de chances de porter un vrai titre incrusté) :
    backdrop-là est explicitement exclu de ce palier.
 2. **Fanart.tv, "thumb" anglais uniquement** (`moviethumb`/`tvthumb`) --
    plus de background, ni clearart, ni français : l'analyse a montré que
-   c'est la source la plus fiable pour un vrai titre incrusté, et ça évite
-   le détour par un fond de compositing.
+   c'est la source Fanart la plus fiable pour un vrai titre incrusté, et
+   ça évite le détour par un fond de compositing. Sauté si
+   `FANART_API_KEY` est absente.
 3. **Backdrop TMDB tagué anglais.**
 4. **Backdrop TMDB tagué avec la langue ORIGINALE du titre** (ex : coréen
    pour un drama coréen), si elle diffère du français et de l'anglais.
@@ -137,11 +146,11 @@ de réponse `429`).
 Tous les groupes de collections ne sont pas ciblés par le script -- soit
 parce qu'un catalogue n'a pas d'équivalent TMDB exploitable, soit par
 choix délibéré. Sur ceux qui **sont** ciblés (54 dossiers), la couverture
-est quasi complète :
+est désormais complète (voir note sur "Recommandation" ci-dessous) :
 
 | Groupe | Ciblé | Résolus | Notes |
 |---|---|---|---|
-| 🔭 Découvrir | 4 / 6 dossiers | 3 / 4 | "TV" et "Magnet" volontairement exclus ; "Recommandation" reste non résolvable (liste MDBList personnalisée au compte, sans URL publique) |
+| 🔭 Découvrir | 4 / 6 dossiers | 4 / 4 | "TV" et "Magnet" volontairement exclus ; "Recommandation" résolu via les catalogues Bingecat (`source: "custom"` dans l'export AIOMetadata, voir section dédiée) -- les listes MDBList "recommandation personnalisée" restent explicitement ignorées (non résolvables), mais ne bloquent plus rien puisque Bingecat couvre le même dossier |
 | 🎬 Services de Streaming | 9 / 9 dossiers | 9 / 9 | ✅ résolu via l'export AIOMetadata (vrai `with_watch_providers` par plateforme, voir section dédiée) |
 | 🎭 Genres | 15 / 15 dossiers | 15 / 15 | ✅ |
 | 🎨 Thématiques | 14 / 14 dossiers | 14 / 14 | ✅ (résolu via l'export AIOMetadata + MDBList) |
@@ -150,12 +159,15 @@ est quasi complète :
 | 🎞️ Franchises | 0 / 158 dossiers | -- | groupe entier désactivé volontairement (trop de dossiers, peu pertinent) |
 | 🏃 Sports | 0 / 7 dossiers | -- | groupe entier désactivé volontairement (pas pertinent pour un backdrop) |
 
-Le seul dossier ciblé et non résolu est **"Recommandation"** (liste
-MDBList personnalisée sans URL publique fixe -- voir la section
-« MDBList »). Les groupes/dossiers exclus (Franchises, Sports,
-TV, Magnet) le sont par choix, réglable dans `CRITERES_GROUPES` en haut
-de `scripts/generer_backdrops.py`. Un dossier non résolu est toujours
-**journalisé avec la raison** dans le résumé de fin d'exécution.
+Tous les dossiers ciblés sont désormais résolvables (le dernier,
+**"Recommandation"**, l'est depuis l'ajout du support Bingecat -- voir
+la section « Catalogues Stremio "custom" »). > **Non vérifié en conditions
+réelles** dans cette session (pas d'accès aux clés API TMDB/Bingecat) --
+à confirmer par un run `--verbose` réel. Les groupes/dossiers exclus
+(Franchises, Sports, TV, Magnet) le sont par choix, réglable dans
+`CRITERES_GROUPES` en haut de `scripts/generer_backdrops.py`. Un dossier
+non résolu est toujours **journalisé avec la raison** dans le résumé de
+fin d'exécution.
 
 ## ✅ Configuration requise
 
@@ -163,8 +175,9 @@ de `scripts/generer_backdrops.py`. Un dossier non résolu est toujours
 
 - **TMDB** : créez un compte sur https://www.themoviedb.org/settings/api et
   récupérez une clé API (v3).
-- **Fanart.tv** (fortement recommandé -- c'est la source des titres/logos
-  incrustés sur les tuiles de la mosaïque, voir « Mode mosaïque ») :
+- **Fanart.tv** (optionnel, mais recommandé pour compléter la couverture
+  côté anglais -- ce n'est PAS la source principale des titres incrustés,
+  voir « Mode mosaïque » pour le détail de la cascade) :
   https://fanart.tv/profile/api-access/
 - **MDBList** (optionnel, voir « MDBList ») -- sans elle, seules
   les listes MDBList *publiques* fonctionnent, ce qui couvre la quasi-
