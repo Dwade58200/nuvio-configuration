@@ -92,24 +92,34 @@ Pour avoir les titres :
 1. Crée un compte sur https://fanart.tv/profile/api-access/ et récupère une clé.
 2. Ajoute-la comme secret GitHub `FANART_API_KEY` (voir « Configuration requise »).
 
-Pour chaque titre, le script cherche une image dans CET ordre précis :
+Pour chaque titre, le script cherche une image dans CET ordre précis
+(pensé pour limiter le nombre de requêtes et privilégier les sources ayant
+le plus de chances de porter un vrai titre incrusté) :
 
 1. **Backdrop TMDB tagué français** (via l'endpoint `/images` de TMDB) --
-   certains titres ont des visuels envoyés spécifiquement pour le marché
-   français, qui incluent parfois un titre local incrusté.
-2. **Fanart.tv, en français** : d'abord **background** (image de fond),
-   puis **thumb** (image avec titre incrusté), puis **clearart/hdclearart**
-   (artwork détouré) -- dans ce cas, il est recomposé sur un VRAI fond
-   (un autre visuel Fanart ou le backdrop TMDB), jamais sur une couleur plate.
-3. **Même schéma, en anglais** (backdrop TMDB tagué EN, puis Fanart EN).
-4. **Sans texte, en tout dernier recours** : Fanart sans langue précise,
-   puis backdrop TMDB générique, puis le backdrop déjà connu du candidat.
+   pays `FR` ou non renseigné uniquement. TMDB renvoie deux champs
+   **distincts** par image (langue `iso_639_1` et pays `iso_3166_1`) : un
+   backdrop peut être tagué langue "fr" mais pays "CA" (contenu québécois,
+   cas réel rencontré sur les séries "From" et "Supernatural") -- ce
+   backdrop-là est explicitement exclu de ce palier.
+2. **Fanart.tv, "thumb" anglais uniquement** (`moviethumb`/`tvthumb`) --
+   plus de background, ni clearart, ni français : l'analyse a montré que
+   c'est la source la plus fiable pour un vrai titre incrusté, et ça évite
+   le détour par un fond de compositing.
+3. **Backdrop TMDB tagué anglais.**
+4. **Backdrop TMDB tagué avec la langue ORIGINALE du titre** (ex : coréen
+   pour un drama coréen), si elle diffère du français et de l'anglais.
+5. **Backdrop TMDB générique, sans texte**, en dernier repli "normal".
+6. **Dernier recours silencieux** (aucune requête supplémentaire) : le
+   backdrop déjà connu du candidat, pour ne jamais laisser une tuile
+   complètement vide.
 
 Le type **"banner"** de Fanart n'est jamais utilisé (mauvais format pour
 nos tuiles paysage). La correspondance de langue est **stricte** : un
-artwork tagué `fr-CA` (français canadien) ou toute autre variante
+backdrop tagué `fr-CA` (français canadien) ou toute autre variante
 régionale n'est JAMAIS considéré comme "français" -- seul le tag exact
-`fr` compte.
+`fr` compte (voir le point sur le pays ci-dessus pour le cas où TMDB
+utilise quand même le tag `fr` par erreur).
 
 ### Volume de requêtes TMDB
 
