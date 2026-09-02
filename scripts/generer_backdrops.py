@@ -348,7 +348,7 @@ def slugifier(texte: str) -> str:
 
 @dataclass
 class RequeteTMDB:
-    kind: str  # "collection" | "discover" | "endpoint" | "person"
+    kind: str  # "collection" | "discover" | "endpoint" | "person" | "mdblist_liste" | "custom_catalogue"
     media_type: str = "movie"
     endpoint: str | None = None
     params: dict[str, Any] = field(default_factory=dict)
@@ -395,12 +395,16 @@ def charger_catalogues_aiometadata(chemin: Path | None) -> dict[str, dict[str, A
     Streaming, Genres, MDBList...) avec ses VRAIS filtres/identifiants
     plutôt qu'une heuristique de repli à partir du nom.
 
-    Deux formes de catalogues sont indexées, distinguées par la clé "kind" :
+    Trois formes de catalogues sont indexées, distinguées par la clé "kind" :
       - {"kind": "discover", "media_type", "params"} : catalogue TMDB avec
         une config "discover" exacte exportée (Streaming, Genres...).
       - {"kind": "mdblist", "media_type", "mdblist_url"} : catalogue
         `source: "mdblist"` avec une URL de liste publique exportée dans
         `metadata.url` (ex: "Sitcom" -> mdblist.37087).
+      - {"kind": "custom_catalogue", "media_type", "url"} : catalogue
+        `source: "custom"` (ex: Bingecat) avec une `sourceUrl` -- un
+        catalogue Stremio classique dont les `metas` utilisent des
+        identifiants IMDb (convertis en TMDB à la résolution).
 
     IMPORTANT : selon la version de l'export, la clé "catalogs" se trouve
     soit à la racine du JSON, soit sous "config" (export réel observé --
@@ -441,6 +445,12 @@ def charger_catalogues_aiometadata(chemin: Path | None) -> dict[str, dict[str, A
                 media_type_brut = (entree.get("type") or (entree.get("metadata") or {}).get("mediatype") or "movie")
                 media_type = "tv" if media_type_brut in ("tv", "series", "show", "shows") else "movie"
                 index[catalog_id] = {"kind": "mdblist", "media_type": media_type, "mdblist_url": url_liste}
+            continue
+
+        if entree.get("source") == "custom" and entree.get("sourceUrl"):
+            media_type_brut = entree.get("type") or "movie"
+            media_type = "tv" if media_type_brut in ("tv", "series", "show", "shows") else "movie"
+            index[catalog_id] = {"kind": "custom_catalogue", "media_type": media_type, "url": entree["sourceUrl"]}
 
     return index
 
@@ -509,6 +519,15 @@ def construire_requetes(
                         )
                     )
                     continue
+            if info_aiometadata and info_aiometadata.get("kind") == "custom_catalogue":
+                requetes.append(
+                    RequeteTMDB(
+                        kind="custom_catalogue",
+                        media_type=info_aiometadata["media_type"],
+                        params={"url": info_aiometadata["url"]},
+                    )
+                )
+                continue
             if info_aiometadata and info_aiometadata.get("kind", "discover") == "discover":
                 params_reels = {
                     cle: _resoudre_placeholder_date(valeur) for cle, valeur in info_aiometadata["params"].items()
@@ -675,6 +694,7 @@ class ClientTMDB:
         self._cache_keyword: dict[str, int | None] = {}
         self._cache_images: dict[tuple[int, str], dict[str, Any]] = {}
         self._cache_tvdb_id: dict[int, int | None] = {}
+        self._cache_imdb: dict[str, tuple[int, str, str | None, str | None] | None] = {}
         # Ce client est partagé entre plusieurs threads (traitement de dossiers
         # en parallèle, chacun téléchargeant lui-même ses tuiles en parallèle) :
         # sans verrou, deux threads peuvent rater le cache au même instant et
@@ -727,6 +747,34 @@ class ClientTMDB:
             resultat = None
         with self._verrou:
             self._cache_tvdb_id[tmdb_id] = resultat
+        return resultat
+
+    def resoudre_imdb_vers_tmdb(self, imdb_id: str) -> tuple[int, str, str | None, str | None] | None:
+        """Convertit un identifiant IMDb ('tt...') en identifiant TMDB, via
+        l'endpoint `/find` (`external_source=imdb_id`). Nécessaire pour les
+        catalogues Stremio/Nuvio "custom" (ex: Bingecat), qui exposent des
+        `id` IMDb et non TMDB dans leurs `metas`.
+
+        Retourne (tmdb_id, media_type, backdrop_path, langue_originale), ou
+        None si l'identifiant n'a pas été trouvé côté TMDB. Mis en cache par
+        imdb_id (le même titre populaire revient souvent dans plusieurs
+        catalogues/dossiers durant une même exécution)."""
+        with self._verrou:
+            if imdb_id in self._cache_imdb:
+                return self._cache_imdb[imdb_id]
+        resultat = None
+        try:
+            data = self._get(f"/find/{imdb_id}", {"external_source": "imdb_id"})
+            for media_type, cle in (("movie", "movie_results"), ("tv", "tv_results")):
+                items = data.get(cle) or []
+                if items:
+                    item = items[0]
+                    resultat = (item.get("id"), media_type, item.get("backdrop_path"), item.get("original_language"))
+                    break
+        except requests.RequestException:
+            resultat = None
+        with self._verrou:
+            self._cache_imdb[imdb_id] = resultat
         return resultat
 
     def recuperer_images(self, tmdb_id: int, media_type: str, langue_originale: str | None = None) -> dict[str, Any]:
@@ -1183,6 +1231,64 @@ def telecharger_et_traiter(
 
 
 # ---------------------------------------------------------------------------
+# Catalogues Stremio "custom" (ex: Bingecat) -- exposés via un export
+# AIOMetadata avec "source": "custom" et une "sourceUrl"
+# ---------------------------------------------------------------------------
+
+def corriger_url_catalogue_mal_formee(url: str) -> str:
+    """Certains exports AIOMetadata contiennent une `sourceUrl` où la
+    query string de l'addon (ex: "?bcv=6") est positionnée AVANT le
+    chemin de la ressource plutôt qu'après (cas réel observé avec
+    Bingecat) : "https://host/base?bcv=6/catalog/movie/x.json" au lieu de
+    "https://host/base/catalog/movie/x.json?bcv=6". Tout client HTTP
+    standard (dont le nôtre) interprète tout ce qui suit le premier "?"
+    comme une query string, donc l'URL telle quelle renvoie une 404.
+
+    Cette fonction déplace la partie qui suit le premier "/" après le "?"
+    (le vrai chemin de ressource) devant la query, sans y toucher si l'URL
+    est déjà bien formée (pas de "/" après le premier "?")."""
+    if "?" not in url:
+        return url
+    base, _, reste = url.partition("?")
+    if "/" not in reste:
+        return url
+    query_reelle, _, chemin_reel = reste.partition("/")
+    return f"{base}/{chemin_reel}?{query_reelle}"
+
+
+class ClientCatalogueCustom:
+    """Accès en lecture à un catalogue Stremio/Nuvio "custom" générique
+    (ex: Bingecat), dont les `metas` utilisent des identifiants IMDb (pas
+    TMDB) -- conversion faite séparément via ClientTMDB.resoudre_imdb_vers_tmdb.
+
+    Ne lève jamais d'exception : liste vide en cas d'échec."""
+
+    def __init__(self, session: requests.Session | None = None):
+        self.session = session or requests.Session()
+        self._cache: dict[str, list[str]] = {}
+        self._verrou = threading.Lock()  # client partagé entre threads, comme ClientTMDB/ClientFanart/ClientMDBList
+
+    def recuperer_ids_imdb(self, url: str, limite: int) -> list[str]:
+        with self._verrou:
+            if url in self._cache:
+                return self._cache[url][:limite]
+        ids: list[str] = []
+        try:
+            r = self.session.get(corriger_url_catalogue_mal_formee(url), timeout=15)
+            r.raise_for_status()
+            data = r.json()
+            for meta in data.get("metas") or []:
+                identifiant = meta.get("id") or ""
+                if identifiant.startswith("tt"):
+                    ids.append(identifiant)
+        except (requests.RequestException, ValueError):
+            ids = []
+        with self._verrou:
+            self._cache[url] = ids
+        return ids[:limite]
+
+
+# ---------------------------------------------------------------------------
 # Orchestration
 # ---------------------------------------------------------------------------
 
@@ -1222,6 +1328,7 @@ class GenerateurBackdrops:
         self.tmdb = ClientTMDB(cle_tmdb, session=self.session)
         self.fanart = ClientFanart(cle_fanart, session=self.session)
         self.mdblist = ClientMDBList(cle_mdblist, session=self.session)
+        self.catalogue_custom = ClientCatalogueCustom(session=self.session)
         self.repertoire_sortie = repertoire_sortie
         self.profil = profil
         self.dry_run = dry_run
@@ -1363,7 +1470,8 @@ class GenerateurBackdrops:
     def _resoudre_liste_candidats(self, requete: RequeteTMDB, cible: int, pages: int) -> list[tuple[str | None, int, str, str | None]]:
         """Résout une requête en liste de candidats (backdrop_path, tmdb_id,
         media_type, langue_originale) -- gère aussi bien les requêtes TMDB
-        classiques que les listes MDBList (`kind == "mdblist_liste"`)."""
+        classiques que les listes MDBList (`kind == "mdblist_liste"`) et les
+        catalogues Stremio "custom" type Bingecat (`kind == "custom_catalogue"`)."""
         if requete.kind == "mdblist_liste":
             if "mdblist_id" in requete.params:
                 items = self.mdblist.recuperer_items_liste_par_id(requete.params["mdblist_id"], limite=cible)
@@ -1372,6 +1480,20 @@ class GenerateurBackdrops:
                     requete.params["mdblist_user"], requete.params["mdblist_slug"], limite=cible
                 )
             return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
+        if requete.kind == "custom_catalogue":
+            # On demande un peu plus d'ids IMDb que la cible : certains ne se
+            # résolvent pas côté TMDB (retiré/introuvable), autant limiter le
+            # risque de retomber sous la cible après conversion.
+            ids_imdb = self.catalogue_custom.recuperer_ids_imdb(requete.params["url"], limite=cible * 2)
+            candidats: list[tuple[str | None, int, str, str | None]] = []
+            for imdb_id in ids_imdb:
+                resolu = self.tmdb.resoudre_imdb_vers_tmdb(imdb_id)
+                if resolu:
+                    tmdb_id, media_type, backdrop_path, langue_originale = resolu
+                    candidats.append((backdrop_path, tmdb_id, media_type, langue_originale))
+                if len(candidats) >= cible:
+                    break
+            return candidats
         return self.tmdb.resoudre_backdrops_multiples(requete, limite=cible, pages=pages)
 
     def traiter_dossier_mosaique(
