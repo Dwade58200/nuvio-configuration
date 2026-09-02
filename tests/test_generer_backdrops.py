@@ -23,6 +23,7 @@ from generer_backdrops import (  # noqa: E402
     GROUPE_STREAMING,
     GROUPE_THEMATIQUES,
     GROUPE_VIBES,
+    ClientCatalogueCustom,
     ClientMDBList,
     ClientTMDB,
     _extraire_slug_thematique,
@@ -32,6 +33,7 @@ from generer_backdrops import (  # noqa: E402
     charger_catalogues_aiometadata,
     charger_collections,
     construire_requetes,
+    corriger_url_catalogue_mal_formee,
     dossier_actif,
     meilleur_backdrop_tmdb_langue,
     normaliser,
@@ -522,6 +524,22 @@ def test_charger_catalogues_aiometadata_indexe_les_listes_mdblist_avec_url():
     }
 
 
+def test_charger_catalogues_aiometadata_indexe_les_catalogues_custom():
+    """Cas réel (Bingecat) : un catalogue `source: "custom"` avec une
+    `sourceUrl` doit être indexé en kind="custom_catalogue", quel que soit
+    le format exact de l'URL (corrigée seulement au moment de la requête,
+    pas ici)."""
+    catalogues = charger_catalogues_aiometadata(FIXTURE_AIOMETADATA)
+    cid = "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118227"
+    assert catalogues[cid] == {
+        "kind": "custom_catalogue",
+        "media_type": "movie",
+        "url": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/movie/aicat_list_118227.json",
+    }
+    cid_serie = "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118228"
+    assert catalogues[cid_serie]["media_type"] == "tv"
+
+
 def test_charger_catalogues_aiometadata_accepte_aussi_l_ancien_format_a_plat():
     """Compatibilité ascendante : un export où `catalogs` est à la racine
     (sans niveau `config`) doit continuer à fonctionner."""
@@ -618,6 +636,26 @@ def test_catalogue_mdblist_de_l_export_produit_une_requete_mdblist_liste():
     assert requetes[0].kind == "mdblist_liste"
     assert requetes[0].media_type == "tv"
     assert requetes[0].params == {"mdblist_user": "polynomialproton", "mdblist_slug": "top-sitcoms"}
+    assert ignorees == []
+
+
+def test_catalogue_custom_de_l_export_produit_une_requete_custom_catalogue():
+    """Cas réel (Bingecat, dossier "Recommandation") : un catalogId
+    'custom.com_aicat_...' avec une sourceUrl exportée doit se résoudre en
+    requête kind="custom_catalogue", peu importe le format de l'URL."""
+    catalogues = charger_catalogues_aiometadata(FIXTURE_AIOMETADATA)
+    cid = "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118227"
+    dossier = {
+        "title": "Recommandation",
+        "sources": [{"provider": "addon", "addonId": "aio-metadata", "catalogId": cid, "type": "movie"}],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_THEMATIQUES, dossier, catalogues)
+    assert len(requetes) == 1
+    assert requetes[0].kind == "custom_catalogue"
+    assert requetes[0].media_type == "movie"
+    assert requetes[0].params == {
+        "url": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/movie/aicat_list_118227.json",
+    }
     assert ignorees == []
 
 
@@ -911,6 +949,110 @@ def test_charger_collections_fichier_absent_leve_une_erreur_claire(tmp_path):
         raise AssertionError("aurait dû lever FileNotFoundError")
     except FileNotFoundError:
         pass
+
+
+# ---------------------------------------------------------------------------
+# Catalogues Stremio "custom" (Bingecat & co)
+# ---------------------------------------------------------------------------
+
+def test_corriger_url_catalogue_mal_formee_deplace_la_query_a_la_fin():
+    """Cas réel Bingecat : la sourceUrl exportée place la query de l'addon
+    ("?bcv=6") AVANT le chemin de la ressource -- tout client HTTP standard
+    interprète alors tout ce qui suit comme une query string, d'où une 404."""
+    url_cassee = "https://bingecat.com/stremio/abc-123/nuvio?bcv=6/catalog/movie/aicat_list_118227.json"
+    assert corriger_url_catalogue_mal_formee(url_cassee) == (
+        "https://bingecat.com/stremio/abc-123/nuvio/catalog/movie/aicat_list_118227.json?bcv=6"
+    )
+
+
+def test_corriger_url_catalogue_mal_formee_laisse_une_url_deja_correcte():
+    url_ok = "https://bingecat.com/stremio/abc-123/nuvio/catalog/movie/aicat_list_118227.json?bcv=6"
+    assert corriger_url_catalogue_mal_formee(url_ok) == url_ok
+
+
+def test_corriger_url_catalogue_mal_formee_laisse_une_url_sans_query():
+    url_sans_query = "https://bingecat.com/stremio/abc-123/nuvio/catalog/movie/aicat_list_118227.json"
+    assert corriger_url_catalogue_mal_formee(url_sans_query) == url_sans_query
+
+
+class _FausseReponseCatalogueCustom:
+    def __init__(self, payload, status_code=200):
+        self._payload = payload
+        self.status_code = status_code
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise __import__("requests").HTTPError(f"HTTP {self.status_code}")
+
+    def json(self):
+        return self._payload
+
+
+class _FausseSessionCatalogueCustom:
+    def __init__(self, payload):
+        self._payload = payload
+        self.dernieres_url = None
+
+    def get(self, url, timeout=None, **kwargs):
+        self.dernieres_url = url
+        return _FausseReponseCatalogueCustom(self._payload)
+
+
+def test_client_catalogue_custom_extrait_les_ids_imdb_et_corrige_l_url():
+    payload = {
+        "metas": [
+            {"id": "tt0290673", "type": "movie", "name": "Irreversible"},
+            {"id": "tt1772250", "type": "movie", "name": "Inside"},
+            {"id": "sans-prefixe-tt", "type": "movie", "name": "Ignoré, pas un id IMDb"},
+        ]
+    }
+    fausse_session = _FausseSessionCatalogueCustom(payload)
+    client = ClientCatalogueCustom(session=fausse_session)
+
+    url_cassee = "https://bingecat.com/stremio/abc-123/nuvio?bcv=6/catalog/movie/x.json"
+    ids = client.recuperer_ids_imdb(url_cassee, limite=10)
+
+    assert ids == ["tt0290673", "tt1772250"]
+    assert fausse_session.dernieres_url == "https://bingecat.com/stremio/abc-123/nuvio/catalog/movie/x.json?bcv=6"
+
+
+def test_client_catalogue_custom_respecte_la_limite():
+    payload = {"metas": [{"id": f"tt{i:07d}"} for i in range(10)]}
+    client = ClientCatalogueCustom(session=_FausseSessionCatalogueCustom(payload))
+    assert len(client.recuperer_ids_imdb("https://x.example/catalog.json", limite=3)) == 3
+
+
+def test_client_catalogue_custom_echec_reseau_retourne_liste_vide():
+    class _SessionEnErreur:
+        def get(self, url, timeout=None, **kwargs):
+            raise __import__("requests").ConnectionError("panne")
+
+    client = ClientCatalogueCustom(session=_SessionEnErreur())
+    assert client.recuperer_ids_imdb("https://x.example/catalog.json", limite=10) == []
+
+
+def test_resoudre_imdb_vers_tmdb_extrait_le_bon_type_et_les_bons_champs():
+    """Cas réel : TMDB /find renvoie soit movie_results, soit tv_results --
+    jamais les deux non vides pour un même id IMDb."""
+    class _FausseSessionFind:
+        def get(self, url, params=None, timeout=None, **kwargs):
+            return _FausseReponseCatalogueCustom({
+                "movie_results": [{"id": 42, "backdrop_path": "/x.jpg", "original_language": "en"}],
+                "tv_results": [],
+            })
+
+    client = ClientTMDB(cle_api="fake", session=_FausseSessionFind())
+    resultat = client.resoudre_imdb_vers_tmdb("tt0290673")
+    assert resultat == (42, "movie", "/x.jpg", "en")
+
+
+def test_resoudre_imdb_vers_tmdb_introuvable_retourne_none():
+    class _FausseSessionFindVide:
+        def get(self, url, params=None, timeout=None, **kwargs):
+            return _FausseReponseCatalogueCustom({"movie_results": [], "tv_results": []})
+
+    client = ClientTMDB(cle_api="fake", session=_FausseSessionFindVide())
+    assert client.resoudre_imdb_vers_tmdb("tt0000000") is None
 
 
 if __name__ == "__main__":
