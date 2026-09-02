@@ -855,8 +855,11 @@ class ClientTMDB:
     ) -> list[tuple[str, int, str, str | None]]:
         """Retourne jusqu'à `limite` tuples (backdrop_path, tmdb_id, media_type,
         langue_originale) pour une requête donnée -- utilisé pour la mosaïque
-        multi-titres. La langue originale sert à prioriser les artworks
-        Fanart.tv dans la bonne langue (voir ClientFanart.choisir_url).
+        multi-titres. La langue originale sert de dernier repli texté côté
+        TMDB (backdrop tagué dans la langue originale du titre, ex: coréen
+        pour un drama coréen) si ni le français ni l'anglais n'ont abouti --
+        voir GenerateurBackdrops._resoudre_image_tuile. Elle n'intervient
+        PAS dans la résolution Fanart.tv, qui ne cherche que l'anglais.
         """
         resultats: list[tuple[str, int, str, str | None]] = []
         try:
@@ -1380,9 +1383,12 @@ class GenerateurBackdrops:
 
         images_tmdb = self.tmdb.recuperer_images(tmdb_id, media_type, langue_originale)
 
-        # 1) TMDB français (pays FR ou non renseigné uniquement).
+        # 1) TMDB dans la langue préférée -- le filtre pays FR n'a de sens
+        # que pour le français (voir le cas fr/CA plus haut) ; pour toute
+        # autre langue préférée, pas de restriction pays.
         if self.langue_preferee:
-            chemin = meilleur_backdrop_tmdb_langue(images_tmdb, self.langue_preferee, pays_autorises={"FR"})
+            pays_autorises = {"FR"} if self.langue_preferee.lower() == "fr" else None
+            chemin = meilleur_backdrop_tmdb_langue(images_tmdb, self.langue_preferee, pays_autorises=pays_autorises)
             if chemin:
                 brut: dict[str, Any] = next((b for b in (images_tmdb.get("backdrops") or []) if b.get("file_path") == chemin), {})
                 image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin}")
@@ -1702,7 +1708,7 @@ def main() -> int:
     parser.add_argument("--limite", type=int, default=None, help="Limiter le nombre de dossiers (tests)")
     parser.add_argument("--dry-run", action="store_true", help="Simule sans appeler TMDB ni écrire d'image")
     parser.add_argument("--mosaique", action="store_true", help="Génère une mosaïque multi-titres + couleur d'accent au lieu d'un seul backdrop (repli automatique si pas assez d'images)")
-    parser.add_argument("--langue-preferee", default="fr", help="Code langue Fanart.tv préféré pour les artworks avec titre incrusté (défaut: fr)")
+    parser.add_argument("--langue-preferee", default="fr", help="Code langue préféré pour le backdrop TMDB avec titre incrusté (palier 1 de la cascade -- n'affecte PAS Fanart.tv, qui ne cherche que l'anglais) (défaut: fr)")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
