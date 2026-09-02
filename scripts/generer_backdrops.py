@@ -961,17 +961,6 @@ class ClientFanart:
         meilleur = sorted(candidats, key=lambda c: -int(c.get("likes", 0)))[0]
         return meilleur.get("url")
 
-    def meilleure_url_fond(self, data: dict[str, Any] | None, media_type: str) -> str | None:
-        """Une image 'background' Fanart, n'importe quelle langue (utilisée
-        comme fond pour composer un artwork 'clearart' transparent)."""
-        if not data:
-            return None
-        candidats = self._candidats_par_type(data, media_type, "background")
-        if not candidats:
-            return None
-        meilleur = sorted(candidats, key=lambda c: -int(c.get("likes", 0)))[0]
-        return meilleur.get("url")
-
 
 def analyser_url_mdblist(url: str) -> tuple[str, str] | None:
     """Extrait (username, slug) d'une URL de liste MDBList telle que collée
@@ -1255,42 +1244,25 @@ class GenerateurBackdrops:
         except Exception:  # noqa: BLE001
             return None
 
-    def _obtenir_fond_pour_clearart(
-        self, fanart_data: dict[str, Any] | None, media_type: str, backdrop_path_repli: str | None
-    ) -> Image.Image | None:
-        """Un clearart est détouré (transparent) : on lui trouve un vrai
-        fond derrière plutôt qu'une couleur plate -- d'abord un
-        'background' Fanart (n'importe quelle langue, il n'a pas de texte
-        de toute façon), sinon le backdrop TMDB brut du candidat."""
-        if fanart_data:
-            url_fond = self.fanart.meilleure_url_fond(fanart_data, media_type)
-            if url_fond:
-                image = self._telecharger_une_image(url_fond)
-                if image:
-                    return image
-        if backdrop_path_repli:
-            return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path_repli}")
-        return None
-
     def _resoudre_image_tuile(self, candidat: tuple[str | None, int, str, str | None]) -> Image.Image | None:
-        """Cascade de résolution pour une tuile, dans l'ordre demandé :
+        """Cascade de résolution pour une tuile, dans l'ordre demandé (revu
+        pour limiter le nombre de requêtes et privilégier les sources ayant
+        le plus de chances de porter un vrai titre incrusté) :
 
-        Pour chaque langue en (français, anglais) :
-          1. backdrop TMDB tagué exactement cette langue (/images) ;
-          2. Fanart "background" dans cette langue ;
-          3. Fanart "thumb" dans cette langue ;
-          4. Fanart "clearart"/"hdclearart" dans cette langue, composé sur
-             un vrai fond (jamais une couleur plate).
-        Si rien trouvé dans aucune des deux langues : un backdrop TMDB tagué
-        avec la langue ORIGINALE du titre (ex: coréen pour un drama coréen),
-        puis même cascade Fanart (background/thumb/clearart) en version SANS
-        TEXTE, puis un backdrop TMDB générique (non tagué), puis le backdrop
-        brut connu du candidat en tout dernier recours.
-
-        NB : une variante régionale du français (ex: "fr-CA", contenu tagué
-        au marché québécois) n'est JAMAIS acceptée à la place d'un vrai
-        "fr-FR", à la demande explicite -- voir meilleur_backdrop_tmdb_langue
-        qui fait une correspondance stricte.
+          1. backdrop TMDB tagué français (pays FR ou non renseigné --
+             jamais un backdrop marqué langue "fr" mais pays "CA", cas réel
+             rencontré sur "From"/"Supernatural") ;
+          2. Fanart "thumb" anglais (movie thumb / tv thumb uniquement --
+             plus de background ni clearart, ça évite le détour par un fond
+             de compositing et une bonne partie des téléchargements
+             inutiles) ;
+          3. backdrop TMDB tagué anglais ;
+          4. backdrop TMDB tagué avec la langue ORIGINALE du titre (ex:
+             coréen pour un drama coréen), si elle diffère de fr/en ;
+          5. backdrop TMDB générique (non tagué, sans texte) ;
+          6. en tout dernier recours SILENCIEUX (aucune requête
+             supplémentaire) : le backdrop brut déjà connu du candidat, pour
+             ne jamais laisser une tuile complètement vide.
         """
         backdrop_path, tmdb_id, media_type, langue_originale = candidat
         logging.debug("[TUILE] Résolution pour tmdb_id=%s (%s), langue préférée=%s", tmdb_id, media_type, self.langue_preferee)
@@ -1299,119 +1271,72 @@ class GenerateurBackdrops:
             logging.debug("[TUILE] Pas de tmdb_id -> backdrop brut du candidat directement")
             return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path}") if backdrop_path else None
 
-        # Chargement paresseux des données Fanart : on ne les récupère que
-        # si TMDB seul n'a pas suffi (économise un appel API dans le cas,
-        # fréquent, où le backdrop TMDB taggué FR existe déjà).
-        cache_fanart: dict[str, Any] = {}
-
-        def obtenir_fanart_data() -> dict[str, Any] | None:
-            if "valeur" not in cache_fanart:
-                valeur = None
-                if not self.fanart.cle_api:
-                    logging.debug("[TUILE] tmdb_id=%s : pas de clé Fanart configurée, palier Fanart sauté", tmdb_id)
-                else:
-                    identifiant = self.tmdb.recuperer_tvdb_id(tmdb_id) if media_type == "tv" else tmdb_id
-                    if not identifiant:
-                        logging.warning(
-                            "[TUILE] tmdb_id=%s (tv) : échec de conversion tmdb_id->tvdb_id, Fanart sauté entièrement", tmdb_id,
-                        )
-                    else:
-                        valeur = self.fanart.donnees(identifiant, media_type)
-                        if valeur is None:
-                            logging.debug("[TUILE] tmdb_id=%s : Fanart n'a renvoyé aucune donnée exploitable (voir logs [FANART] ci-dessus)", tmdb_id)
-                cache_fanart["valeur"] = valeur
-            return cache_fanart["valeur"]
-
         images_tmdb = self.tmdb.recuperer_images(tmdb_id, media_type, langue_originale)
 
-        for langue in (self.langue_preferee, "en"):
-            if not langue:
-                continue
-
-            # Pour le français spécifiquement : on exige un pays FR ou non
-            # renseigné, jamais un autre pays explicite (ex: CA -- contenu
-            # québécois, tagué langue="fr" mais pays="CA" par TMDB, deux
-            # champs distincts). Pas de restriction équivalente pour "en" :
-            # pas demandée, et moins problématique (l'anglais ne varie pas
-            # de la même façon selon le pays pour un titre).
-            pays_autorises = {"FR"} if langue.lower() == "fr" else None
-            chemin = meilleur_backdrop_tmdb_langue(images_tmdb, langue, pays_autorises=pays_autorises)
+        # 1) TMDB français (pays FR ou non renseigné uniquement).
+        if self.langue_preferee:
+            chemin = meilleur_backdrop_tmdb_langue(images_tmdb, self.langue_preferee, pays_autorises={"FR"})
             if chemin:
-                # On relit les tags BRUTS tels que renvoyés par l'API TMDB
-                # (langue ET pays), pas juste ce qu'on cherchait -- utile
-                # pour repérer un futur cas mal classé sans deviner.
-                brut = next(
-                    (b for b in (images_tmdb.get("backdrops") or []) if b.get("file_path") == chemin),
-                    {},
-                )
+                brut: dict[str, Any] = next((b for b in (images_tmdb.get("backdrops") or []) if b.get("file_path") == chemin), {})
                 image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin}")
                 if image:
                     logging.info(
-                        "[TUILE] tmdb_id=%s -> retenu : TMDB backdrop %s (recherché='%s', tag brut API : langue='%s' pays='%s')",
-                        tmdb_id, chemin, langue, brut.get("iso_639_1"), brut.get("iso_3166_1"),
+                        "[TUILE] tmdb_id=%s -> retenu (1) : TMDB backdrop %s (langue='%s' pays='%s')",
+                        tmdb_id, chemin, brut.get("iso_639_1"), brut.get("iso_3166_1"),
                     )
                     return image
-                logging.debug("[TUILE] tmdb_id=%s : TMDB backdrop '%s' trouvé mais téléchargement échoué", tmdb_id, langue)
+                logging.debug("[TUILE] tmdb_id=%s : TMDB backdrop fr trouvé mais téléchargement échoué", tmdb_id)
 
-            fanart_data = obtenir_fanart_data()
-            if fanart_data:
-                for type_nom in ("background", "thumb"):
-                    url = self.fanart.url_par_type_et_langue(fanart_data, media_type, type_nom, langue)
-                    if url:
-                        image = self._telecharger_une_image(url)
+        # 2) Fanart "thumb" anglais uniquement -- pas de clé configurée ou
+        # pas de données : palier simplement sauté (pas d'erreur, cas
+        # normal et fréquent).
+        if self.fanart.cle_api:
+            identifiant_fanart = self.tmdb.recuperer_tvdb_id(tmdb_id) if media_type == "tv" else tmdb_id
+            if not identifiant_fanart:
+                logging.warning("[TUILE] tmdb_id=%s (tv) : échec de conversion tmdb_id->tvdb_id, Fanart sauté", tmdb_id)
+            else:
+                fanart_data = self.fanart.donnees(identifiant_fanart, media_type)
+                if fanart_data:
+                    url_thumb_en = self.fanart.url_par_type_et_langue(fanart_data, media_type, "thumb", "en")
+                    if url_thumb_en:
+                        image = self._telecharger_une_image(url_thumb_en)
                         if image:
-                            logging.debug("[TUILE] tmdb_id=%s -> retenu : Fanart '%s' langue '%s'", tmdb_id, type_nom, langue)
+                            logging.info("[TUILE] tmdb_id=%s -> retenu (2) : Fanart thumb anglais", tmdb_id)
                             return image
+                elif fanart_data is None:
+                    logging.debug("[TUILE] tmdb_id=%s : Fanart n'a renvoyé aucune donnée exploitable (voir logs [FANART] ci-dessus)", tmdb_id)
 
-                url_clearart = self.fanart.url_par_type_et_langue(fanart_data, media_type, "clearart", langue)
-                if url_clearart:
-                    clearart = self._telecharger_une_image(url_clearart)
-                    if clearart:
-                        fond = self._obtenir_fond_pour_clearart(fanart_data, media_type, backdrop_path)
-                        logging.debug("[TUILE] tmdb_id=%s -> retenu : Fanart clearart langue '%s' composé sur fond", tmdb_id, langue)
-                        return mosaique_module.composer_sur_fond(clearart, fond) if fond else clearart
+        # 3) TMDB anglais.
+        chemin_en = meilleur_backdrop_tmdb_langue(images_tmdb, "en")
+        if chemin_en:
+            image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin_en}")
+            if image:
+                logging.info("[TUILE] tmdb_id=%s -> retenu (3) : TMDB backdrop anglais %s", tmdb_id, chemin_en)
+                return image
+            logging.debug("[TUILE] tmdb_id=%s : TMDB backdrop en trouvé mais téléchargement échoué", tmdb_id)
 
-        # Repli texté supplémentaire : backdrop TMDB tagué avec la langue
-        # ORIGINALE du titre (ex: coréen pour un drama coréen), si elle
-        # diffère de fr/en et qu'aucun des deux n'a abouti ci-dessus.
+        # 4) TMDB langue native du titre (si différente de fr/en).
         if langue_originale and langue_originale.lower() not in {(self.langue_preferee or "").lower(), "en"}:
             chemin_natif = meilleur_backdrop_tmdb_langue(images_tmdb, langue_originale)
             if chemin_natif:
                 image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin_natif}")
                 if image:
                     logging.info(
-                        "[TUILE] tmdb_id=%s -> retenu (après échec fr/en) : TMDB backdrop langue native '%s'", tmdb_id, langue_originale,
+                        "[TUILE] tmdb_id=%s -> retenu (4) : TMDB backdrop langue native '%s'", tmdb_id, langue_originale,
                     )
                     return image
 
-        # Dernier recours : sans texte
-        fanart_data = obtenir_fanart_data()
-        if fanart_data:
-            for type_nom in ("background", "thumb"):
-                url = self.fanart.url_par_type_et_langue(fanart_data, media_type, type_nom, None)
-                if url:
-                    image = self._telecharger_une_image(url)
-                    if image:
-                        logging.info("[TUILE] tmdb_id=%s -> REPLI SANS TEXTE : Fanart '%s' non taggué", tmdb_id, type_nom)
-                        return image
-
-            url_clearart = self.fanart.url_par_type_et_langue(fanart_data, media_type, "clearart", None)
-            if url_clearart:
-                clearart = self._telecharger_une_image(url_clearart)
-                if clearart:
-                    fond = self._obtenir_fond_pour_clearart(fanart_data, media_type, backdrop_path)
-                    logging.info("[TUILE] tmdb_id=%s -> REPLI SANS TEXTE : Fanart clearart non taggué", tmdb_id)
-                    return mosaique_module.composer_sur_fond(clearart, fond) if fond else clearart
-
+        # 5) TMDB générique (non tagué, sans texte).
         chemin_generique = meilleur_backdrop_tmdb_langue(images_tmdb, None)
         if chemin_generique:
             image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin_generique}")
             if image:
-                logging.info("[TUILE] tmdb_id=%s -> REPLI SANS TEXTE : backdrop TMDB générique non taggué", tmdb_id)
+                logging.info("[TUILE] tmdb_id=%s -> retenu (5) : TMDB backdrop générique non taggué", tmdb_id)
                 return image
 
+        # 6) Dernier recours silencieux : backdrop brut déjà connu, aucune requête de plus.
         if backdrop_path:
-            logging.info("[TUILE] tmdb_id=%s -> DERNIER RECOURS : backdrop brut du candidat (aucune cascade n'a abouti)", tmdb_id)
+            logging.info("[TUILE] tmdb_id=%s -> retenu (6, dernier recours) : backdrop brut du candidat", tmdb_id)
             return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path}")
         logging.warning("[TUILE] tmdb_id=%s -> ÉCHEC TOTAL : aucune image trouvée", tmdb_id)
         return None
