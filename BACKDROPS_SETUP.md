@@ -15,11 +15,12 @@ adapté à la structure de collections propre à ce dépôt.
 5. Utilisation
 6. Export AIOMetadata
 7. MDBList
-8. Mise à jour des URLs
-9. Structure de fichiers
-10. Dépannage
-11. Résilience aux renommages de groupes
-12. Idées pour plus tard
+8. Catalogues Stremio "custom" (Bingecat & co)
+9. Mise à jour des URLs
+10. Structure de fichiers
+11. Dépannage
+12. Résilience aux renommages de groupes
+13. Idées pour plus tard
 
 ## 🎯 Comment ça marche
 
@@ -372,6 +373,38 @@ nécessite aucune clé -- mais qui ne fonctionne que pour des listes
 **publiques** et seulement quand la liste est identifiée par
 `mdblistUrl`/`mdblistUser`+`mdblistSlug` (pas par `mdblistId` seul, qui
 lui nécessite une clé API).
+
+## 🐱 Catalogues Stremio "custom" (Bingecat & co)
+
+Certains catalogues ajoutés depuis l'addon AIOMetadata ne sont ni du
+`discover` TMDB ni du MDBList, mais un catalogue Stremio "maison" tiers
+(`source: "custom"` dans l'export, avec une `sourceUrl`) -- c'est le cas
+de **Bingecat**, utilisé pour le dossier "Recommandation" (catalogues
+"AI Recommendations", "Latest movies/series for you", etc.).
+
+Ces catalogues renvoient un JSON Stremio classique (`{"metas": [...]}`)
+dont chaque item est identifié par son **id IMDb** (`tt...`), pas par un
+id TMDB -- le pipeline convertit chacun via l'endpoint TMDB `/find`
+(`external_source=imdb_id`) avant de rentrer dans la cascade de
+résolution de backdrop habituelle. Résolution automatique dès que
+`--aiometadata Templates/aiometadata-setup.json` est fourni (comme pour
+MDBList) : aucune configuration supplémentaire n'est nécessaire côté
+`Nuvio-Collections-Dwade58200.json`, tant que le catalogue est bien
+présent dans l'export.
+
+> **Note sur l'URL** : Bingecat exporte parfois une `sourceUrl` où le
+> paramètre `?bcv=6` de l'addon est positionné AVANT le chemin de la
+> ressource (`.../nuvio?bcv=6/catalog/movie/x.json` au lieu de
+> `.../nuvio/catalog/movie/x.json?bcv=6`) -- ce qui la rend invalide pour
+> n'importe quel client HTTP standard (tout ce qui suit le `?` est traité
+> comme une query string). Le pipeline corrige automatiquement ce format
+> avant chaque requête (`corriger_url_catalogue_mal_formee`), aucune
+> action manuelle nécessaire.
+
+Avec ce mécanisme, les recommandations MDBList personnalisées
+(`mdblist.recommended.*`, voir ci-dessus, jamais résolvables) peuvent
+être remplacées par les catalogues Bingecat équivalents pour le dossier
+"Recommandation", qui eux fonctionnent bien via ce chemin.
 
 ## 🔗 Mise à jour des URLs (`heroBackdropUrl`)
 
