@@ -162,6 +162,7 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🫵",
         "focusGifUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/focused/recommended.webp",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Recommandation_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Recommandation.png?raw=true",
         "catalogSources": [
@@ -268,6 +269,7 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "⬆️",
         "focusGifUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/discover/focused/trending.gif?raw=true",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Tendance_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Tendance.png?raw=true",
         "catalogSources": [
@@ -326,6 +328,7 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔥",
         "focusGifUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/focused/popular.webp",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Populaire_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Populaire.png?raw=true",
         "catalogSources": [
@@ -384,6 +387,7 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏆",
         "focusGifUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/focused/top-rated.webp",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/TOP_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/TOP.png?raw=true",
         "catalogSources": [
@@ -409,22 +413,7 @@
         "sources": [
           {
             "type": "Film",
-            "genre": "",
-            "title": null,
-            "sortBy": null,
-            "tmdbId": null,
-            "addonId": "aio-metadata",
-            "filters": null,
-            "sortHow": null,
-            "provider": "addon",
-            "catalogId": "mdblist.131775",
-            "mediaType": null,
-            "traktListId": null,
-            "tmdbSourceType": null
-          },
-          {
-            "type": "Film",
-            "genre": "",
+            "genre": "None",
             "title": null,
             "sortBy": null,
             "tmdbId": null,
@@ -439,7 +428,7 @@
           },
           {
             "type": "Film",
-            "genre": "",
+            "genre": "None",
             "title": null,
             "sortBy": null,
             "tmdbId": null,
@@ -454,7 +443,7 @@
           },
           {
             "type": "Film",
-            "genre": "",
+            "genre": "None",
             "title": null,
             "sortBy": null,
             "tmdbId": null,
@@ -462,29 +451,14 @@
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "mdblist.30875",
-            "mediaType": null,
-            "traktListId": null,
-            "tmdbSourceType": null
-          },
-          {
-            "type": "Film",
-            "genre": "",
-            "title": null,
-            "sortBy": null,
-            "tmdbId": null,
-            "addonId": "aio-metadata",
-            "filters": null,
-            "sortHow": null,
-            "provider": "addon",
-            "catalogId": "mdblist.194886",
+            "catalogId": "tmdb.discover.movie.top_france.mtkl4inv",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
           },
           {
             "type": "Série",
-            "genre": "",
+            "genre": "None",
             "title": null,
             "sortBy": null,
             "tmdbId": null,
@@ -492,48 +466,47 @@
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "mdblist.30898",
+            "catalogId": "tmdb.discover.series.populaires_france.mtklkcwb",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🇫🇷",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Francais_Logo.png?raw=true",
+        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Francais.png?raw=true",
         "catalogSources": [
           {
             "type": "Film",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.131775"
-          },
-          {
-            "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.29598"
           },
           {
             "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.125891"
           },
           {
             "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "mdblist.30875"
-          },
-          {
-            "type": "Film",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.194886"
+            "catalogId": "tmdb.discover.movie.top_france.mtkl4inv"
           },
           {
             "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "mdblist.30898"
+            "catalogId": "tmdb.discover.series.populaires_france.mtklkcwb"
           }
         ],
-        "focusGifEnabled": false
+        "focusGifEnabled": false,
+        "heroBackdropUrl": ""
       },
       {
         "id": "41b5c194-a78c-4b81-a8ad-16f0263f662c",
@@ -558,6 +531,8 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📺",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/TV_Logo.jpg?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/TV.webp?raw=true",
         "catalogSources": [
@@ -593,6 +568,8 @@
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧲",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Magnet_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Magnet.png?raw=true",
         "catalogSources": [
@@ -603,12 +580,14 @@
             "catalogId": "custom.community_stremio_intell_debrid_search.other.IntellDebridSearch"
           }
         ],
-        "focusGifEnabled": false
+        "focusGifEnabled": false,
+        "heroBackdropUrl": ""
       }
     ],
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
+    "backdropImageUrl": "",
     "focusGlowEnabled": true
   },
   {
@@ -3604,6 +3583,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧑‍🎓",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Adolescence_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Adolescence.png?raw=true",
         "catalogSources": [
@@ -3661,6 +3642,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🥋",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Arts_Martiaux_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Arts_Martiaux.png?raw=true",
         "catalogSources": [
@@ -3715,9 +3698,11 @@
             "tmdbSourceType": null
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "💰",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Chasse_au_Tresor_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Chasse_au_Tresor.png?raw=true",
         "catalogSources": [
@@ -3775,6 +3760,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🥰",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Comedie_Romantique_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Comedie_Romantique.png?raw=true",
         "catalogSources": [
@@ -3832,6 +3819,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🕵️",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Espionnage_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Espionnage.png?raw=true",
         "catalogSources": [
@@ -3889,6 +3878,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🌌",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Espace_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Espace.png?raw=true",
         "catalogSources": [
@@ -4168,13 +4159,16 @@
             "tmdbSourceType": "DIRECTOR"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎬",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Grands_Realisateurs_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Grands_Realisateurs.png?raw=true",
         "catalogSources": [],
-        "focusGifEnabled": false
+        "focusGifEnabled": false,
+        "heroBackdropUrl": ""
       },
       {
         "id": "folder-cafccf4a",
@@ -4211,9 +4205,11 @@
             "tmdbSourceType": null
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📖",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Faits-Reels_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Faits-Reels.png?raw=true",
         "catalogSources": [
@@ -4230,7 +4226,8 @@
             "catalogId": "tmdb.discover.series.inspire_de_faits_reels.0e8x59op"
           }
         ],
-        "focusGifEnabled": false
+        "focusGifEnabled": false,
+        "heroBackdropUrl": ""
       },
       {
         "id": "folder-4ba5b053",
@@ -4270,6 +4267,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🪄",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Magie_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Magie.png?raw=true",
         "catalogSources": [
@@ -4312,6 +4311,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎉",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Sitcoms_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Sitcoms.png?raw=true",
         "catalogSources": [
@@ -4363,6 +4364,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🦸",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Super-Heros_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Super-Heros.png?raw=true",
         "catalogSources": [
@@ -4420,6 +4423,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧛",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Vampires_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Vampires.png?raw=true",
         "catalogSources": [
@@ -4477,6 +4482,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😈",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Vengeance_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Vengeance.png?raw=true",
         "catalogSources": [
@@ -4534,6 +4541,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🕰️",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Voyage_Temporel_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Voyage_Temporel.png?raw=true",
         "catalogSources": [
@@ -4557,6 +4566,7 @@
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
+    "backdropImageUrl": "",
     "focusGlowEnabled": true
   },
   {
@@ -5191,6 +5201,339 @@
     "viewMode": "TABBED_GRID",
     "showAllTab": true,
     "focusGlowEnabled": false
+  },
+  {
+    "id": "9c0d5ab6-9ce2-4459-aac3-5f81247cabc3",
+    "title": "🎌 Animés",
+    "folders": [
+      {
+        "id": "folder-b5be81c4",
+        "title": "Nouveautés",
+        "sources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.207754"
+          },
+          {
+            "type": "series",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.29911"
+          },
+          {
+            "type": "Film",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.7764"
+          }
+        ],
+        "hideTitle": true,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "🆕",
+        "focusGifUrl": "https://i.ibb.co/RKWkVK0/Nouveautes.png",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://i.ibb.co/vv68RLPV/nouveautes.png",
+        "coverImageUrl": "https://i.ibb.co/zVxgh28r/nouveautes.png",
+        "catalogSources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.207754"
+          },
+          {
+            "type": "series",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.29911"
+          },
+          {
+            "type": "Film",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.7764"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": "https://i.ibb.co/HLwpyGcx/Anime-Nouveautes.png"
+      },
+      {
+        "id": "folder-a9bd00e9",
+        "title": "Populaires",
+        "sources": [
+          {
+            "type": "series",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.29910"
+          },
+          {
+            "type": "movie",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.29928"
+          }
+        ],
+        "hideTitle": true,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "🔥",
+        "focusGifUrl": "https://i.ibb.co/BHqty0jC/Populaires.png",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://i.ibb.co/MkNGXFX5/Populaires.png",
+        "coverImageUrl": "https://i.ibb.co/p9XtHwQ/Populaires.png",
+        "catalogSources": [
+          {
+            "type": "series",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.29910"
+          },
+          {
+            "type": "movie",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.29928"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": "https://i.ibb.co/gbqF8t0P/Anime-Nouveautes.png"
+      },
+      {
+        "id": "folder-a520d1cc",
+        "title": "Top",
+        "sources": [
+          {
+            "type": "series",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.30461"
+          },
+          {
+            "type": "Film",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.195911"
+          }
+        ],
+        "hideTitle": true,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "🏆",
+        "focusGifUrl": "https://i.ibb.co/6RJftCGS/Les-mieux-notes.png",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://i.ibb.co/ccR6s3gw/Les-mieux-notes.png",
+        "coverImageUrl": "https://i.ibb.co/5WxPwXQh/Les-mieux-notes.png",
+        "catalogSources": [
+          {
+            "type": "series",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.30461"
+          },
+          {
+            "type": "Film",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.195911"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": "https://i.ibb.co/QFhkkdcm/anime-les-mieux-notes.png"
+      },
+      {
+        "id": "folder-anime-ghibli",
+        "title": "Studio Ghibli",
+        "sources": [
+          {
+            "type": "movie",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.29927"
+          }
+        ],
+        "hideTitle": true,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "⛩️",
+        "focusGifUrl": "https://i.ibb.co/0p7ZBJpG/Studio-Ghibli.png",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://i.ibb.co/yBpNhBcG/Studio-Ghibli.png",
+        "coverImageUrl": "https://i.ibb.co/nqpHqD44/Studio-Ghibli.png",
+        "catalogSources": [
+          {
+            "type": "movie",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.29927"
+          }
+        ],
+        "focusGifEnabled": true,
+        "heroBackdropUrl": "https://i.ibb.co/ns7fv1ST/ghibli.png"
+      },
+      {
+        "id": "folder-23813a61",
+        "title": "20s",
+        "sources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.25240"
+          }
+        ],
+        "hideTitle": true,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "🧟",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://i.ibb.co/7tFWbSst/Anime-20s-Logo.png",
+        "coverImageUrl": "https://i.ibb.co/TDdqD3tn/Anime-20s.png",
+        "catalogSources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.25240"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": "https://i.ibb.co/whvPcFjq/Anime-20s-Background.jpg"
+      },
+      {
+        "id": "folder-e33bbf93",
+        "title": "10s",
+        "sources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.25241"
+          }
+        ],
+        "hideTitle": true,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "👹",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://i.ibb.co/WpGhyTDJ/Anime-10s-Logo.png",
+        "coverImageUrl": "https://i.ibb.co/HDr3BNMd/Anime-10s.png",
+        "catalogSources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.25241"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": "https://i.ibb.co/FcJDRK2/Anime-10s-Background.jpg"
+      },
+      {
+        "id": "folder-55cdf553",
+        "title": "00s",
+        "sources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.25242"
+          }
+        ],
+        "hideTitle": true,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "🥷",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://i.ibb.co/n8MDFkQR/Anime-00s-Logo.png",
+        "coverImageUrl": "https://i.ibb.co/FqmTr03B/Anime-00s.png",
+        "catalogSources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.25242"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": "https://i.ibb.co/39D06Nry/Anime-00s-Background.jpg"
+      },
+      {
+        "id": "folder-6127dc59",
+        "title": "90s",
+        "sources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.25243"
+          }
+        ],
+        "hideTitle": true,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "🏴‍☠️",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://i.ibb.co/TDZRJrBt/Anime-90s-Logo.png",
+        "coverImageUrl": "https://i.ibb.co/C5v6k4dH/Anime-90s.png",
+        "catalogSources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.25243"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": "https://i.ibb.co/xKJ8JSkF/Anime-90s-Background.webp"
+      },
+      {
+        "id": "folder-f3b75c30",
+        "title": "80s",
+        "sources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "mdblist.25244"
+          }
+        ],
+        "hideTitle": true,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "🐲",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "https://i.ibb.co/Pzwxdv0B/Anime-80s-Logo.png",
+        "coverImageUrl": "https://i.ibb.co/SXJLCLS8/Anime-80s.png",
+        "catalogSources": [
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "mdblist.25244"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": "https://i.ibb.co/SXQdjjRj/Anime-80s-Background.jpg"
+      }
+    ],
+    "pinToTop": false,
+    "viewMode": "FOLLOW_LAYOUT",
+    "showAllTab": true,
+    "backdropImageUrl": "https://raw.githubusercontent.com/Trk88pl/TRK88-COLLECTIONS/main/anime.png",
+    "focusGlowEnabled": true
   },
   {
     "id": "collection-3b262792",
@@ -11603,378 +11946,6 @@
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
-    "focusGlowEnabled": true
-  },
-  {
-    "id": "9c0d5ab6-9ce2-4459-aac3-5f81247cabc3",
-    "title": "🎌 Animés",
-    "folders": [
-      {
-        "id": "folder-b5be81c4",
-        "title": "Nouveautés",
-        "sources": [
-          {
-            "title": "Nouveaux Animés",
-            "sortBy": "primary_release_date.desc",
-            "tmdbId": null,
-            "filters": {
-              "withGenres": "16",
-              "voteCountGte": 5,
-              "withOriginalLanguage": "ja"
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Nouveaux Animés",
-            "sortBy": "first_air_date.desc",
-            "tmdbId": null,
-            "filters": {
-              "withGenres": "16",
-              "voteCountGte": 5,
-              "withOriginalLanguage": "ja"
-            },
-            "provider": "tmdb",
-            "mediaType": "TV",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.207754"
-          },
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.128038"
-          },
-          {
-            "type": "Film",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.128039"
-          }
-        ],
-        "hideTitle": true,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "🆕",
-        "focusGifUrl": "https://i.ibb.co/RKWkVK0/Nouveautes.png",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://i.ibb.co/vv68RLPV/nouveautes.png",
-        "coverImageUrl": "https://i.ibb.co/zVxgh28r/nouveautes.png",
-        "catalogSources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.207754"
-          },
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.128038"
-          },
-          {
-            "type": "Film",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.128039"
-          }
-        ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://i.ibb.co/HLwpyGcx/Anime-Nouveautes.png"
-      },
-      {
-        "id": "folder-a9bd00e9",
-        "title": "Populaires",
-        "sources": [
-          {
-            "type": "series",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.29910"
-          },
-          {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.29928"
-          }
-        ],
-        "hideTitle": true,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "🔥",
-        "focusGifUrl": "https://i.ibb.co/BHqty0jC/Populaires.png",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://i.ibb.co/MkNGXFX5/Populaires.png",
-        "coverImageUrl": "https://i.ibb.co/p9XtHwQ/Populaires.png",
-        "catalogSources": [
-          {
-            "type": "series",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.29910"
-          },
-          {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.29928"
-          }
-        ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://i.ibb.co/gbqF8t0P/Anime-Nouveautes.png"
-      },
-      {
-        "id": "folder-a520d1cc",
-        "title": "Top",
-        "sources": [
-          {
-            "title": "Top Anime",
-            "sortBy": "vote_average.desc",
-            "tmdbId": null,
-            "filters": {
-              "withGenres": "16",
-              "voteCountGte": 250,
-              "withOriginalLanguage": "ja"
-            },
-            "provider": "tmdb",
-            "mediaType": "MOVIE",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "title": "Top Anime",
-            "sortBy": "vote_average.desc",
-            "tmdbId": null,
-            "filters": {
-              "withGenres": "16",
-              "voteCountGte": 100,
-              "withOriginalLanguage": "ja"
-            },
-            "provider": "tmdb",
-            "mediaType": "TV",
-            "tmdbSourceType": "DISCOVER"
-          },
-          {
-            "type": "series",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.30461"
-          }
-        ],
-        "hideTitle": true,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "🏆",
-        "focusGifUrl": "https://i.ibb.co/6RJftCGS/Les-mieux-notes.png",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://i.ibb.co/ccR6s3gw/Les-mieux-notes.png",
-        "coverImageUrl": "https://i.ibb.co/5WxPwXQh/Les-mieux-notes.png",
-        "catalogSources": [
-          {
-            "type": "series",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.30461"
-          }
-        ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://i.ibb.co/QFhkkdcm/anime-les-mieux-notes.png"
-      },
-      {
-        "id": "folder-anime-ghibli",
-        "title": "Studio Ghibli",
-        "sources": [
-          {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.29927"
-          }
-        ],
-        "hideTitle": true,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "⛩️",
-        "focusGifUrl": "https://i.ibb.co/0p7ZBJpG/Studio-Ghibli.png",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://i.ibb.co/yBpNhBcG/Studio-Ghibli.png",
-        "coverImageUrl": "https://i.ibb.co/nqpHqD44/Studio-Ghibli.png",
-        "catalogSources": [
-          {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.29927"
-          }
-        ],
-        "focusGifEnabled": true,
-        "heroBackdropUrl": "https://i.ibb.co/ns7fv1ST/ghibli.png"
-      },
-      {
-        "id": "folder-23813a61",
-        "title": "20s",
-        "sources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.25240"
-          }
-        ],
-        "hideTitle": true,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "🧟",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://i.ibb.co/7tFWbSst/Anime-20s-Logo.png",
-        "coverImageUrl": "https://i.ibb.co/TDdqD3tn/Anime-20s.png",
-        "catalogSources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.25240"
-          }
-        ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://i.ibb.co/whvPcFjq/Anime-20s-Background.jpg"
-      },
-      {
-        "id": "folder-e33bbf93",
-        "title": "10s",
-        "sources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.25241"
-          }
-        ],
-        "hideTitle": true,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "👹",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://i.ibb.co/WpGhyTDJ/Anime-10s-Logo.png",
-        "coverImageUrl": "https://i.ibb.co/HDr3BNMd/Anime-10s.png",
-        "catalogSources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.25241"
-          }
-        ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://i.ibb.co/FcJDRK2/Anime-10s-Background.jpg"
-      },
-      {
-        "id": "folder-55cdf553",
-        "title": "00s",
-        "sources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.25242"
-          }
-        ],
-        "hideTitle": true,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "🥷",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://i.ibb.co/n8MDFkQR/Anime-00s-Logo.png",
-        "coverImageUrl": "https://i.ibb.co/FqmTr03B/Anime-00s.png",
-        "catalogSources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.25242"
-          }
-        ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://i.ibb.co/39D06Nry/Anime-00s-Background.jpg"
-      },
-      {
-        "id": "folder-6127dc59",
-        "title": "90s",
-        "sources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.25243"
-          }
-        ],
-        "hideTitle": true,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "🏴‍☠️",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://i.ibb.co/TDZRJrBt/Anime-90s-Logo.png",
-        "coverImageUrl": "https://i.ibb.co/C5v6k4dH/Anime-90s.png",
-        "catalogSources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.25243"
-          }
-        ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://i.ibb.co/xKJ8JSkF/Anime-90s-Background.webp"
-      },
-      {
-        "id": "folder-f3b75c30",
-        "title": "80s",
-        "sources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.25244"
-          }
-        ],
-        "hideTitle": true,
-        "tileShape": "LANDSCAPE",
-        "coverEmoji": "🐲",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
-        "titleLogoUrl": "https://i.ibb.co/Pzwxdv0B/Anime-80s-Logo.png",
-        "coverImageUrl": "https://i.ibb.co/SXJLCLS8/Anime-80s.png",
-        "catalogSources": [
-          {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.25244"
-          }
-        ],
-        "focusGifEnabled": false,
-        "heroBackdropUrl": "https://i.ibb.co/SXQdjjRj/Anime-80s-Background.jpg"
-      }
-    ],
-    "pinToTop": false,
-    "viewMode": "FOLLOW_LAYOUT",
-    "showAllTab": true,
-    "backdropImageUrl": "https://raw.githubusercontent.com/Trk88pl/TRK88-COLLECTIONS/main/anime.png",
     "focusGlowEnabled": true
   }
 ]
