@@ -145,7 +145,7 @@ de réponse `429`).
 
 Tous les groupes de collections ne sont pas ciblés par le script -- soit
 parce qu'un catalogue n'a pas d'équivalent TMDB exploitable, soit par
-choix délibéré. Sur ceux qui **sont** ciblés (54 dossiers), la couverture
+choix délibéré. Sur ceux qui **sont** ciblés (63 dossiers), la couverture
 est désormais complète (voir note sur "Recommandation" ci-dessous) :
 
 | Groupe | Ciblé | Résolus | Notes |
@@ -155,6 +155,7 @@ est désormais complète (voir note sur "Recommandation" ci-dessous) :
 | 🎭 Genres | 15 / 15 dossiers | 15 / 15 | ✅ |
 | 🎨 Thématiques | 14 / 14 dossiers | 14 / 14 | ✅ (résolu via l'export AIOMetadata + MDBList) |
 | 🎭 Vibe | 4 / 4 dossiers | 4 / 4 | ✅ |
+| 🎌 Animés | 9 / 9 dossiers | 9 / 9 | ✅ résolu via MDBList (export AIOMetadata), non encore vérifié en conditions réelles |
 | 📅 Années | 8 / 8 dossiers | 8 / 8 | ✅ |
 | 🎞️ Franchises | 0 / 158 dossiers | -- | groupe entier désactivé volontairement (trop de dossiers, peu pertinent) |
 | 🏃 Sports | 0 / 7 dossiers | -- | groupe entier désactivé volontairement (pas pertinent pour un backdrop) |
