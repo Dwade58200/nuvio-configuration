@@ -16,6 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from generer_backdrops import (  # noqa: E402
+    GROUPE_ANIMES,
     GROUPE_DECOUVRIR,
     GROUPE_FRANCHISES,
     GROUPE_GENRES,
@@ -55,6 +56,7 @@ def test_titres_groupes_reconnus_quelle_que_soit_la_variante_emoji():
     variantes_genres = ["🎭Genres", "🎭 Genres", "genres", "Genres"]
     variantes_streaming = ["🎬Services de Streaming", "🎬 Services de Streaming"]
     variantes_vibes = ["Vibe", "🎭 Vibe", "✨ Vibe"]
+    variantes_animes = ["Animés", "🎌 Animés", "🎌Animes", "animes"]
     variantes_franchises = ["Franchises", "🎞️ Franchises"]
     variantes_sports = ["Sports", "🏃‍♂️ Sports"]
 
@@ -64,6 +66,8 @@ def test_titres_groupes_reconnus_quelle_que_soit_la_variante_emoji():
         assert normaliser(variante) == GROUPE_STREAMING, variante
     for variante in variantes_vibes:
         assert normaliser(variante) == GROUPE_VIBES, variante
+    for variante in variantes_animes:
+        assert normaliser(variante) == GROUPE_ANIMES, variante
     for variante in variantes_franchises:
         assert normaliser(variante) == GROUPE_FRANCHISES, variante
     for variante in variantes_sports:
@@ -94,6 +98,15 @@ def test_streaming_est_maintenant_actif():
 def test_genres_tous_actifs():
     assert dossier_actif(GROUPE_GENRES, "Action") is True
     assert dossier_actif(GROUPE_GENRES, "Comédie") is True
+
+
+def test_animes_tous_actifs():
+    """Tous les dossiers Animés sont résolubles via MDBList/AIOMetadata
+    (aucun filtre inclusion/exclusion nécessaire, contrairement à
+    Découvrir)."""
+    assert dossier_actif(GROUPE_ANIMES, "Nouveautés") is True
+    assert dossier_actif(GROUPE_ANIMES, "Studio Ghibli") is True
+    assert dossier_actif(GROUPE_ANIMES, "20s") is True
 
 
 def test_decouvrir_filtre_inclusion_exclusion():
@@ -723,6 +736,7 @@ def test_groupe_slugs_sont_en_francais():
     assert GROUPE_SLUGS[GROUPE_STREAMING] == "Services de Streaming"
     assert GROUPE_SLUGS[GROUPE_THEMATIQUES] == "Thematiques"
     assert GROUPE_SLUGS[GROUPE_VIBES] == "Vibes"
+    assert GROUPE_SLUGS[GROUPE_ANIMES] == "Animes"
     assert GROUPE_SLUGS[GROUPE_FRANCHISES] == "Franchises"
     assert GROUPE_SLUGS[GROUPE_SPORTS] == "Sports"
     assert GROUPE_SLUGS[GROUPE_DECOUVRIR] == "Decouvertes"
@@ -748,6 +762,27 @@ def test_noms_backdrop_personnalises_exacts():
         "Super-Héros": "Super-Heros_Backdrop",
         "Voyage Temporel": "Voyage_Temporel_Backdrop",
         "Retournent le cerveau": "Retournent_Cerveau_Backdrop",
+    }
+    for titre, attendu in correspondances.items():
+        assert nom_fichier_backdrop(titre) == attendu, titre
+
+
+def test_noms_fichiers_dossiers_animes_generiques_sans_table_personnalisee():
+    """Les 9 dossiers Animés n'ont pas besoin d'entrée dans
+    NOMS_BACKDROP_PERSONNALISES -- le repli générique suffit déjà (accents
+    retirés, décennies laissées telles quelles)."""
+    from generer_backdrops import nom_fichier_backdrop
+
+    correspondances = {
+        "Nouveautés": "Nouveautes_Backdrop",
+        "Populaires": "Populaires_Backdrop",
+        "Top": "Top_Backdrop",
+        "Studio Ghibli": "Studio_Ghibli_Backdrop",
+        "20s": "20s_Backdrop",
+        "10s": "10s_Backdrop",
+        "00s": "00s_Backdrop",
+        "90s": "90s_Backdrop",
+        "80s": "80s_Backdrop",
     }
     for titre, attendu in correspondances.items():
         assert nom_fichier_backdrop(titre) == attendu, titre
