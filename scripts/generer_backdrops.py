@@ -58,6 +58,7 @@ import sys
 import threading
 import time
 import unicodedata
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date as _date
 from pathlib import Path
@@ -1476,7 +1477,9 @@ class GenerateurBackdrops:
 
         return [images[i] for i in sorted(images)]
 
-    def _resoudre_liste_candidats(self, requete: RequeteTMDB, cible: int, pages: int) -> list[tuple[str | None, int, str, str | None]]:
+    def _resoudre_liste_candidats(
+        self, requete: RequeteTMDB, cible: int, pages: int
+    ) -> Sequence[tuple[str | None, int, str, str | None]]:
         """Résout une requête en liste de candidats (backdrop_path, tmdb_id,
         media_type, langue_originale) -- gère aussi bien les requêtes TMDB
         classiques que les listes MDBList (`kind == "mdblist_liste"`) et les
@@ -1517,7 +1520,7 @@ class GenerateurBackdrops:
         cible = mosaique_module.nombre_cellules_grille(largeur, hauteur, echelle=largeur / 1920)
         pages_necessaires = min(6, math.ceil(cible / 18) + 1)
 
-        candidats: list[tuple[str, int, str, str | None]] = []
+        candidats: list[tuple[str | None, int, str, str | None]] = []
         vus: set[tuple[str, int]] = set()
 
         # on interleave les requêtes pour ne pas être dominé par la première
