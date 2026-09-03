@@ -99,6 +99,7 @@ GROUPE_STREAMING = "services de streaming"
 GROUPE_GENRES = "genres"
 GROUPE_THEMATIQUES = "thematiques"
 GROUPE_VIBES = "vibe"
+GROUPE_ANIMES = "animes"
 GROUPE_ANNEES = "annees"
 GROUPE_FRANCHISES = "franchises"
 GROUPE_SPORTS = "sports"
@@ -131,6 +132,7 @@ GROUPE_SLUGS: dict[str, str] = {
     GROUPE_GENRES: "Genres",
     GROUPE_THEMATIQUES: "Thematiques",
     GROUPE_VIBES: "Vibes",
+    GROUPE_ANIMES: "Animes",
     GROUPE_ANNEES: "Annees",
     GROUPE_FRANCHISES: "Franchises",
     GROUPE_SPORTS: "Sports",
@@ -206,6 +208,7 @@ CRITERES_GROUPES: dict[str, CritereGroupe] = {
     GROUPE_GENRES: CritereGroupe(actif=True),
     GROUPE_THEMATIQUES: CritereGroupe(actif=True),
     GROUPE_VIBES: CritereGroupe(actif=True),
+    GROUPE_ANIMES: CritereGroupe(actif=True),  # tout résolu via MDBList/AIOMetadata, aucun filtre nécessaire
     GROUPE_ANNEES: CritereGroupe(actif=True),
     GROUPE_FRANCHISES: CritereGroupe(actif=False),  # désactivé à la demande de l'utilisateur
     GROUPE_SPORTS: CritereGroupe(actif=False),  # pas de backdrop pour le sport
