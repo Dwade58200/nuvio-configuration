@@ -53,11 +53,12 @@ nuvio-configuration/
 
 | Groupe | Dossiers | Exemple de contenu |
 |---|---|---|
-| 🔭 Découvrir | 6 | Recommandation, Tendance, Populaire… |
+| 🔭 Découvrir | 7 | Recommandation, Tendance, Populaire… |
 | 🎬 Services de Streaming | 9 | Netflix, Disney+, Prime Video… |
 | 🎭 Genres | 15 | Action, Comédie, Horreur… |
 | 🎨 Thématiques | 14 | Arts martiaux, Braquage… |
 | 🎭 Vibe | 4 | Ambiances/humeurs de visionnage |
+| 🎌 Animés | 9 | Catalogues animés dédiés |
 | 📅 Années | 8 | Par décennie |
 | 🎞️ Franchises | 158 | Sagas et univers (Marvel, Star Wars…) |
 | 🏃 Sports | 7 | Documentaires/films sportifs par discipline |
@@ -105,10 +106,10 @@ Pour une exécution réelle, deux secrets GitHub sont nécessaires
 ## Qualité & CI
 
 À chaque push/PR, `.github/workflows/tests.yml` fait tourner :
-- **pytest** (120 tests) -- résolution des sources, composition des
+- **pytest** (139 tests) -- résolution des sources, composition des
   mosaïques, mise à jour des URLs, validation du schéma ;
 - **ruff** -- lint (bloquant) ;
-- **mypy** -- vérification de types (informatif) ;
+- **mypy** -- vérification de types (bloquant) ;
 - **`valider_collections.py`** -- conformité de
   `Templates/Nuvio-Collections-Dwade58200.json` à
   `schema/nuvio-collections.schema.json`.
@@ -120,6 +121,14 @@ Pour une exécution réelle, deux secrets GitHub sont nécessaires
 | [`BACKDROPS_SETUP.md`](BACKDROPS_SETUP.md) | Référence technique complète du pipeline : fonctionnement détaillé, options CLI, configuration MDBList/AIOMetadata, dépannage |
 | [`AMELIORATIONS.md`](AMELIORATIONS.md) | Liste de travail : ce qui a été fait, ce qui reste, pistes non planifiées |
 | [`APPLIQUER.md`](APPLIQUER.md) | Journal des corrections de la dernière session en date, pour suivre ce qui a changé |
+
+## Licence
+
+Le code (`scripts/`, `tests/`, `schema/`) est sous licence [MIT](LICENSE).
+Le contenu de `Templates/Nuvio-Collections-Dwade58200.json` et
+`Templates/aiometadata-setup.json` reste une configuration personnelle
+(pas de garantie de compatibilité si réutilisé tel quel avec un autre
+compte AIOMetadata/Nuvio).
 
 ## Usage courant
 
