@@ -61,7 +61,7 @@ nuvio-configuration/
 | 🎌 Animés | 9 | Catalogues animés dédiés |
 | 📅 Années | 8 | Par décennie |
 | 🎞️ Franchises | 158 | Sagas et univers (Marvel, Star Wars…) |
-| 🏃 Sports | 7 | Documentaires/films sportifs par discipline |
+| 🏃 Sports | 9 | Documentaires/films sportifs par discipline |
 
 Pour chaque dossier, `Templates/Nuvio-Collections-Dwade58200.json` précise
 ses `sources` (catalogue TMDB/AIOMetadata/MDBList qui l'alimente), son

@@ -6,7 +6,58 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
-## ✅ Fait (session du 27 août 2026)
+## ✅ Fait (session du 4 septembre 2026, suite -- catalogues France recréés)
+
+- [x] Utilisateur a recréé les catalogues `top_france`/`populaires_france`
+      côté AIOMetadata (mêmes `catalogId`, désormais avec de vrais filtres
+      `with_original_language=fr` + `watch_region=FR` dans l'export)
+- [x] `Templates/aiometadata-setup.json` et
+      `Templates/Nuvio-Collections-Dwade58200.json` remplacés par les
+      exports fournis (2026-09-04) -- groupe Sports passé de 7 à 9 dossiers
+      (Rugby, Autres Sports ; groupe désactivé pour les backdrops, sans
+      impact sur la couverture)
+- [x] **Repli "france" retiré** de `generer_backdrops.py` (devenu inutile
+      -- les 4 sources du dossier "Français" se résolvent maintenant
+      directement via l'export AIOMetadata, avec les vrais filtres TMDB) ;
+      la correction du bug `media_type` (`"Film"`/`"Série"` non normalisé)
+      est conservée, bug indépendant qui touche d'autres dossiers
+- [x] Revalidé : 64/64 dossiers ciblés résolus (0 erreur), `ruff`/`mypy`/
+      `pytest` (139 tests) toujours au vert
+
+---
+
+
+
+- [x] Audit complet du dépôt (structure, CI, schéma, exécution réelle des
+      tests/lint/type-check/dry-run) demandé par l'utilisateur
+- [x] **3 erreurs mypy corrigées** (`list` invariant déclaré trop strict
+      sur `_resoudre_liste_candidats` et `candidats` -- `Sequence` +
+      élargissement à `str | None`) ; `mypy` retiré de `continue-on-error`
+      dans `tests.yml` (devient bloquant comme `ruff`)
+- [x] `LICENSE` ajoutée (MIT) -- couvre le code, pas les fichiers de
+      configuration personnelle sous `Templates/`
+- [x] README resynchronisé : nombre de tests (120 -> 139), groupe
+      "🎌 Animés" (9 dossiers) ajouté au tableau des collections
+      (absent), "Découvrir" corrigé (6 -> 7)
+- [x] Dossier "Découvrir > Français" ajouté aux dossiers ciblés pour la
+      génération de backdrop (`CRITERES_GROUPES[GROUPE_DECOUVRIR].inclure`)
+- [x] **Bug corrigé** : `media_type` pour les sources `provider=addon` se
+      basait sur `source.get("type") == "movie"` (comparaison stricte,
+      anglais minuscule) -- le dossier "Français" utilise `"Film"`/`"Série"`
+      (français, capitalisé), donc un film y était traité comme une série
+      dans les replis de résolution. Même bug potentiel sur ~40 autres
+      sources (`Genres`, `Streaming`, `Animés`, `Franchises`) dès qu'elles
+      tombent sur un repli au lieu de l'export AIOMetadata. Corrigé par
+      normalisation (`normaliser(...) in ("movie", "film")`)
+- [x] Repli dédié ajouté pour les catalogId `tmdb.discover.*france*` non
+      présents dans l'export AIOMetadata actuel (`top_france`,
+      `populaires_france`) : filtre TMDB `with_original_language=fr`
+      plutôt qu'un repli générique "popularité globale" qui aurait produit
+      un visuel quasi identique à "Populaire"/"Top"
+
+---
+
+
 
 - [x] `.github/workflows/tests.yml` créé, déclenché sur `push` (toutes
       branches) et `pull_request` : `pip install -r requirements-dev.txt`,

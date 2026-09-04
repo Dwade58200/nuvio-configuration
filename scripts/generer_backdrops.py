@@ -202,7 +202,7 @@ class CritereGroupe:
 CRITERES_GROUPES: dict[str, CritereGroupe] = {
     GROUPE_DECOUVRIR: CritereGroupe(
         actif=True,
-        inclure=("Recommandation", "Tendance", "Populaire", "Top"),
+        inclure=("Recommandation", "Tendance", "Populaire", "Top", "Français"),
         exclure=("TV", "Magnet"),
     ),
     GROUPE_STREAMING: CritereGroupe(actif=True),  # certains catalogues sont désormais résolubles via TMDB
@@ -505,7 +505,13 @@ def construire_requetes(
 
         elif provider == "addon" and source.get("addonId") == "aio-metadata":
             catalog_id = source.get("catalogId") or ""
-            media_type = "movie" if source.get("type") == "movie" else "tv"
+            # Le champ "type" du JSON n'est pas toujours en anglais minuscule
+            # ("movie"/"tv") -- certains dossiers (ex: "Découvrir > Français")
+            # utilisent "Film"/"Série" (français, capitalisé). On normalise
+            # avant comparaison pour ne pas confondre un film avec une série
+            # dans les replis ci-dessous (l'export AIOMetadata, quand il
+            # connaît le catalogue, prime de toute façon sur cette valeur).
+            media_type = "movie" if normaliser(source.get("type") or "") in ("movie", "film") else "tv"
 
             # Priorité absolue : si un export AIOMetadata a été fourni et
             # connaît ce catalogue exact, on utilise ses VRAIS filtres/

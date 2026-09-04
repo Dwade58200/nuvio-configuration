@@ -145,12 +145,12 @@ de réponse `429`).
 
 Tous les groupes de collections ne sont pas ciblés par le script -- soit
 parce qu'un catalogue n'a pas d'équivalent TMDB exploitable, soit par
-choix délibéré. Sur ceux qui **sont** ciblés (63 dossiers), la couverture
+choix délibéré. Sur ceux qui **sont** ciblés (64 dossiers), la couverture
 est désormais complète (voir note sur "Recommandation" ci-dessous) :
 
 | Groupe | Ciblé | Résolus | Notes |
 |---|---|---|---|
-| 🔭 Découvrir | 4 / 6 dossiers | 4 / 4 | "TV" et "Magnet" volontairement exclus ; "Recommandation" résolu via les catalogues Bingecat (`source: "custom"` dans l'export AIOMetadata, voir section dédiée) -- les listes MDBList "recommandation personnalisée" restent explicitement ignorées (non résolvables), mais ne bloquent plus rien puisque Bingecat couvre le même dossier |
+| 🔭 Découvrir | 5 / 7 dossiers | 5 / 5 | "TV" et "Magnet" volontairement exclus ; "Recommandation" résolu via les catalogues Bingecat (`source: "custom"` dans l'export AIOMetadata, voir section dédiée) -- les listes MDBList "recommandation personnalisée" restent explicitement ignorées (non résolvables), mais ne bloquent plus rien puisque Bingecat couvre le même dossier ; "Français" ajouté -- 2 sources MDBList + 2 discover TMDB `with_original_language=fr` / `watch_region=FR`, résolus directement depuis l'export AIOMetadata (catalogues recréés côté AIOMetadata) |
 | 🎬 Services de Streaming | 9 / 9 dossiers | 9 / 9 | ✅ résolu via l'export AIOMetadata (vrai `with_watch_providers` par plateforme, voir section dédiée) |
 | 🎭 Genres | 15 / 15 dossiers | 15 / 15 | ✅ |
 | 🎨 Thématiques | 14 / 14 dossiers | 14 / 14 | ✅ (résolu via l'export AIOMetadata + MDBList) |

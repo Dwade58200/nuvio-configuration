@@ -38,7 +38,7 @@
             "tmdbSourceType": null
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "title": null,
             "sortBy": null,
@@ -53,7 +53,7 @@
             "tmdbSourceType": null
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "title": null,
             "sortBy": null,
@@ -68,67 +68,7 @@
             "tmdbSourceType": null
           },
           {
-            "type": "movie",
-            "genre": "None",
-            "title": null,
-            "sortBy": null,
-            "tmdbId": null,
-            "addonId": "aio-metadata",
-            "filters": null,
-            "sortHow": null,
-            "provider": "addon",
-            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118225",
-            "mediaType": null,
-            "traktListId": null,
-            "tmdbSourceType": null
-          },
-          {
-            "type": "series",
-            "genre": "None",
-            "title": null,
-            "sortBy": null,
-            "tmdbId": null,
-            "addonId": "aio-metadata",
-            "filters": null,
-            "sortHow": null,
-            "provider": "addon",
-            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118226",
-            "mediaType": null,
-            "traktListId": null,
-            "tmdbSourceType": null
-          },
-          {
-            "type": "movie",
-            "genre": "None",
-            "title": null,
-            "sortBy": null,
-            "tmdbId": null,
-            "addonId": "aio-metadata",
-            "filters": null,
-            "sortHow": null,
-            "provider": "addon",
-            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_random_public_movie",
-            "mediaType": null,
-            "traktListId": null,
-            "tmdbSourceType": null
-          },
-          {
-            "type": "series",
-            "genre": "None",
-            "title": null,
-            "sortBy": null,
-            "tmdbId": null,
-            "addonId": "aio-metadata",
-            "filters": null,
-            "sortHow": null,
-            "provider": "addon",
-            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_random_public_series",
-            "mediaType": null,
-            "traktListId": null,
-            "tmdbSourceType": null
-          },
-          {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "title": null,
             "sortBy": null,
@@ -143,7 +83,7 @@
             "tmdbSourceType": null
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "title": null,
             "sortBy": null,
@@ -153,6 +93,66 @@
             "sortHow": null,
             "provider": "addon",
             "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118228",
+            "mediaType": null,
+            "traktListId": null,
+            "tmdbSourceType": null
+          },
+          {
+            "type": "Film",
+            "genre": "None",
+            "title": null,
+            "sortBy": null,
+            "tmdbId": null,
+            "addonId": "aio-metadata",
+            "filters": null,
+            "sortHow": null,
+            "provider": "addon",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118225",
+            "mediaType": null,
+            "traktListId": null,
+            "tmdbSourceType": null
+          },
+          {
+            "type": "Série",
+            "genre": "None",
+            "title": null,
+            "sortBy": null,
+            "tmdbId": null,
+            "addonId": "aio-metadata",
+            "filters": null,
+            "sortHow": null,
+            "provider": "addon",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118226",
+            "mediaType": null,
+            "traktListId": null,
+            "tmdbSourceType": null
+          },
+          {
+            "type": "Film",
+            "genre": "None",
+            "title": null,
+            "sortBy": null,
+            "tmdbId": null,
+            "addonId": "aio-metadata",
+            "filters": null,
+            "sortHow": null,
+            "provider": "addon",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_random_public_movie",
+            "mediaType": null,
+            "traktListId": null,
+            "tmdbSourceType": null
+          },
+          {
+            "type": "Série",
+            "genre": "None",
+            "title": null,
+            "sortBy": null,
+            "tmdbId": null,
+            "addonId": "aio-metadata",
+            "filters": null,
+            "sortHow": null,
+            "provider": "addon",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_random_public_series",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
@@ -179,52 +179,52 @@
             "catalogId": "mdblist.recommended.recommended.movies"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118229"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118230"
           },
           {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118225"
-          },
-          {
-            "type": "series",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118226"
-          },
-          {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_random_public_movie"
-          },
-          {
-            "type": "series",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_random_public_series"
-          },
-          {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118227"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118228"
+          },
+          {
+            "type": "Film",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118225"
+          },
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118226"
+          },
+          {
+            "type": "Film",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_random_public_movie"
+          },
+          {
+            "type": "Série",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_random_public_series"
           }
         ],
         "focusGifEnabled": true,
@@ -514,18 +514,32 @@
         "sources": [
           {
             "type": "tv",
-            "genre": "",
+            "genre": "None",
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "com.tvmio.iptv",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "tvmio-fr",
+            "catalogId": "821e3b0.tvmio-fr",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
+          },
+          {
+            "type": "tv",
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "dd8e3b0.vavoo_tv_fr"
+          },
+          {
+            "type": "tv",
+            "genre": "Sport",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "b64e3b0.streamvix_tv"
           }
         ],
         "hideTitle": false,
@@ -538,8 +552,21 @@
         "catalogSources": [
           {
             "type": "tv",
-            "addonId": "com.tvmio.iptv",
-            "catalogId": "tvmio-fr"
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "821e3b0.tvmio-fr"
+          },
+          {
+            "type": "tv",
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "dd8e3b0.vavoo_tv_fr"
+          },
+          {
+            "type": "tv",
+            "genre": "Sport",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "b64e3b0.streamvix_tv"
           }
         ],
         "focusGifEnabled": true,
@@ -1622,8 +1649,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "💥",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Action_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Action.png?raw=true",
         "catalogSources": [
@@ -1765,8 +1790,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧭",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Aventure_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Aventure.png?raw=true",
         "catalogSources": [
@@ -1908,8 +1931,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😆",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Comedie_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Com%C3%A9die.png?raw=true",
         "catalogSources": [
@@ -2051,8 +2072,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😭",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Drame_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Drame.png?raw=true",
         "catalogSources": [
@@ -2179,8 +2198,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🐉",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Fantastique_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Fantastique.png?raw=true",
         "catalogSources": [
@@ -2316,8 +2333,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🪖",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Guerre_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Guerre.png?raw=true",
         "catalogSources": [
@@ -2504,8 +2519,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "👻",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Horreur_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Horreur.png?raw=true",
         "catalogSources": [
@@ -2665,8 +2678,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧩",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Mystere_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Mystere.png?raw=true",
         "catalogSources": [
@@ -2808,8 +2819,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🚔",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Policier_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Policier.png?raw=true",
         "catalogSources": [
@@ -2921,8 +2930,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "💕",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Romance_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Romance.png?raw=true",
         "catalogSources": [
@@ -3052,8 +3059,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "👽",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Sci-Fi_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Sci-Fi.png?raw=true",
         "catalogSources": [
@@ -3165,8 +3170,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔪",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Thriller_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Thriller.png?raw=true",
         "catalogSources": [
@@ -3236,8 +3239,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🤠",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Western_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Western.png?raw=true",
         "catalogSources": [
@@ -3355,8 +3356,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎨",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Animation_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Animation.png?raw=true",
         "catalogSources": [
@@ -3498,8 +3497,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📽️",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Documentaires_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Documentaires.png?raw=true",
         "catalogSources": [
@@ -3592,8 +3589,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧑‍🎓",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Adolescence_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Adolescence.png?raw=true",
         "catalogSources": [
@@ -3651,8 +3646,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🥋",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Arts_Martiaux_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Arts_Martiaux.png?raw=true",
         "catalogSources": [
@@ -3710,8 +3703,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "💰",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Chasse_au_Tresor_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Chasse_au_Tresor.png?raw=true",
         "catalogSources": [
@@ -3769,8 +3760,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🥰",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Comedie_Romantique_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Comedie_Romantique.png?raw=true",
         "catalogSources": [
@@ -3828,8 +3817,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🕵️",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Espionnage_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Espionnage.png?raw=true",
         "catalogSources": [
@@ -3887,8 +3874,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🌌",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Espace_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Espace.png?raw=true",
         "catalogSources": [
@@ -4171,8 +4156,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎬",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Grands_Realisateurs_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Grands_Realisateurs.png?raw=true",
         "catalogSources": [],
@@ -4217,8 +4200,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📖",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Faits-Reels_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Faits-Reels.png?raw=true",
         "catalogSources": [
@@ -4276,8 +4257,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🪄",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Magie_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Magie.png?raw=true",
         "catalogSources": [
@@ -4320,8 +4299,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎉",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Sitcoms_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Sitcoms.png?raw=true",
         "catalogSources": [
@@ -4373,8 +4350,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🦸",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Super-Heros_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Super-Heros.png?raw=true",
         "catalogSources": [
@@ -4432,8 +4407,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧛",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Vampires_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Vampires.png?raw=true",
         "catalogSources": [
@@ -4491,8 +4464,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😈",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Vengeance_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Vengeance.png?raw=true",
         "catalogSources": [
@@ -4550,8 +4521,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🕰️",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Logos/Voyage_Temporel_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Thematiques/Covers/Voyage_Temporel.png?raw=true",
         "catalogSources": [
@@ -4575,7 +4544,6 @@
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
-    "backdropImageUrl": "",
     "focusGlowEnabled": true
   },
   {
@@ -5249,7 +5217,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🆕",
         "focusGifUrl": "https://i.ibb.co/RKWkVK0/Nouveautes.png",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/vv68RLPV/nouveautes.png",
         "coverImageUrl": "https://i.ibb.co/zVxgh28r/nouveautes.png",
         "catalogSources": [
@@ -5298,7 +5265,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔥",
         "focusGifUrl": "https://i.ibb.co/BHqty0jC/Populaires.png",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/MkNGXFX5/Populaires.png",
         "coverImageUrl": "https://i.ibb.co/p9XtHwQ/Populaires.png",
         "catalogSources": [
@@ -5341,7 +5307,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏆",
         "focusGifUrl": "https://i.ibb.co/6RJftCGS/Les-mieux-notes.png",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/ccR6s3gw/Les-mieux-notes.png",
         "coverImageUrl": "https://i.ibb.co/5WxPwXQh/Les-mieux-notes.png",
         "catalogSources": [
@@ -5377,7 +5342,6 @@
         "tileShape": "LANDSCAPE",
         "coverEmoji": "⛩️",
         "focusGifUrl": "https://i.ibb.co/0p7ZBJpG/Studio-Ghibli.png",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/yBpNhBcG/Studio-Ghibli.png",
         "coverImageUrl": "https://i.ibb.co/nqpHqD44/Studio-Ghibli.png",
         "catalogSources": [
@@ -5406,8 +5370,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧟",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/7tFWbSst/Anime-20s-Logo.png",
         "coverImageUrl": "https://i.ibb.co/TDdqD3tn/Anime-20s.png",
         "catalogSources": [
@@ -5436,8 +5398,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "👹",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/WpGhyTDJ/Anime-10s-Logo.png",
         "coverImageUrl": "https://i.ibb.co/HDr3BNMd/Anime-10s.png",
         "catalogSources": [
@@ -5466,8 +5426,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🥷",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/n8MDFkQR/Anime-00s-Logo.png",
         "coverImageUrl": "https://i.ibb.co/FqmTr03B/Anime-00s.png",
         "catalogSources": [
@@ -5496,8 +5454,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏴‍☠️",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/TDZRJrBt/Anime-90s-Logo.png",
         "coverImageUrl": "https://i.ibb.co/C5v6k4dH/Anime-90s.png",
         "catalogSources": [
@@ -5526,8 +5482,6 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🐲",
-        "focusGifUrl": "",
-        "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/Pzwxdv0B/Anime-80s-Logo.png",
         "coverImageUrl": "https://i.ibb.co/SXJLCLS8/Anime-80s.png",
         "catalogSources": [
@@ -11587,11 +11541,11 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "community.sports.fly",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "sports_live",
+            "catalogId": "412e3b0.sports_live",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
@@ -11602,33 +11556,61 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "community.sports.fly",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "sports_today",
+            "catalogId": "412e3b0.sports_today",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
+          },
+          {
+            "type": "tv",
+            "genre": "Z-Eventi",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "b64e3b0.streamvix_live"
+          },
+          {
+            "type": "tv",
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📺",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Logos/Sport_Live_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Covers/Sport_Live.png?raw=true",
         "catalogSources": [
           {
             "type": "sport",
             "genre": "None",
-            "addonId": "community.sports.fly",
-            "catalogId": "sports_live"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "412e3b0.sports_live"
           },
           {
             "type": "sport",
             "genre": "None",
-            "addonId": "community.sports.fly",
-            "catalogId": "sports_today"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "412e3b0.sports_today"
+          },
+          {
+            "type": "tv",
+            "genre": "Z-Eventi",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "b64e3b0.streamvix_live"
+          },
+          {
+            "type": "tv",
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "focusGifEnabled": false,
@@ -11644,11 +11626,11 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "community.sports.fly",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "sports_football",
+            "catalogId": "412e3b0.sports_football",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
@@ -11659,33 +11641,74 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "org.prisonmike.streamvix",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "streamvix_eventi",
+            "catalogId": "b64e3b0.streamvix_eventi",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
+          },
+          {
+            "type": "tv",
+            "genre": "Football",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_live_events"
+          },
+          {
+            "type": "tv",
+            "genre": "Football",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_replays"
+          },
+          {
+            "type": "tv",
+            "genre": "Football",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_highlights"
           }
         ],
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "⚽",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Logos/Sport_Football_Logo.webp?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Covers/Sport_Football.png?raw=true",
         "catalogSources": [
           {
             "type": "sport",
             "genre": "None",
-            "addonId": "community.sports.fly",
-            "catalogId": "sports_football"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "412e3b0.sports_football"
           },
           {
             "type": "tv",
             "genre": "Soccer",
-            "addonId": "org.prisonmike.streamvix",
-            "catalogId": "streamvix_eventi"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "b64e3b0.streamvix_eventi"
+          },
+          {
+            "type": "tv",
+            "genre": "Football",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_live_events"
+          },
+          {
+            "type": "tv",
+            "genre": "Football",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_replays"
+          },
+          {
+            "type": "tv",
+            "genre": "Football",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_highlights"
           }
         ],
         "focusGifEnabled": false,
@@ -11701,11 +11724,11 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "community.sports.fly",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "sports_basketball",
+            "catalogId": "412e3b0.sports_basketball",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
@@ -11716,33 +11739,61 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "org.prisonmike.streamvix",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "streamvix_eventi",
+            "catalogId": "b64e3b0.streamvix_eventi",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
+          },
+          {
+            "type": "tv",
+            "genre": "Basketball",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_live_events"
+          },
+          {
+            "type": "tv",
+            "genre": "Basketball",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_replays"
           }
         ],
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏀",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Logos/Sport_NBA_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Covers/Sport_NBA.png?raw=true",
         "catalogSources": [
           {
             "type": "sport",
             "genre": "None",
-            "addonId": "community.sports.fly",
-            "catalogId": "sports_basketball"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "412e3b0.sports_basketball"
           },
           {
             "type": "tv",
             "genre": "Basket",
-            "addonId": "org.prisonmike.streamvix",
-            "catalogId": "streamvix_eventi"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "b64e3b0.streamvix_eventi"
+          },
+          {
+            "type": "tv",
+            "genre": "Basketball",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_live_events"
+          },
+          {
+            "type": "tv",
+            "genre": "Basketball",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_replays"
           }
         ],
         "focusGifEnabled": false,
@@ -11753,32 +11804,60 @@
         "title": "Tennis",
         "sources": [
           {
-            "type": "tv",
-            "genre": "Tennis",
+            "type": "sport",
+            "genre": "None",
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "org.prisonmike.streamvix",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "streamvix_eventi",
+            "catalogId": "412e3b0.sports_tennis",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
+          },
+          {
+            "type": "tv",
+            "genre": "Tennis",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "b64e3b0.streamvix_eventi"
+          },
+          {
+            "type": "tv",
+            "genre": "Tennis",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎾",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Logos/Sport_Tennis_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Covers/Sport_Tennis.png?raw=true",
         "catalogSources": [
           {
+            "type": "sport",
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "412e3b0.sports_tennis"
+          },
+          {
             "type": "tv",
             "genre": "Tennis",
-            "addonId": "org.prisonmike.streamvix",
-            "catalogId": "streamvix_eventi"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "b64e3b0.streamvix_eventi"
+          },
+          {
+            "type": "tv",
+            "genre": "Tennis",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "focusGifEnabled": false,
@@ -11794,11 +11873,11 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "community.sports.fly",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "sports_motor_sports",
+            "catalogId": "412e3b0.sports_motor_sports",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
@@ -11809,11 +11888,11 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "org.prisonmike.streamvix",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "streamvix_eventi",
+            "catalogId": "b64e3b0.streamvix_eventi",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
@@ -11824,39 +11903,54 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "org.prisonmike.streamvix",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "streamvix_eventi",
+            "catalogId": "b64e3b0.streamvix_eventi",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
+          },
+          {
+            "type": "tv",
+            "genre": "Motorsport",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏎️",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Logos/Sport_Auto-Moto_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Covers/Sport_Auto-Moto.png?raw=true",
         "catalogSources": [
           {
             "type": "sport",
             "genre": "None",
-            "addonId": "community.sports.fly",
-            "catalogId": "sports_motor_sports"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "412e3b0.sports_motor_sports"
           },
           {
             "type": "tv",
             "genre": "F1",
-            "addonId": "org.prisonmike.streamvix",
-            "catalogId": "streamvix_eventi"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "b64e3b0.streamvix_eventi"
           },
           {
             "type": "tv",
             "genre": "MotoGp",
-            "addonId": "org.prisonmike.streamvix",
-            "catalogId": "streamvix_eventi"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "b64e3b0.streamvix_eventi"
+          },
+          {
+            "type": "tv",
+            "genre": "Motorsport",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "focusGifEnabled": false,
@@ -11872,11 +11966,11 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "community.sports.fly",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "sports_fight",
+            "catalogId": "412e3b0.sports_fight",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
@@ -11887,33 +11981,48 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "org.prisonmike.streamvix",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "streamvix_eventi",
+            "catalogId": "b64e3b0.streamvix_eventi",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
+          },
+          {
+            "type": "tv",
+            "genre": "Boxing",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🥊",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Logos/Sport_Combat_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Covers/Sport_Combat.png?raw=true",
         "catalogSources": [
           {
             "type": "sport",
             "genre": "None",
-            "addonId": "community.sports.fly",
-            "catalogId": "sports_fight"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "412e3b0.sports_fight"
           },
           {
             "type": "tv",
             "genre": "Boxing",
-            "addonId": "org.prisonmike.streamvix",
-            "catalogId": "streamvix_eventi"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "b64e3b0.streamvix_eventi"
+          },
+          {
+            "type": "tv",
+            "genre": "Boxing",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "focusGifEnabled": false,
@@ -11929,36 +12038,151 @@
             "title": null,
             "sortBy": null,
             "tmdbId": null,
-            "addonId": "community.sports.fly",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
             "filters": null,
             "sortHow": null,
             "provider": "addon",
-            "catalogId": "sports_american_football",
+            "catalogId": "412e3b0.sports_american_football",
             "mediaType": null,
             "traktListId": null,
             "tmdbSourceType": null
+          },
+          {
+            "type": "tv",
+            "genre": "NFL",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "b64e3b0.streamvix_eventi"
+          },
+          {
+            "type": "tv",
+            "genre": "American Football",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "hideTitle": false,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏈",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Logos/Sport_NFL_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Covers/Sport_NFL.png?raw=true",
         "catalogSources": [
           {
             "type": "sport",
             "genre": "None",
-            "addonId": "community.sports.fly",
-            "catalogId": "sports_american_football"
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "412e3b0.sports_american_football"
+          },
+          {
+            "type": "tv",
+            "genre": "NFL",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "b64e3b0.streamvix_eventi"
+          },
+          {
+            "type": "tv",
+            "genre": "American Football",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_live_events"
           }
         ],
         "focusGifEnabled": false,
         "heroBackdropUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Sports/Backdrops/Sport_NFL_Backdrop.jpg?raw=true"
+      },
+      {
+        "id": "folder-a9a5a10e",
+        "title": "Rugby",
+        "sources": [
+          {
+            "type": "sport",
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "412e3b0.sports_rugby"
+          },
+          {
+            "type": "tv",
+            "genre": "Rugby",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_live_events"
+          }
+        ],
+        "hideTitle": false,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "",
+        "coverImageUrl": "",
+        "catalogSources": [
+          {
+            "type": "sport",
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "412e3b0.sports_rugby"
+          },
+          {
+            "type": "tv",
+            "genre": "Rugby",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_live_events"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": ""
+      },
+      {
+        "id": "folder-e028b4c7",
+        "title": "Autres Sports",
+        "sources": [
+          {
+            "type": "Sport",
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "aiostreams.merged.1788472090540"
+          },
+          {
+            "type": "tv",
+            "genre": "Cycling",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "provider": "addon",
+            "catalogId": "e6ae3b0.stremverse_live_events"
+          }
+        ],
+        "hideTitle": false,
+        "tileShape": "LANDSCAPE",
+        "coverEmoji": "",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
+        "titleLogoUrl": "",
+        "coverImageUrl": "",
+        "catalogSources": [
+          {
+            "type": "Sport",
+            "genre": "None",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "aiostreams.merged.1788472090540"
+          },
+          {
+            "type": "tv",
+            "genre": "Cycling",
+            "addonId": "aiostreamsfortheweebsstable.midnightignite.me.9b1784d5-b81",
+            "catalogId": "e6ae3b0.stremverse_live_events"
+          }
+        ],
+        "focusGifEnabled": false,
+        "heroBackdropUrl": ""
       }
     ],
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
+    "backdropImageUrl": "",
     "focusGlowEnabled": true
   }
 ]

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-02T16:57:29.893Z",
+  "exportedAt": "2026-09-04T11:12:27.875Z",
   "catalogs": [
     {
       "id": "mdblist.22390",
@@ -221,9 +221,8 @@
       "enabled": true,
       "showInHome": false,
       "source": "custom",
-      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/movie/aicat_list_118229.json",
+      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio/catalog/movie/aicat_list_118229.json",
       "genres": [],
-      "cacheTTL": 86400,
       "enableRatingPosters": true,
       "manifestData": {
         "extra": [
@@ -233,22 +232,21 @@
             "options": [
               "Drama",
               "Comedy",
-              "Documentary",
-              "Biography",
               "Adventure",
+              "Biography",
               "History",
               "Sci-Fi",
-              "Crime",
-              "Music",
-              "Romance",
               "Thriller",
               "Animation",
-              "War",
-              "Action",
+              "Crime",
+              "Documentary",
               "Family",
               "Fantasy",
-              "Sport",
+              "Romance",
+              "War",
+              "Action",
               "Horror",
+              "Sport",
               "Mystery"
             ],
             "optionsLimit": 1
@@ -269,7 +267,7 @@
           "tvdb:"
         ]
       },
-      "displayType": "movie"
+      "displayType": "Film"
     },
     {
       "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118230",
@@ -278,9 +276,8 @@
       "enabled": true,
       "showInHome": false,
       "source": "custom",
-      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/series/aicat_list_118230.json",
+      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio/catalog/series/aicat_list_118230.json",
       "genres": [],
-      "cacheTTL": 86400,
       "enableRatingPosters": true,
       "manifestData": {
         "extra": [
@@ -289,23 +286,23 @@
             "name": "genre",
             "options": [
               "Drama",
-              "Comedy",
-              "Action",
-              "Sci-Fi",
-              "Adventure",
-              "Animation",
-              "Mystery",
-              "Fantasy",
               "Thriller",
               "Crime",
-              "Family",
-              "Horror",
-              "Documentary",
+              "Action",
+              "Comedy",
+              "Mystery",
+              "Animation",
+              "Adventure",
               "Romance",
-              "Biography",
-              "Short",
+              "Sci-Fi",
               "Sport",
-              "Western"
+              "Fantasy",
+              "Western",
+              "Documentary",
+              "Family",
+              "Game-Show",
+              "History",
+              "Horror"
             ],
             "optionsLimit": 1
           },
@@ -325,168 +322,7 @@
           "tvdb:"
         ]
       },
-      "displayType": "series"
-    },
-    {
-      "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118225",
-      "type": "movie",
-      "name": "🔁 Parce que tu as vu...",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/movie/aicat_list_118225.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "extra": [
-          {
-            "isRequired": false,
-            "name": "genre",
-            "options": [
-              "Thriller",
-              "Drama",
-              "Crime",
-              "Mystery",
-              "Action",
-              "Comedy",
-              "Horror",
-              "Romance",
-              "Sci-Fi",
-              "Western",
-              "Adventure",
-              "Biography",
-              "War"
-            ],
-            "optionsLimit": 1
-          },
-          {
-            "isRequired": false,
-            "name": "skip"
-          }
-        ],
-        "id": "aicat_list_118225",
-        "name": "Because you watched...",
-        "pageSize": 50,
-        "showInHome": true,
-        "type": "movie",
-        "idPrefixes": [
-          "tt",
-          "tmdb:",
-          "tvdb:"
-        ]
-      },
-      "displayType": "movie"
-    },
-    {
-      "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118226",
-      "type": "series",
-      "name": "🔁 Parce que tu as vu...",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/series/aicat_list_118226.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "extra": [
-          {
-            "isRequired": false,
-            "name": "genre",
-            "options": [
-              "Drama",
-              "Crime",
-              "Thriller",
-              "Mystery",
-              "Action",
-              "Comedy",
-              "Sci-Fi",
-              "Adventure",
-              "Animation",
-              "Horror"
-            ],
-            "optionsLimit": 1
-          },
-          {
-            "isRequired": false,
-            "name": "skip"
-          }
-        ],
-        "id": "aicat_list_118226",
-        "name": "Because you watched...",
-        "pageSize": 50,
-        "showInHome": true,
-        "type": "series",
-        "idPrefixes": [
-          "tt",
-          "tmdb:",
-          "tvdb:"
-        ]
-      },
-      "displayType": "series"
-    },
-    {
-      "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_random_public_movie",
-      "type": "movie",
-      "name": "🎲 Liste pour toi",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/movie/aicat_random_public_movie.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "extra": [
-          {
-            "isRequired": false,
-            "name": "skip"
-          }
-        ],
-        "id": "aicat_random_public_movie",
-        "name": "List for you",
-        "pageSize": 50,
-        "showInHome": true,
-        "type": "movie",
-        "idPrefixes": [
-          "tt",
-          "tmdb:",
-          "tvdb:"
-        ]
-      },
-      "displayType": "movie"
-    },
-    {
-      "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_random_public_series",
-      "type": "series",
-      "name": "🎲 Liste pour toi",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/series/aicat_random_public_series.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "extra": [
-          {
-            "isRequired": false,
-            "name": "skip"
-          }
-        ],
-        "id": "aicat_random_public_series",
-        "name": "List for you",
-        "pageSize": 50,
-        "showInHome": true,
-        "type": "series",
-        "idPrefixes": [
-          "tt",
-          "tmdb:",
-          "tvdb:"
-        ]
-      },
-      "displayType": "series"
+      "displayType": "Série"
     },
     {
       "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118227",
@@ -495,9 +331,8 @@
       "enabled": true,
       "showInHome": false,
       "source": "custom",
-      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/movie/aicat_list_118227.json",
+      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio/catalog/movie/aicat_list_118227.json",
       "genres": [],
-      "cacheTTL": 86400,
       "enableRatingPosters": true,
       "manifestData": {
         "extra": [
@@ -508,19 +343,19 @@
               "Drama",
               "Thriller",
               "Mystery",
-              "Crime",
               "Sci-Fi",
+              "Crime",
               "Action",
-              "Comedy",
-              "Romance",
+              "Horror",
               "Adventure",
               "Fantasy",
+              "Romance",
+              "Comedy",
               "Animation",
-              "Horror",
               "Biography",
-              "History",
               "War",
-              "Western"
+              "Documentary",
+              "History"
             ],
             "optionsLimit": 1
           },
@@ -540,7 +375,7 @@
           "tvdb:"
         ]
       },
-      "displayType": "movie"
+      "displayType": "Film"
     },
     {
       "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118228",
@@ -549,9 +384,8 @@
       "enabled": true,
       "showInHome": false,
       "source": "custom",
-      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/series/aicat_list_118228.json",
+      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio/catalog/series/aicat_list_118228.json",
       "genres": [],
-      "cacheTTL": 86400,
       "enableRatingPosters": true,
       "manifestData": {
         "extra": [
@@ -560,18 +394,17 @@
             "name": "genre",
             "options": [
               "Drama",
-              "Sci-Fi",
               "Thriller",
-              "Mystery",
+              "Sci-Fi",
               "Action",
+              "Mystery",
               "Crime",
-              "Fantasy",
               "Adventure",
-              "Horror",
+              "Fantasy",
               "Animation",
               "Comedy",
-              "Family",
-              "Sport",
+              "Horror",
+              "Romance",
               "War",
               "Western"
             ],
@@ -593,122 +426,267 @@
           "tvdb:"
         ]
       },
-      "displayType": "series"
-    },
-    {
-      "id": "tmdb.trending",
-      "name": "⬆️ Tendance",
-      "type": "movie",
-      "source": "tmdb",
-      "enabled": true,
-      "showInHome": false,
-      "randomizePerPage": false,
-      "sort": "default",
-      "order": "asc",
-      "displayType": "movie"
-    },
-    {
-      "id": "tmdb.trending",
-      "name": "⬆️ Tendance",
-      "type": "series",
-      "source": "tmdb",
-      "enabled": true,
-      "showInHome": false,
-      "randomizePerPage": false,
-      "sort": "default",
-      "order": "asc",
-      "displayType": "series"
-    },
-    {
-      "id": "tmdb.top",
-      "name": "🔥 Populaire",
-      "type": "movie",
-      "source": "tmdb",
-      "enabled": true,
-      "showInHome": false,
-      "randomizePerPage": false,
-      "sort": "default",
-      "order": "asc",
-      "displayType": "movie"
-    },
-    {
-      "id": "tmdb.top",
-      "name": "🔥 Populaire",
-      "type": "series",
-      "source": "tmdb",
-      "enabled": true,
-      "showInHome": false,
-      "randomizePerPage": false,
-      "sort": "default",
-      "order": "asc",
-      "displayType": "series"
-    },
-    {
-      "id": "tmdb.top_rated",
-      "name": "🏆 Top",
-      "type": "movie",
-      "source": "tmdb",
-      "enabled": true,
-      "showInHome": false,
-      "randomizePerPage": false,
-      "sort": "default",
-      "order": "asc",
-      "displayType": "movie"
-    },
-    {
-      "id": "tmdb.top_rated",
-      "name": "🏆 Top",
-      "type": "series",
-      "source": "tmdb",
-      "enabled": true,
-      "showInHome": false,
-      "randomizePerPage": false,
-      "sort": "default",
-      "order": "asc",
-      "displayType": "series"
-    },
-    {
-      "id": "mdblist.30898",
-      "type": "series",
-      "name": "🇫🇷 France | 📺 Séries TV",
-      "enabled": true,
-      "showInHome": false,
-      "source": "mdblist",
-      "sort": "default",
-      "order": "asc",
-      "genreSelection": "standard",
-      "enableRatingPosters": true,
       "displayType": "Série",
-      "metadata": {
-        "itemCount": 299,
-        "url": "https://mdblist.com/lists/jukebox8786/series-tv-francaises-series-tv",
-        "mediatype": "show",
-        "author": "jukebox8786"
-      }
+      "randomizePerPage": true
     },
     {
-      "id": "mdblist.194886",
+      "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118225",
       "type": "movie",
-      "name": "🇫🇷 France | ✨ Top IMDB Rotation",
+      "name": "🔁 Parce que tu as vu...",
+      "enabled": true,
+      "showInHome": false,
+      "source": "custom",
+      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio/catalog/movie/aicat_list_118225.json",
+      "genres": [],
+      "enableRatingPosters": true,
+      "manifestData": {
+        "extra": [
+          {
+            "isRequired": false,
+            "name": "genre",
+            "options": [
+              "Thriller",
+              "Drama",
+              "Crime",
+              "Action",
+              "Horror",
+              "Mystery",
+              "Comedy",
+              "Documentary",
+              "Romance",
+              "Sci-Fi",
+              "Adventure",
+              "Animation",
+              "Biography",
+              "Fantasy",
+              "War",
+              "Western"
+            ],
+            "optionsLimit": 1
+          },
+          {
+            "isRequired": false,
+            "name": "skip"
+          }
+        ],
+        "id": "aicat_list_118225",
+        "name": "Because you watched...",
+        "pageSize": 50,
+        "showInHome": true,
+        "type": "movie",
+        "idPrefixes": [
+          "tt",
+          "tmdb:",
+          "tvdb:"
+        ]
+      },
+      "displayType": "Film"
+    },
+    {
+      "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_list_118226",
+      "type": "series",
+      "name": "🔁 Parce que tu as vu...",
+      "enabled": true,
+      "showInHome": false,
+      "source": "custom",
+      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio/catalog/series/aicat_list_118226.json",
+      "genres": [],
+      "enableRatingPosters": true,
+      "manifestData": {
+        "extra": [
+          {
+            "isRequired": false,
+            "name": "genre",
+            "options": [
+              "Animation",
+              "Action",
+              "Fantasy",
+              "Adventure",
+              "Drama",
+              "Comedy",
+              "Thriller",
+              "Horror",
+              "Sci-Fi",
+              "Mystery",
+              "Romance",
+              "Crime",
+              "History"
+            ],
+            "optionsLimit": 1
+          },
+          {
+            "isRequired": false,
+            "name": "skip"
+          }
+        ],
+        "id": "aicat_list_118226",
+        "name": "Because you watched...",
+        "pageSize": 50,
+        "showInHome": true,
+        "type": "series",
+        "idPrefixes": [
+          "tt",
+          "tmdb:",
+          "tvdb:"
+        ]
+      },
+      "displayType": "Série"
+    },
+    {
+      "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_random_public_movie",
+      "type": "movie",
+      "name": "🎲 Liste pour toi",
+      "enabled": true,
+      "showInHome": false,
+      "source": "custom",
+      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio/catalog/movie/aicat_random_public_movie.json",
+      "genres": [],
+      "enableRatingPosters": true,
+      "manifestData": {
+        "extra": [
+          {
+            "isRequired": false,
+            "name": "skip"
+          }
+        ],
+        "id": "aicat_random_public_movie",
+        "name": "List for you",
+        "pageSize": 50,
+        "showInHome": true,
+        "type": "movie",
+        "idPrefixes": [
+          "tt",
+          "tmdb:",
+          "tvdb:"
+        ]
+      },
+      "displayType": "Film"
+    },
+    {
+      "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.series.aicat_random_public_series",
+      "type": "series",
+      "name": "🎲 Liste pour toi",
+      "enabled": true,
+      "showInHome": false,
+      "source": "custom",
+      "sourceUrl": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio/catalog/series/aicat_random_public_series.json",
+      "genres": [],
+      "enableRatingPosters": true,
+      "manifestData": {
+        "extra": [
+          {
+            "isRequired": false,
+            "name": "skip"
+          }
+        ],
+        "id": "aicat_random_public_series",
+        "name": "List for you",
+        "pageSize": 50,
+        "showInHome": true,
+        "type": "series",
+        "idPrefixes": [
+          "tt",
+          "tmdb:",
+          "tvdb:"
+        ]
+      },
+      "displayType": "Série"
+    },
+    {
+      "id": "tmdb.trending",
+      "name": "⬆️ Tendance",
+      "type": "movie",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "randomizePerPage": false,
+      "sort": "default",
+      "order": "asc",
+      "displayType": "movie"
+    },
+    {
+      "id": "tmdb.trending",
+      "name": "⬆️ Tendance",
+      "type": "series",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "randomizePerPage": false,
+      "sort": "default",
+      "order": "asc",
+      "displayType": "series"
+    },
+    {
+      "id": "tmdb.top",
+      "name": "🔥 Populaire",
+      "type": "movie",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "randomizePerPage": false,
+      "sort": "default",
+      "order": "asc",
+      "displayType": "movie"
+    },
+    {
+      "id": "tmdb.top",
+      "name": "🔥 Populaire",
+      "type": "series",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "randomizePerPage": false,
+      "sort": "default",
+      "order": "asc",
+      "displayType": "series"
+    },
+    {
+      "id": "tmdb.top_rated",
+      "name": "🏆 Top",
+      "type": "movie",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "randomizePerPage": false,
+      "sort": "default",
+      "order": "asc",
+      "displayType": "movie"
+    },
+    {
+      "id": "tmdb.top_rated",
+      "name": "🏆 Top",
+      "type": "series",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "randomizePerPage": false,
+      "sort": "default",
+      "order": "asc",
+      "displayType": "series"
+    },
+    {
+      "id": "mdblist.29598",
+      "type": "movie",
+      "name": "🇫🇷 France | 🆕 Nouveautés",
       "enabled": true,
       "showInHome": false,
       "source": "mdblist",
-      "sort": "default",
+      "sort": "released",
       "order": "asc",
       "genreSelection": "standard",
       "enableRatingPosters": true,
       "displayType": "Film",
       "metadata": {
-        "itemCount": 505,
-        "url": "https://mdblist.com/lists/cc-hub-streaming/top-rated-french-productions",
+        "itemCount": 75,
+        "url": "https://mdblist.com/lists/jukebox8786/french-latest-movies",
         "mediatype": "movie",
-        "author": "cc-hub-streaming"
+        "author": "jukebox8786"
       }
     },
     {
       "id": "mdblist.125891",
       "type": "movie",
-      "name": "🇫🇷 France | 🔥 Populaire IMDB",
+      "name": "🇫🇷 France | 🔥 Populaire",
       "enabled": true,
       "showInHome": false,
       "source": "mdblist",
@@ -725,60 +703,170 @@
       }
     },
     {
-      "id": "mdblist.131775",
+      "id": "tmdb.discover.movie.top_france.mtkl4inv",
       "type": "movie",
-      "name": "🇫🇷 France | 🔔 Dernières sorties",
+      "name": "🇫🇷 France | 🏆 Top",
       "enabled": true,
       "showInHome": false,
-      "source": "mdblist",
-      "sort": "default",
-      "order": "asc",
-      "genreSelection": "standard",
-      "enableRatingPosters": true,
+      "source": "tmdb",
       "displayType": "Film",
       "metadata": {
-        "itemCount": 3084,
-        "url": "https://mdblist.com/lists/cc-hub-streaming/foreign-cinema-latest-french-movies",
-        "mediatype": "movie",
-        "author": "cc-hub-streaming"
+        "discover": {
+          "version": 2,
+          "source": "tmdb",
+          "mediaType": "movie",
+          "params": {
+            "sort_by": "vote_average.desc",
+            "include_adult": true,
+            "without_genres": "16",
+            "with_original_language": "fr",
+            "watch_region": "FR",
+            "vote_average.gte": 6,
+            "vote_count.gte": 700,
+            "primary_release_date.gte": "1960-01-01"
+          },
+          "formState": {
+            "catalogName": "🇫🇷 France | 🏆 Top",
+            "discoverSource": "tmdb",
+            "sortBy": "vote_average.desc",
+            "cacheTTL": null,
+            "catalogType": "movie",
+            "includeGenres": [],
+            "excludeGenres": [
+              {
+                "id": 16,
+                "label": "Animation"
+              }
+            ],
+            "genreJoinMode": "or",
+            "originalLanguage": "fr",
+            "originCountry": "",
+            "certificationCountry": "",
+            "certificationValue": "",
+            "certificationMode": "exact",
+            "includeAdult": true,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
+            "selectedPeople": [],
+            "peopleJoinMode": "or",
+            "withCompanies": [],
+            "withoutCompanies": [],
+            "companyJoinMode": "or",
+            "withNetworks": [],
+            "withKeywords": [],
+            "withoutKeywords": [],
+            "keywordJoinMode": "or",
+            "watchRegion": "FR",
+            "watchProviders": [],
+            "providerJoinMode": "or",
+            "voteAverageRange": [
+              6,
+              10
+            ],
+            "voteCountMin": 700,
+            "runtimeRange": [
+              0,
+              400
+            ],
+            "primaryReleaseFrom": "1960-01-01",
+            "primaryReleaseTo": "",
+            "movieDatePreset": "custom",
+            "firstAirFrom": "",
+            "firstAirTo": "",
+            "seriesDatePreset": "clear",
+            "airDateFrom": "",
+            "airDateTo": "",
+            "airDatePreset": "clear",
+            "releaseRegion": ""
+          }
+        },
+        "description": "TMDB Discover (movie)",
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=true&without_genres=16&with_original_language=fr&watch_region=FR&vote_average.gte=6&vote_count.gte=700&primary_release_date.gte=1960-01-01"
       }
     },
     {
-      "id": "mdblist.30875",
-      "type": "movie",
-      "name": "🇫🇷 France | 🎬 Films",
+      "id": "tmdb.discover.series.populaires_france.mtklkcwb",
+      "type": "series",
+      "name": "🇫🇷 France | 📺 Séries TV",
       "enabled": true,
       "showInHome": false,
-      "source": "mdblist",
-      "sort": "default",
-      "order": "asc",
-      "genreSelection": "standard",
-      "enableRatingPosters": true,
-      "displayType": "Film",
+      "source": "tmdb",
+      "displayType": "Série",
       "metadata": {
-        "itemCount": 442,
-        "url": "https://mdblist.com/lists/jukebox8786/films-francais-films",
-        "mediatype": "movie",
-        "author": "jukebox8786"
-      }
-    },
-    {
-      "id": "mdblist.29598",
-      "type": "movie",
-      "name": "🇫🇷 France | 🆕 Films récents",
-      "enabled": true,
-      "showInHome": false,
-      "source": "mdblist",
-      "sort": "default",
-      "order": "asc",
-      "genreSelection": "standard",
-      "enableRatingPosters": true,
-      "displayType": "Film",
-      "metadata": {
-        "itemCount": 75,
-        "url": "https://mdblist.com/lists/jukebox8786/french-latest-movies",
-        "mediatype": "movie",
-        "author": "jukebox8786"
+        "discover": {
+          "version": 2,
+          "source": "tmdb",
+          "mediaType": "tv",
+          "params": {
+            "sort_by": "popularity.desc",
+            "include_adult": true,
+            "without_genres": "16",
+            "with_original_language": "fr",
+            "watch_region": "FR",
+            "vote_average.gte": 3,
+            "vote_count.gte": 20
+          },
+          "formState": {
+            "catalogName": "🇫🇷 France | 📺 Séries TV",
+            "discoverSource": "tmdb",
+            "sortBy": "popularity.desc",
+            "cacheTTL": null,
+            "catalogType": "series",
+            "includeGenres": [],
+            "excludeGenres": [
+              {
+                "id": 16,
+                "label": "Animation"
+              }
+            ],
+            "genreJoinMode": "or",
+            "originalLanguage": "fr",
+            "originCountry": "",
+            "certificationCountry": "",
+            "certificationValue": "",
+            "certificationMode": "exact",
+            "includeAdult": true,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
+            "selectedPeople": [],
+            "peopleJoinMode": "or",
+            "withCompanies": [],
+            "withoutCompanies": [],
+            "companyJoinMode": "or",
+            "withNetworks": [],
+            "withKeywords": [],
+            "withoutKeywords": [],
+            "keywordJoinMode": "or",
+            "watchRegion": "FR",
+            "watchProviders": [],
+            "providerJoinMode": "or",
+            "voteAverageRange": [
+              3,
+              10
+            ],
+            "voteCountMin": 20,
+            "runtimeRange": [
+              0,
+              400
+            ],
+            "primaryReleaseFrom": "",
+            "primaryReleaseTo": "",
+            "movieDatePreset": "clear",
+            "firstAirFrom": "",
+            "firstAirTo": "",
+            "seriesDatePreset": "clear",
+            "airDateFrom": "",
+            "airDateTo": "",
+            "airDatePreset": "clear",
+            "releaseRegion": ""
+          }
+        },
+        "description": "TMDB Discover (tv)",
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=popularity.desc&include_adult=true&without_genres=16&with_original_language=fr&watch_region=FR&vote_average.gte=3&vote_count.gte=20"
       }
     },
     {
@@ -13312,7 +13400,7 @@
       "enabled": true,
       "showInHome": false,
       "source": "mdblist",
-      "sort": "default",
+      "sort": "released",
       "order": "asc",
       "cacheTTL": 300,
       "genreSelection": "standard",
@@ -13326,49 +13414,28 @@
       "displayType": "series"
     },
     {
-      "id": "mdblist.128038",
-      "type": "series",
-      "name": "🎌 Nouveautés (Anime)",
-      "enabled": true,
-      "showInHome": false,
-      "source": "mdblist",
-      "sort": "default",
-      "order": "asc",
-      "cacheTTL": 86400,
-      "genreSelection": "standard",
-      "enableRatingPosters": true,
-      "displayType": "Série",
-      "metadata": {
-        "itemCount": 500,
-        "url": "https://mdblist.com/lists/snoak/latest-animationanime-shows",
-        "mediatype": "show",
-        "author": "snoak"
-      }
-    },
-    {
-      "id": "mdblist.128039",
+      "id": "mdblist.7764",
       "type": "movie",
-      "name": "🎌 Nouveautés (Anime)",
+      "name": "🎌 Les nouveautés (Anime)",
       "enabled": true,
       "showInHome": false,
       "source": "mdblist",
-      "sort": "default",
+      "sort": "released",
       "order": "asc",
-      "cacheTTL": 86400,
       "genreSelection": "standard",
       "enableRatingPosters": true,
       "displayType": "Film",
       "metadata": {
-        "itemCount": 500,
-        "url": "https://mdblist.com/lists/snoak/latest-animationanime-movies",
+        "itemCount": 100,
+        "url": "https://mdblist.com/lists/danielknell/latest-anime-movies",
         "mediatype": "movie",
-        "author": "snoak"
+        "author": "danielknell"
       }
     },
     {
       "id": "mdblist.29909",
       "type": "series",
-      "name": "🎌 Les plus tendances (Anime)",
+      "name": "🎌 Tendances (Anime)",
       "enabled": true,
       "showInHome": false,
       "source": "mdblist",
@@ -13448,6 +13515,25 @@
       },
       "randomizePerPage": false,
       "displayType": "series"
+    },
+    {
+      "id": "mdblist.195911",
+      "type": "movie",
+      "name": "🎌 Top (Anime)",
+      "enabled": true,
+      "showInHome": false,
+      "source": "mdblist",
+      "sort": "default",
+      "order": "asc",
+      "genreSelection": "standard",
+      "enableRatingPosters": true,
+      "displayType": "Film",
+      "metadata": {
+        "itemCount": 3910,
+        "url": "https://mdblist.com/lists/iamscallywag/anime-movies-of-all-time",
+        "mediatype": "movie",
+        "author": "iamscallywag"
+      }
     },
     {
       "id": "mdblist.29927",
@@ -14088,565 +14174,52 @@
       "randomizePerPage": false
     },
     {
-      "id": "custom.community_sports_fly.sport.sports_live",
-      "type": "sport",
-      "name": "🔴 Live Now",
+      "id": "tmdb.airing_today",
+      "name": "TMDB Airing Today",
+      "type": "series",
+      "source": "tmdb",
       "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_live.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_live",
-        "name": "Live Now",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
+      "showInHome": false
     },
     {
-      "id": "custom.org_prisonmike_streamvix.tv.streamvix_live",
-      "type": "tv",
-      "name": "🔴 StreamViX Live",
+      "id": "tvdb.trending",
+      "name": "TVDB Trending",
+      "type": "movie",
+      "source": "tvdb",
       "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://streamvix.hayd.uk/eyJtZWRpYWZsb3dNYXN0ZXIiOnRydWUsIm1lZGlhRmxvd1Byb3h5VXJsIjoiIiwibWVkaWFGbG93UHJveHlQYXNzd29yZCI6IiIsInVzZU1lZGlhRmxvdyI6ZmFsc2UsImR2ckVuYWJsZWQiOmZhbHNlLCJkaXNhYmxlTGl2ZVR2IjpmYWxzZSwidmF2b29Ob01mcEVuYWJsZWQiOnRydWUsInRyYWlsZXJFbmFibGVkIjpmYWxzZSwiZGlzYWJsZVZpeHNyYyI6ZmFsc2UsInZpeERpcmVjdCI6ZmFsc2UsInZpeERpcmVjdEZoZCI6ZmFsc2UsInZpeFByb3h5IjpmYWxzZSwiY2IwMUVuYWJsZWQiOmZhbHNlLCJndWFyZGFoZEVuYWJsZWQiOmZhbHNlLCJhZG5FbmFibGVkIjpmYWxzZSwidmlkeGdvRW5hYmxlZCI6ZmFsc2UsImd1YXJkb3NlcmllRW5hYmxlZCI6ZmFsc2UsImd1YXJkYWZsaXhFbmFibGVkIjpmYWxzZSwiZXVyb3N0cmVhbWluZ0VuYWJsZWQiOnRydWUsInRvb25pdGFsaWFFbmFibGVkIjpmYWxzZSwidG9vbkVuYWJsZWQiOmZhbHNlLCJhbmltZXNhdHVybkVuYWJsZWQiOmZhbHNlLCJhbmltZXdvcmxkRW5hYmxlZCI6ZmFsc2UsImFuaW1ldW5pdHlFbmFibGVkIjpmYWxzZSwiYW5pbWV1bml0eURpcmVjdCI6ZmFsc2UsImFuaW1ldW5pdHlEaXJlY3RGaGQiOmZhbHNlLCJhbmltZXVuaXR5UHJveHkiOmZhbHNlLCJmYXN0TW9kZSI6dHJ1ZX0=/catalog/tv/streamvix_live.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "id": "streamvix_live",
-        "type": "tv",
-        "name": "StreamViX Live",
-        "extra": [
-          {
-            "name": "genre",
-            "isRequired": true,
-            "options": [
-              "Z-Eventi",
-              "AK-Eventi",
-              "X-Eventi",
-              "THISNOT",
-              "SportzX",
-              "Sports99",
-              "Freeshot",
-              "pa.cc"
-            ]
-          }
-        ],
-        "idPrefixes": [
-          "tt",
-          "kitsu",
-          "tv",
-          "mal",
-          "tmdb",
-          "dvr"
-        ]
-      }
+      "showInHome": false
     },
     {
-      "id": "custom.community_sports_fly.sport.sports_today",
-      "type": "sport",
-      "name": "📅 Today",
+      "id": "tvdb.trending",
+      "name": "TVDB Trending",
+      "type": "series",
+      "source": "tvdb",
       "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_today.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_today",
-        "name": "Today",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
+      "showInHome": false
     },
     {
-      "id": "custom.community_sports_fly.sport.sports_basketball",
-      "type": "sport",
-      "name": "🏀 Basketball",
+      "id": "tvdb.genres",
+      "name": "TVDB Genres",
+      "type": "movie",
+      "source": "tvdb",
       "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_basketball.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_basketball",
-        "name": "Basketball",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
+      "showInHome": false
     },
     {
-      "id": "custom.community_sports_fly.sport.sports_football",
-      "type": "sport",
-      "name": "⚽ Football",
+      "id": "tvdb.collections",
+      "name": "TVDB Collections",
+      "type": "movie",
+      "source": "tvdb",
       "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_football.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_football",
-        "name": "Football",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
+      "showInHome": false
     },
     {
-      "id": "custom.community_sports_fly.sport.sports_american_football",
-      "type": "sport",
-      "name": "🏈 American Football",
+      "id": "tvmaze.schedule",
+      "name": "TVmaze Daily Schedule",
+      "type": "series",
+      "source": "tvmaze",
       "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_american_football.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_american_football",
-        "name": "American Football",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
-    },
-    {
-      "id": "custom.community_sports_fly.sport.sports_baseball",
-      "type": "sport",
-      "name": "⚾ Baseball",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_baseball.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_baseball",
-        "name": "Baseball",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
-    },
-    {
-      "id": "custom.community_sports_fly.sport.sports_motor_sports",
-      "type": "sport",
-      "name": "🏎️ Motor Sports",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_motor_sports.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_motor_sports",
-        "name": "Motor Sports",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
-    },
-    {
-      "id": "custom.community_sports_fly.sport.sports_fight",
-      "type": "sport",
-      "name": "🥊 Fight (UFC, Boxing)",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_fight.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_fight",
-        "name": "Fight (UFC, Boxing)",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
-    },
-    {
-      "id": "custom.community_sports_fly.sport.sports_tennis",
-      "type": "sport",
-      "name": "🎾 Tennis",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_tennis.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_tennis",
-        "name": "Tennis",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
-    },
-    {
-      "id": "custom.community_sports_fly.sport.sports_rugby",
-      "type": "sport",
-      "name": "🏉 Rugby",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_rugby.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_rugby",
-        "name": "Rugby",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
-    },
-    {
-      "id": "custom.community_sports_fly.sport.sports_other",
-      "type": "sport",
-      "name": "🎽 Other",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://sports.highfly.dev/eyJpbmNsdWRlU3BvcnRzIjpbImJhc2tldGJhbGwiLCJhbWVyaWNhbi1mb290YmFsbCIsImZvb3RiYWxsIiwiZmlnaHQiLCJiYXNlYmFsbCIsIm1vdG9yLXNwb3J0cyIsInRlbm5pcyIsInJ1Z2J5Iiwib3RoZXIiXX0/catalog/sport/sports_other.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "type": "sport",
-        "id": "sports_other",
-        "name": "Other",
-        "extra": [
-          {
-            "name": "skip",
-            "isRequired": false
-          }
-        ],
-        "showInHome": true,
-        "idPrefixes": [
-          "streamed",
-          "sf",
-          "recap",
-          "leaf"
-        ]
-      }
-    },
-    {
-      "id": "custom.org_prisonmike_streamvix.tv.streamvix_tv",
-      "type": "tv",
-      "name": "📺 StreamViX TV",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://streamvix.hayd.uk/eyJtZWRpYWZsb3dNYXN0ZXIiOnRydWUsIm1lZGlhRmxvd1Byb3h5VXJsIjoiIiwibWVkaWFGbG93UHJveHlQYXNzd29yZCI6IiIsInVzZU1lZGlhRmxvdyI6ZmFsc2UsImR2ckVuYWJsZWQiOmZhbHNlLCJkaXNhYmxlTGl2ZVR2IjpmYWxzZSwidmF2b29Ob01mcEVuYWJsZWQiOnRydWUsInRyYWlsZXJFbmFibGVkIjpmYWxzZSwiZGlzYWJsZVZpeHNyYyI6ZmFsc2UsInZpeERpcmVjdCI6ZmFsc2UsInZpeERpcmVjdEZoZCI6ZmFsc2UsInZpeFByb3h5IjpmYWxzZSwiY2IwMUVuYWJsZWQiOmZhbHNlLCJndWFyZGFoZEVuYWJsZWQiOmZhbHNlLCJhZG5FbmFibGVkIjpmYWxzZSwidmlkeGdvRW5hYmxlZCI6ZmFsc2UsImd1YXJkb3NlcmllRW5hYmxlZCI6ZmFsc2UsImd1YXJkYWZsaXhFbmFibGVkIjpmYWxzZSwiZXVyb3N0cmVhbWluZ0VuYWJsZWQiOnRydWUsInRvb25pdGFsaWFFbmFibGVkIjpmYWxzZSwidG9vbkVuYWJsZWQiOmZhbHNlLCJhbmltZXNhdHVybkVuYWJsZWQiOmZhbHNlLCJhbmltZXdvcmxkRW5hYmxlZCI6ZmFsc2UsImFuaW1ldW5pdHlFbmFibGVkIjpmYWxzZSwiYW5pbWV1bml0eURpcmVjdCI6ZmFsc2UsImFuaW1ldW5pdHlEaXJlY3RGaGQiOmZhbHNlLCJhbmltZXVuaXR5UHJveHkiOmZhbHNlLCJmYXN0TW9kZSI6dHJ1ZX0=/catalog/tv/streamvix_tv.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "id": "streamvix_tv",
-        "type": "tv",
-        "name": "StreamViX TV",
-        "extra": [
-          {
-            "name": "genre",
-            "isRequired": true,
-            "options": [
-              "RAI",
-              "Mediaset",
-              "Sky",
-              "Sport",
-              "Cinema",
-              "Documentari",
-              "Discovery",
-              "News",
-              "Generali",
-              "Bambini",
-              "Pluto"
-            ]
-          }
-        ],
-        "idPrefixes": [
-          "tt",
-          "kitsu",
-          "tv",
-          "mal",
-          "tmdb",
-          "dvr"
-        ]
-      }
-    },
-    {
-      "id": "custom.org_prisonmike_streamvix.tv.streamvix_eventi",
-      "type": "tv",
-      "name": "🎫 StreamViX Eventi",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://streamvix.hayd.uk/eyJtZWRpYWZsb3dNYXN0ZXIiOnRydWUsIm1lZGlhRmxvd1Byb3h5VXJsIjoiIiwibWVkaWFGbG93UHJveHlQYXNzd29yZCI6IiIsInVzZU1lZGlhRmxvdyI6ZmFsc2UsImR2ckVuYWJsZWQiOmZhbHNlLCJkaXNhYmxlTGl2ZVR2IjpmYWxzZSwidmF2b29Ob01mcEVuYWJsZWQiOnRydWUsInRyYWlsZXJFbmFibGVkIjpmYWxzZSwiZGlzYWJsZVZpeHNyYyI6ZmFsc2UsInZpeERpcmVjdCI6ZmFsc2UsInZpeERpcmVjdEZoZCI6ZmFsc2UsInZpeFByb3h5IjpmYWxzZSwiY2IwMUVuYWJsZWQiOmZhbHNlLCJndWFyZGFoZEVuYWJsZWQiOmZhbHNlLCJhZG5FbmFibGVkIjpmYWxzZSwidmlkeGdvRW5hYmxlZCI6ZmFsc2UsImd1YXJkb3NlcmllRW5hYmxlZCI6ZmFsc2UsImd1YXJkYWZsaXhFbmFibGVkIjpmYWxzZSwiZXVyb3N0cmVhbWluZ0VuYWJsZWQiOnRydWUsInRvb25pdGFsaWFFbmFibGVkIjpmYWxzZSwidG9vbkVuYWJsZWQiOmZhbHNlLCJhbmltZXNhdHVybkVuYWJsZWQiOmZhbHNlLCJhbmltZXdvcmxkRW5hYmxlZCI6ZmFsc2UsImFuaW1ldW5pdHlFbmFibGVkIjpmYWxzZSwiYW5pbWV1bml0eURpcmVjdCI6ZmFsc2UsImFuaW1ldW5pdHlEaXJlY3RGaGQiOmZhbHNlLCJhbmltZXVuaXR5UHJveHkiOmZhbHNlLCJmYXN0TW9kZSI6dHJ1ZX0=/catalog/tv/streamvix_eventi.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "id": "streamvix_eventi",
-        "type": "tv",
-        "name": "StreamViX Eventi",
-        "extra": [
-          {
-            "name": "genre",
-            "isRequired": true,
-            "options": [
-              "Serie A",
-              "Serie B",
-              "Serie C",
-              "Coppe",
-              "Soccer",
-              "Premier League",
-              "Liga",
-              "Bundesliga",
-              "Ligue 1",
-              "Tennis",
-              "F1",
-              "MotoGp",
-              "Basket",
-              "Volleyball",
-              "Ice Hockey",
-              "Wrestling",
-              "Boxing",
-              "Darts",
-              "Baseball",
-              "NFL"
-            ]
-          }
-        ],
-        "idPrefixes": [
-          "tt",
-          "kitsu",
-          "tv",
-          "mal",
-          "tmdb",
-          "dvr"
-        ]
-      }
-    },
-    {
-      "id": "custom.org_prisonmike_streamvix.tv.streamvix_tv_search",
-      "type": "tv",
-      "name": "🔎 Cerca TV",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://streamvix.hayd.uk/eyJtZWRpYWZsb3dNYXN0ZXIiOnRydWUsIm1lZGlhRmxvd1Byb3h5VXJsIjoiIiwibWVkaWFGbG93UHJveHlQYXNzd29yZCI6IiIsInVzZU1lZGlhRmxvdyI6ZmFsc2UsImR2ckVuYWJsZWQiOmZhbHNlLCJkaXNhYmxlTGl2ZVR2IjpmYWxzZSwidmF2b29Ob01mcEVuYWJsZWQiOnRydWUsInRyYWlsZXJFbmFibGVkIjpmYWxzZSwiZGlzYWJsZVZpeHNyYyI6ZmFsc2UsInZpeERpcmVjdCI6ZmFsc2UsInZpeERpcmVjdEZoZCI6ZmFsc2UsInZpeFByb3h5IjpmYWxzZSwiY2IwMUVuYWJsZWQiOmZhbHNlLCJndWFyZGFoZEVuYWJsZWQiOmZhbHNlLCJhZG5FbmFibGVkIjpmYWxzZSwidmlkeGdvRW5hYmxlZCI6ZmFsc2UsImd1YXJkb3NlcmllRW5hYmxlZCI6ZmFsc2UsImd1YXJkYWZsaXhFbmFibGVkIjpmYWxzZSwiZXVyb3N0cmVhbWluZ0VuYWJsZWQiOnRydWUsInRvb25pdGFsaWFFbmFibGVkIjpmYWxzZSwidG9vbkVuYWJsZWQiOmZhbHNlLCJhbmltZXNhdHVybkVuYWJsZWQiOmZhbHNlLCJhbmltZXdvcmxkRW5hYmxlZCI6ZmFsc2UsImFuaW1ldW5pdHlFbmFibGVkIjpmYWxzZSwiYW5pbWV1bml0eURpcmVjdCI6ZmFsc2UsImFuaW1ldW5pdHlEaXJlY3RGaGQiOmZhbHNlLCJhbmltZXVuaXR5UHJveHkiOmZhbHNlLCJmYXN0TW9kZSI6dHJ1ZX0=/catalog/tv/streamvix_tv_search.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "id": "streamvix_tv_search",
-        "type": "tv",
-        "name": "🔎 Cerca TV",
-        "extra": [
-          {
-            "name": "search",
-            "isRequired": true
-          }
-        ],
-        "idPrefixes": [
-          "tt",
-          "kitsu",
-          "tv",
-          "mal",
-          "tmdb",
-          "dvr"
-        ]
-      }
-    },
-    {
-      "id": "custom.org_prisonmike_streamvix.tv.streamvix_live_search",
-      "type": "tv",
-      "name": "🔎 Cerca Live",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://streamvix.hayd.uk/eyJtZWRpYWZsb3dNYXN0ZXIiOnRydWUsIm1lZGlhRmxvd1Byb3h5VXJsIjoiIiwibWVkaWFGbG93UHJveHlQYXNzd29yZCI6IiIsInVzZU1lZGlhRmxvdyI6ZmFsc2UsImR2ckVuYWJsZWQiOmZhbHNlLCJkaXNhYmxlTGl2ZVR2IjpmYWxzZSwidmF2b29Ob01mcEVuYWJsZWQiOnRydWUsInRyYWlsZXJFbmFibGVkIjpmYWxzZSwiZGlzYWJsZVZpeHNyYyI6ZmFsc2UsInZpeERpcmVjdCI6ZmFsc2UsInZpeERpcmVjdEZoZCI6ZmFsc2UsInZpeFByb3h5IjpmYWxzZSwiY2IwMUVuYWJsZWQiOmZhbHNlLCJndWFyZGFoZEVuYWJsZWQiOmZhbHNlLCJhZG5FbmFibGVkIjpmYWxzZSwidmlkeGdvRW5hYmxlZCI6ZmFsc2UsImd1YXJkb3NlcmllRW5hYmxlZCI6ZmFsc2UsImd1YXJkYWZsaXhFbmFibGVkIjpmYWxzZSwiZXVyb3N0cmVhbWluZ0VuYWJsZWQiOnRydWUsInRvb25pdGFsaWFFbmFibGVkIjpmYWxzZSwidG9vbkVuYWJsZWQiOmZhbHNlLCJhbmltZXNhdHVybkVuYWJsZWQiOmZhbHNlLCJhbmltZXdvcmxkRW5hYmxlZCI6ZmFsc2UsImFuaW1ldW5pdHlFbmFibGVkIjpmYWxzZSwiYW5pbWV1bml0eURpcmVjdCI6ZmFsc2UsImFuaW1ldW5pdHlEaXJlY3RGaGQiOmZhbHNlLCJhbmltZXVuaXR5UHJveHkiOmZhbHNlLCJmYXN0TW9kZSI6dHJ1ZX0=/catalog/tv/streamvix_live_search.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "id": "streamvix_live_search",
-        "type": "tv",
-        "name": "🔎 Cerca Live",
-        "extra": [
-          {
-            "name": "search",
-            "isRequired": true
-          }
-        ],
-        "idPrefixes": [
-          "tt",
-          "kitsu",
-          "tv",
-          "mal",
-          "tmdb",
-          "dvr"
-        ]
-      }
-    },
-    {
-      "id": "custom.org_prisonmike_streamvix.tv.streamvix_eventi_search",
-      "type": "tv",
-      "name": "🔎 Cerca Eventi",
-      "enabled": true,
-      "showInHome": false,
-      "source": "custom",
-      "sourceUrl": "https://streamvix.hayd.uk/eyJtZWRpYWZsb3dNYXN0ZXIiOnRydWUsIm1lZGlhRmxvd1Byb3h5VXJsIjoiIiwibWVkaWFGbG93UHJveHlQYXNzd29yZCI6IiIsInVzZU1lZGlhRmxvdyI6ZmFsc2UsImR2ckVuYWJsZWQiOmZhbHNlLCJkaXNhYmxlTGl2ZVR2IjpmYWxzZSwidmF2b29Ob01mcEVuYWJsZWQiOnRydWUsInRyYWlsZXJFbmFibGVkIjpmYWxzZSwiZGlzYWJsZVZpeHNyYyI6ZmFsc2UsInZpeERpcmVjdCI6ZmFsc2UsInZpeERpcmVjdEZoZCI6ZmFsc2UsInZpeFByb3h5IjpmYWxzZSwiY2IwMUVuYWJsZWQiOmZhbHNlLCJndWFyZGFoZEVuYWJsZWQiOmZhbHNlLCJhZG5FbmFibGVkIjpmYWxzZSwidmlkeGdvRW5hYmxlZCI6ZmFsc2UsImd1YXJkb3NlcmllRW5hYmxlZCI6ZmFsc2UsImd1YXJkYWZsaXhFbmFibGVkIjpmYWxzZSwiZXVyb3N0cmVhbWluZ0VuYWJsZWQiOnRydWUsInRvb25pdGFsaWFFbmFibGVkIjpmYWxzZSwidG9vbkVuYWJsZWQiOmZhbHNlLCJhbmltZXNhdHVybkVuYWJsZWQiOmZhbHNlLCJhbmltZXdvcmxkRW5hYmxlZCI6ZmFsc2UsImFuaW1ldW5pdHlFbmFibGVkIjpmYWxzZSwiYW5pbWV1bml0eURpcmVjdCI6ZmFsc2UsImFuaW1ldW5pdHlEaXJlY3RGaGQiOmZhbHNlLCJhbmltZXVuaXR5UHJveHkiOmZhbHNlLCJmYXN0TW9kZSI6dHJ1ZX0=/catalog/tv/streamvix_eventi_search.json",
-      "genres": [],
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "manifestData": {
-        "id": "streamvix_eventi_search",
-        "type": "tv",
-        "name": "🔎 Cerca Eventi",
-        "extra": [
-          {
-            "name": "search",
-            "isRequired": true
-          }
-        ],
-        "idPrefixes": [
-          "tt",
-          "kitsu",
-          "tv",
-          "mal",
-          "tmdb",
-          "dvr"
-        ]
-      }
+      "showInHome": false
     }
   ]
 }
