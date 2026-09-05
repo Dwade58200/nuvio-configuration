@@ -106,7 +106,7 @@ Pour une exécution réelle, deux secrets GitHub sont nécessaires
 ## Qualité & CI
 
 À chaque push/PR, `.github/workflows/tests.yml` fait tourner :
-- **pytest** (139 tests) -- résolution des sources, composition des
+- **pytest** (146 tests) -- résolution des sources, composition des
   mosaïques, mise à jour des URLs, validation du schéma ;
 - **ruff** -- lint (bloquant) ;
 - **mypy** -- vérification de types (bloquant) ;
@@ -133,6 +133,12 @@ compte AIOMetadata/Nuvio).
 ## Usage courant
 
 - **Rien, la plupart du temps** -- le cron mensuel s'occupe de tout.
+- **Ajouter/renommer une collection dans Nuvio** → rien à faire côté script,
+  c'est pris en compte automatiquement au prochain run (voir
+  `BACKDROPS_SETUP.md`, section *Ajout/suppression d'une collection*).
+- **Imposer une image sans passer par la génération** → fichier
+  `Templates/images-manuelles.json` (voir `BACKDROPS_SETUP.md`, section
+  *Images manuelles*).
 - **Ajouter une collection** → éditer `Templates/Nuvio-Collections-Dwade58200.json`
   (idéalement en suivant `schema/nuvio-collections.schema.json`), puis
   réimporter dans Nuvio.

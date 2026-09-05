@@ -16,11 +16,13 @@ adapté à la structure de collections propre à ce dépôt.
 6. Export AIOMetadata
 7. MDBList
 8. Catalogues Stremio "custom" (Bingecat & co)
-9. Mise à jour des URLs
-10. Structure de fichiers
-11. Dépannage
-12. Résilience aux renommages de groupes
-13. Idées pour plus tard
+9. Images manuelles (sans passer par la génération)
+10. Ajout/suppression d'une collection dans Nuvio
+11. Mise à jour des URLs
+12. Structure de fichiers
+13. Dépannage
+14. Résilience aux renommages de groupes
+15. Idées pour plus tard
 
 ## 🎯 Comment ça marche
 
@@ -223,6 +225,8 @@ Options utiles de `generer_backdrops.py` :
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
 | `--profil {standard,haute,compresse}` | Taille/qualité de sortie |
+| `--images-manuelles chemin.json` | Surcharges manuelles titre→image, court-circuitent la résolution (défaut : `Templates/images-manuelles.json`, ignoré si absent) |
+| `--signaler-orphelins` | Liste en fin d'exécution les backdrops sur disque sans dossier actif correspondant (rapport seul) |
 | `-v` | Logs détaillés |
 
 ### Depuis GitHub Actions
@@ -420,6 +424,63 @@ Avec ce mécanisme, les recommandations MDBList personnalisées
 être remplacées par les catalogues Bingecat équivalents pour le dossier
 "Recommandation", qui eux fonctionnent bien via ce chemin.
 
+## 🖼️ Images manuelles (sans passer par la génération)
+
+Pour imposer une image précise à un dossier sans passer par toute la
+résolution TMDB/Fanart/MDBList (ex : une image que tu as choisie toi-même,
+ou un dossier dont le catalogue ne donne jamais un visuel satisfaisant),
+crée un fichier `Templates/images-manuelles.json` :
+
+```json
+{
+  "Netflix": "https://exemple.com/mon-backdrop-netflix.jpg",
+  "Noël": "chemin/local/vers/image-noel.jpg"
+}
+```
+
+- Clé = titre **exact** du dossier, tel qu'il apparaît dans le JSON de
+  collections (accents/emoji compris).
+- Valeur = une URL `http(s)://` (téléchargée) ou un chemin de fichier local
+  (lu directement sur disque) -- dans les deux cas, l'image est simplement
+  redimensionnée/compressée selon `--profil`, sans aucune requête de
+  résolution de catalogue.
+- Ce fichier est **optionnel** : absent, le pipeline fonctionne exactement
+  comme avant. Il n'est pas suivi par le schéma de collections (ce n'est
+  pas le même fichier).
+- Priorité **absolue** : un dossier listé ici est traité même si son groupe
+  est désactivé (Franchises, Sports...) -- c'est le seul cas où
+  `CRITERES_GROUPES` peut être court-circuité.
+- Chemin personnalisable via `--images-manuelles chemin/vers/fichier.json`
+  (défaut : `Templates/images-manuelles.json`).
+
+Une fois le fichier généré, lance `mettre_a_jour_urls.py` normalement --
+il détecte le fichier sur disque comme n'importe quel autre backdrop généré
+et met à jour `heroBackdropUrl` en conséquence.
+
+## 🆕 Ajout/suppression d'une collection dans Nuvio
+
+Un groupe ou un dossier ajouté dans Nuvio (donc dans un nouvel export du
+JSON de collections) est **pris en compte automatiquement** dès la
+prochaine exécution -- aucune retouche du script n'est nécessaire. Un
+groupe absent de `CRITERES_GROUPES` est traité par défaut avec les réglages
+génériques (actif, sans filtre de dossiers, nom de dossier de sortie dérivé
+automatiquement de son titre). Un message `🆕 Nouveau groupe détecté...`
+s'affiche à titre informatif -- tu n'as besoin d'ajouter une entrée dans
+`CRITERES_GROUPES`/`GROUPE_SLUGS` (voir bandeau `⚙️ ZONE ÉDITABLE` en haut
+de `generer_backdrops.py`) que pour :
+
+- **exclure** ce groupe de la génération (comme Sports/Franchises) ;
+- **filtrer** certains de ses dossiers (comme Découvrir) ;
+- lui donner un **nom de dossier de sortie** différent du repli automatique.
+
+Pour une collection ou un dossier **supprimé** dans Nuvio : rien ne casse
+(il n'est simplement plus traité), mais son image reste orpheline sur
+disque. Pour repérer ces fichiers (rapport seul, rien n'est supprimé) :
+
+```bash
+python3 scripts/generer_backdrops.py --dry-run --signaler-orphelins
+```
+
 ## 🔗 Mise à jour des URLs (`heroBackdropUrl`)
 
 Un second script, `scripts/mettre_a_jour_urls.py`, met à jour le champ
@@ -479,12 +540,13 @@ cas connus.
 fichiers ~7 jours ; le workflow purge automatiquement le cache après chaque
 commit, mais tu peux aussi lancer `python3 scripts/purger_cache.py` toi-même.
 
-**"⚠️ Groupe non reconnu dans le JSON"** → un groupe entier a été renommé
-dans Nuvio au-delà d'un simple emoji/espace/accent (ce que le script gère
-déjà tout seul). Il faut ajouter ce nouveau nom au script : dans
-`scripts/generer_backdrops.py`, section `CRITERES_GROUPES`/`GROUPE_SLUGS`
-en haut du fichier. Le message indique le titre normalisé pour t'aider à
-identifier de quel groupe canonique il s'agit.
+**"🆕 Nouveau groupe détecté dans le JSON"** → un groupe a été ajouté dans
+Nuvio, ou renommé au-delà d'un simple emoji/espace/accent. Ce n'est PAS un
+problème : le groupe est déjà traité automatiquement avec les réglages par
+défaut. Le message est informatif -- ajoute une entrée dans
+`CRITERES_GROUPES`/`GROUPE_SLUGS` (section `⚙️ ZONE ÉDITABLE` en haut de
+`scripts/generer_backdrops.py`) uniquement si tu veux l'exclure, filtrer
+certains de ses dossiers, ou lui donner un nom de dossier de sortie précis.
 
 **"⚠️ Groupe(s) attendu(s) mais absent(s) du JSON"** → l'inverse : un
 groupe que le script s'attend à trouver (ex: "vibe") n'apparaît nulle part
@@ -511,9 +573,12 @@ espaces réduits) plutôt qu'en texte exact. Concrètement :
 - `"🎭Genres"`, `"🎭 Genres"`, `"🆕 Genres"` sont tous reconnus comme le
   même groupe "Genres".
 - Un renommage plus profond (ex: "Vibe" → "Ambiances") n'est PAS deviné
-  automatiquement -- mais il déclenche un avertissement explicite au lieu
-  d'échouer en silence (voir « Dépannage »), avec le nom exact
-  à ajouter au script.
+  automatiquement -- mais depuis la mise à jour "ajout automatique" (voir
+  section *Ajout/suppression d'une collection dans Nuvio*), ça ne bloque
+  plus rien : le groupe est traité avec les réglages par défaut, un simple
+  message `🆕 Nouveau groupe détecté...` s'affiche à titre informatif, avec
+  le nom exact à ajouter à `CRITERES_GROUPES` si tu veux affiner son
+  traitement (l'exclure, filtrer ses dossiers, etc.).
 
 ## 🗺️ Idées pour plus tard (non planifiées)
 

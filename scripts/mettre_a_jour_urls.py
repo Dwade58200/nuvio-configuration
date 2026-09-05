@@ -42,6 +42,7 @@ from generer_backdrops import (  # noqa: E402
     dossier_actif,
     nom_fichier_backdrop,
     normaliser,
+    slugifier,
 )
 
 
@@ -65,9 +66,11 @@ def mettre_a_jour(
 
     for groupe in collections:
         titre_groupe = groupe.get("title", "")
-        slug_groupe = GROUPE_SLUGS.get(normaliser(titre_groupe))
-        if not slug_groupe:
-            continue  # groupe inconnu du générateur -> on ne touche à rien
+        # Repli sur un slug généré automatiquement pour un groupe absent de
+        # GROUPE_SLUGS (ex: nouvelle collection ajoutée dans Nuvio) -- même
+        # logique que generer_backdrops.py, pour rester synchronisé sur les
+        # chemins de fichiers même pour un groupe non déclaré explicitement.
+        slug_groupe = GROUPE_SLUGS.get(normaliser(titre_groupe), slugifier(titre_groupe))
 
         for dossier in groupe.get("folders", []):
             if not dossier_actif(titre_groupe, dossier.get("title", "")):

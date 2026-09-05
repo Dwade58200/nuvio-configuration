@@ -6,6 +6,46 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
+## ✅ Fait (session du 5 septembre 2026 -- 3 demandes explicites)
+
+- [x] **Ajout/suppression automatique d'une collection Nuvio** :
+      `dossier_actif()` traite désormais un groupe absent de
+      `CRITERES_GROUPES` comme **actif par défaut** (opt-out) au lieu de
+      l'ignorer silencieusement (opt-in) -- un ajout dans Nuvio est pris en
+      compte au prochain run sans toucher au script. `mettre_a_jour_urls.py`
+      aligné (repli `slugifier` au lieu de `continue` sur un groupe
+      inconnu). Message d'avertissement reformulé (`🆕 Nouveau groupe
+      détecté...` au lieu de `⚠️ non reconnu`, désormais informatif et non
+      bloquant). Nouveau : `detecter_backdrops_orphelins()` +
+      `--signaler-orphelins` pour repérer (rapport seul, rien n'est
+      supprimé) les images restées sur disque après suppression d'une
+      collection/d'un dossier côté Nuvio.
+- [x] **Zone éditable clairement indiquée** : bandeau
+      `⚙️ ZONE ÉDITABLE -- DÉBUT/FIN` autour de toute la config destinée à
+      être modifiée à la main (`CRITERES_GROUPES`, `GROUPE_SLUGS`,
+      `NOMS_BACKDROP_PERSONNALISES`, `GENRE_TMDB_IDS`, `NETWORK_TMDB_IDS`...),
+      séparée explicitement de la logique du pipeline en dessous.
+- [x] **Images manuelles sans génération de backdrop** : nouveau fichier
+      optionnel `Templates/images-manuelles.json`
+      (`{"Titre du dossier": "url_ou_chemin"}`), chargé via
+      `charger_images_manuelles()` et vérifié en priorité ABSOLUE dans
+      `traiter_dossier()` -- court-circuite toute résolution
+      TMDB/Fanart/MDBList, fonctionne même sur un groupe désactivé
+      (Franchises/Sports). Nouveau flag CLI `--images-manuelles`. Code de
+      redimensionnement/sauvegarde factorisé (`_redimensionner_et_sauver`)
+      entre le téléchargement (`telecharger_et_traiter`) et le nouveau cas
+      fichier local (`traiter_image_locale`).
+- [x] 7 nouveaux tests (139 -> 146), tous verts ; `ruff`/`mypy` toujours au
+      vert ; run réel (`--dry-run` sur le vrai JSON) toujours 53 générés /
+      0 erreur -- aucune régression.
+- [x] Documentation : nouvelles sections *Images manuelles* et
+      *Ajout/suppression d'une collection dans Nuvio* dans
+      `BACKDROPS_SETUP.md` (+ sommaire, tableau d'options CLI, section
+      Dépannage et Résilience aux renommages mises à jour) ; README
+      resynchronisé (nombre de tests, section *Usage courant*).
+
+---
+
 ## ✅ Fait (session du 4 septembre 2026, suite -- catalogues France recréés)
 
 - [x] Utilisateur a recréé les catalogues `top_france`/`populaires_france`

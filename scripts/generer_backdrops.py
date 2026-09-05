@@ -86,6 +86,25 @@ TMDB_API_BASE = "https://api.themoviedb.org/3"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p"
 FANART_API_BASE = "https://webservice.fanart.tv/v3"
 
+# =============================================================================
+# ⚙️  ZONE ÉDITABLE -- DÉBUT
+# =============================================================================
+# Tout ce qui se trouve entre ce bandeau et « ZONE ÉDITABLE -- FIN » est la
+# configuration destinée à être modifiée à la main : c'est la SEULE partie du
+# fichier à toucher pour ajouter/exclure un groupe, renommer un fichier de
+# backdrop, ajuster un filtre de dossiers, ou ajouter un genre/réseau TV.
+# Le reste du fichier (après le bandeau de fin) est la logique du pipeline
+# -- à ne modifier qu'en cas de bug ou de nouvelle fonctionnalité.
+#
+# Depuis la mise à jour "ajout automatique" : un groupe absent de
+# CRITERES_GROUPES n'est PLUS ignoré -- il est traité par défaut avec les
+# réglages génériques (voir `dossier_actif`). Vous n'avez donc besoin
+# d'ajouter une entrée ici QUE pour :
+#   - exclure un groupe (comme Sports/Franchises) ;
+#   - filtrer certains dossiers d'un groupe (comme Découvrir) ;
+#   - lui donner un nom de dossier de sortie personnalisé (GROUPE_SLUGS).
+# Un ajout de collection dans Nuvio n'exige donc plus de retouche ici.
+#
 # Titres EXACTS des groupes tels qu'ils existent réellement dans le JSON.
 # (le bug initial venait d'un mauvais mapping ici -> corrigé, puis reproduit
 # une seconde fois quand Nuvio a ajouté/changé des emojis sur les groupes)
@@ -272,6 +291,13 @@ NETWORK_TMDB_IDS: dict[str, int] = {
     "tf1": 290,
     "m6": 712,
 }
+
+# =============================================================================
+# ⚙️  ZONE ÉDITABLE -- FIN
+# =============================================================================
+# À partir d'ici : logique du pipeline (résolution des sources, appels API,
+# composition d'image...). Ne pas modifier sans comprendre l'impact -- voir
+# BACKDROPS_SETUP.md pour le détail du fonctionnement.
 
 
 def _resoudre_reseaux_depuis_texte(texte: str) -> list[int]:
@@ -678,7 +704,14 @@ def construire_requetes(
 
 def dossier_actif(groupe_titre: str, dossier_titre: str) -> bool:
     critere = CRITERES_GROUPES.get(normaliser(groupe_titre))
-    if critere is None or not critere.actif:
+    if critere is None:
+        # Groupe absent de CRITERES_GROUPES : PAS ignoré -- traité actif par
+        # défaut (opt-out), pour qu'un ajout de collection dans Nuvio soit
+        # pris en compte automatiquement sans retoucher au script. Le
+        # warning affiché dans generer_tout() signale sa présence ; n'ajouter
+        # une entrée ici que pour l'exclure ou filtrer ses dossiers.
+        return True
+    if not critere.actif:
         return False
     if critere.inclure and not any(mot.lower() in dossier_titre.lower() for mot in critere.inclure):
         return False
@@ -1226,14 +1259,8 @@ PROFILS_QUALITE = {
 }
 
 
-def telecharger_et_traiter(
-    url: str, chemin_sortie: Path, session: requests.Session, profil: str = "standard"
-) -> None:
+def _redimensionner_et_sauver(image: Image.Image, chemin_sortie: Path, profil: str) -> None:
     reglages = PROFILS_QUALITE.get(profil, PROFILS_QUALITE["standard"])
-    r = session.get(url, timeout=30)
-    r.raise_for_status()
-
-    image = Image.open(io.BytesIO(r.content)).convert("RGB")
     largeur_cible = reglages["largeur"]
     if image.width > largeur_cible:
         ratio = largeur_cible / image.width
@@ -1241,6 +1268,23 @@ def telecharger_et_traiter(
 
     chemin_sortie.parent.mkdir(parents=True, exist_ok=True)
     image.save(chemin_sortie, "JPEG", quality=reglages["qualite"], optimize=True)
+
+
+def telecharger_et_traiter(
+    url: str, chemin_sortie: Path, session: requests.Session, profil: str = "standard"
+) -> None:
+    r = session.get(url, timeout=30)
+    r.raise_for_status()
+    image = Image.open(io.BytesIO(r.content)).convert("RGB")
+    _redimensionner_et_sauver(image, chemin_sortie, profil)
+
+
+def traiter_image_locale(chemin_source: Path, chemin_sortie: Path, profil: str = "standard") -> None:
+    """Reprend une image déjà présente sur disque (surcharge manuelle avec
+    un chemin local plutôt qu'une URL) et lui applique le même traitement
+    (redimensionnement/compression) qu'une image téléchargée."""
+    image = Image.open(chemin_source).convert("RGB")
+    _redimensionner_et_sauver(image, chemin_sortie, profil)
 
 
 # ---------------------------------------------------------------------------
@@ -1326,6 +1370,7 @@ class GenerateurBackdrops:
         langue_preferee: str = "fr",
         cle_mdblist: str | None = None,
         catalogues_aiometadata: dict[str, dict[str, Any]] | None = None,
+        images_manuelles: dict[str, str] | None = None,
     ):
         self.session = requests.Session()
         # Le profil `mosaique` télécharge jusqu'à 12 tuiles en parallèle par
@@ -1348,6 +1393,7 @@ class GenerateurBackdrops:
         self.mosaique = mosaique
         self.langue_preferee = langue_preferee
         self.catalogues_aiometadata = catalogues_aiometadata or {}
+        self.images_manuelles = images_manuelles or {}
 
     def _dimensions_canvas(self) -> tuple[int, int]:
         largeur = PROFILS_QUALITE.get(self.profil, PROFILS_QUALITE["standard"])["largeur"]
@@ -1565,6 +1611,24 @@ class GenerateurBackdrops:
     def traiter_dossier(self, groupe_titre: str, dossier: dict[str, Any]) -> ResultatDossier:
         dossier_titre = dossier.get("title", "sans-titre")
 
+        # Surcharge manuelle : priorité ABSOLUE, avant même dossier_actif --
+        # permet d'imposer une image y compris pour un groupe désactivé
+        # (Franchises, Sports...). Aucune résolution TMDB/Fanart/MDBList.
+        image_manuelle = self.images_manuelles.get(dossier_titre)
+        if image_manuelle:
+            chemin_relatif = Path(GROUPE_SLUGS.get(normaliser(groupe_titre), slugifier(groupe_titre))) / NOM_DOSSIER_BACKDROPS / f"{nom_fichier_backdrop(dossier_titre)}.jpg"
+            chemin_sortie = self.repertoire_sortie / chemin_relatif
+            if self.dry_run:
+                return ResultatDossier(groupe_titre, dossier_titre, "genere", f"[dry-run] image manuelle : {image_manuelle}", str(chemin_relatif))
+            try:
+                if image_manuelle.startswith("http://") or image_manuelle.startswith("https://"):
+                    telecharger_et_traiter(image_manuelle, chemin_sortie, self.session, self.profil)
+                else:
+                    traiter_image_locale(Path(image_manuelle), chemin_sortie, self.profil)
+                return ResultatDossier(groupe_titre, dossier_titre, "genere", f"image manuelle : {image_manuelle}", str(chemin_relatif))
+            except Exception as exc:  # noqa: BLE001
+                return ResultatDossier(groupe_titre, dossier_titre, "erreur", f"image manuelle invalide ({image_manuelle}) : {exc}")
+
         if not dossier_actif(groupe_titre, dossier_titre):
             return ResultatDossier(groupe_titre, dossier_titre, "ignore", "groupe/dossier non ciblé en phase 1")
 
@@ -1631,9 +1695,11 @@ class GenerateurBackdrops:
 
             if cle_normalisee not in groupes_connus:
                 print(
-                    f"⚠️  Groupe non reconnu dans le JSON : {titre_groupe!r} (normalisé: {cle_normalisee!r}) "
-                    "-- aucun mapping connu, ce groupe entier sera ignoré. "
-                    "Si ce groupe existe bien dans Nuvio, il faut l'ajouter au script (CRITERES_GROUPES / GROUPE_SLUGS)."
+                    f"🆕 Nouveau groupe détecté dans le JSON : {titre_groupe!r} (normalisé: {cle_normalisee!r}) "
+                    "-- absent de CRITERES_GROUPES, donc traité automatiquement avec les réglages par défaut "
+                    "(actif, sans filtre de dossiers, nom de sortie généré depuis son titre). "
+                    "Ajoute une entrée dans CRITERES_GROUPES/GROUPE_SLUGS seulement si tu veux l'exclure, "
+                    "filtrer certains de ses dossiers, ou lui donner un nom de dossier de sortie précis."
                 )
 
             if filtre_groupe and normaliser(filtre_groupe) not in cle_normalisee:
@@ -1676,9 +1742,52 @@ class GenerateurBackdrops:
 # CLI
 # ---------------------------------------------------------------------------
 
+def charger_images_manuelles(chemin: Path | None) -> dict[str, str]:
+    """Charge le fichier optionnel de surcharges manuelles : un objet JSON
+    `{"Titre EXACT du dossier": "url_https_ou_chemin_local"}`. Pour tout
+    dossier listé ici, l'image fournie est utilisée TELLE QUELLE (juste
+    redimensionnée/compressée selon le profil) -- aucune résolution de
+    source, aucun appel TMDB/Fanart/MDBList n'est effectué pour ce dossier.
+    Absence du fichier = dict vide (fonctionnalité optionnelle, sans impact
+    si non utilisée). Voir BACKDROPS_SETUP.md, section « Images manuelles »."""
+    if chemin is None or not chemin.exists():
+        return {}
+    with chemin.open(encoding="utf-8") as f:
+        donnees = json.load(f)
+    if not isinstance(donnees, dict):
+        raise ValueError(f"{chemin} doit contenir un objet JSON {{\"Titre du dossier\": \"url_ou_chemin\"}}")
+    return {str(cle): str(valeur) for cle, valeur in donnees.items()}
+
+
 def charger_collections(chemin: Path) -> list[dict[str, Any]]:
     with chemin.open(encoding="utf-8") as f:
         return json.load(f)
+
+
+def detecter_backdrops_orphelins(
+    collections: list[dict[str, Any]], repertoire_sortie: Path
+) -> list[Path]:
+    """Liste les fichiers `*_Backdrop.jpg` présents sur disque qui ne
+    correspondent plus à AUCUN dossier actif du JSON actuel -- typiquement
+    une collection ou un dossier supprimé dans Nuvio depuis la dernière
+    génération. Ne supprime rien : simple rapport, à nettoyer à la main."""
+    noms_attendus: set[str] = set()
+    for groupe in collections:
+        titre_groupe = groupe.get("title", "")
+        for dossier in groupe.get("folders", []):
+            dossier_titre = dossier.get("title", "")
+            if dossier_actif(titre_groupe, dossier_titre):
+                noms_attendus.add(nom_fichier_backdrop(dossier_titre) + ".jpg")
+
+    if not repertoire_sortie.exists():
+        return []
+
+    orphelins = [
+        chemin
+        for chemin in repertoire_sortie.glob(f"*/{NOM_DOSSIER_BACKDROPS}/*.jpg")
+        if chemin.name not in noms_attendus
+    ]
+    return sorted(orphelins)
 
 
 def afficher_resume(resultats: list[ResultatDossier]) -> None:
@@ -1721,6 +1830,8 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="Simule sans appeler TMDB ni écrire d'image")
     parser.add_argument("--mosaique", action="store_true", help="Génère une mosaïque multi-titres + couleur d'accent au lieu d'un seul backdrop (repli automatique si pas assez d'images)")
     parser.add_argument("--langue-preferee", default="fr", help="Code langue préféré pour le backdrop TMDB avec titre incrusté (palier 1 de la cascade -- n'affecte PAS Fanart.tv, qui ne cherche que l'anglais) (défaut: fr)")
+    parser.add_argument("--images-manuelles", default="Templates/images-manuelles.json", help="JSON {\"Titre du dossier\": \"url_ou_chemin_image\"} pour imposer une image sans passer par la génération TMDB/Fanart (optionnel, ignoré si le fichier n'existe pas)")
+    parser.add_argument("--signaler-orphelins", action="store_true", help="Liste en fin d'exécution les backdrops sur disque qui ne correspondent plus à aucun dossier actif (ex: collection supprimée dans Nuvio) -- rapport seul, ne supprime rien")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -1742,12 +1853,19 @@ def main() -> int:
         langue_preferee=args.langue_preferee,
         cle_mdblist=args.cle_mdblist or os.environ.get("MDBLIST_API_KEY"),
         catalogues_aiometadata=charger_catalogues_aiometadata(Path(args.aiometadata) if args.aiometadata else None),
+        images_manuelles=charger_images_manuelles(Path(args.images_manuelles) if args.images_manuelles else None),
     )
 
     resultats = generateur.generer_tout(
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
     )
     afficher_resume(resultats)
+
+    if args.signaler_orphelins:
+        orphelins = detecter_backdrops_orphelins(collections, Path(args.sortie))
+        print(f"\n🗑️  Backdrops orphelins (plus aucun dossier actif correspondant) : {len(orphelins)}")
+        for chemin in orphelins:
+            print(f"  - {chemin}")
 
     return 0
 
