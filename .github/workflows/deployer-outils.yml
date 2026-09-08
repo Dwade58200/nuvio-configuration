@@ -1,0 +1,42 @@
+name: Déployer les outils (GitHub Pages)
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "outils/**"
+      - ".github/workflows/deployer-outils.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un seul déploiement Pages à la fois ; on laisse celui en cours se
+# terminer plutôt que de l'annuler (évite un déploiement à moitié fait).
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le repository
+        uses: actions/checkout@v4
+
+      - name: Configurer GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Empaqueter le dossier outils/
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: outils
+
+      - name: Déployer sur GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
