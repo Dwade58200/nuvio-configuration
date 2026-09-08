@@ -47,7 +47,7 @@
       "properties": {
         "provider": {
           "type": "string",
-          "enum": ["tmdb", "addon", "mdblist"]
+          "enum": ["tmdb", "addon", "mdblist", "trakt"]
         }
       },
       "allOf": [
@@ -80,6 +80,20 @@
               "catalogId": { "type": "string", "minLength": 1 },
               "type": { "type": "string" },
               "genre": { "type": "string" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "provider": { "const": "trakt" } }
+          },
+          "then": {
+            "required": ["traktListId", "mediaType"],
+            "properties": {
+              "traktListId": { "type": "integer" },
+              "mediaType": { "type": "string", "enum": ["MOVIE", "TV"] },
+              "sortBy": { "type": "string" },
+              "sortHow": { "type": "string", "enum": ["asc", "desc"] }
             }
           }
         },
