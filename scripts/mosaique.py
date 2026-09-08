@@ -36,6 +36,9 @@ DECALAGE_LIGNE = 0.5      # décalage horizontal d'une ligne à l'autre (cascade
 INCLINAISON_DEG = 10       # angle de rotation de la grille entière
 MARGE_CASES = 3           # cases en trop (au-delà du canvas) pour couvrir les coins après rotation
 
+INTENSITE_OMBRE = 1.0        # multiplie l'alpha des 3 dégradés de vignette (gauche/bas/coin) -- 1.0 = valeurs par défaut ci-dessous, inchangées
+RAYON_FLOU_LUEUR_MIN = 24    # flou minimum (px, échelle canvas) de la lueur d'accent diffuse
+
 MINIMUM_IMAGES_DISTINCTES = 3   # en dessous, pas assez de variété -> repli sur mode single-backdrop
 TUILES_CIBLE = 12               # nombre de tuiles visées (on répète les images si besoin, comme luckynumb3rs)
 
@@ -239,9 +242,13 @@ def construire_grille_inclinee(
 # Dégradé multi-couches teinté par la couleur d'accent
 # ---------------------------------------------------------------------------
 
-def _degrade_lineaire(largeur: int, hauteur: int, direction: str, couleur: tuple[int, int, int] = (6, 6, 8)) -> Image.Image:
+def _degrade_lineaire(
+    largeur: int, hauteur: int, direction: str, couleur: tuple[int, int, int] = (6, 6, 8), intensite: float = 1.0
+) -> Image.Image:
     """Dégradé calculé à basse résolution puis mis à l'échelle (rapide),
-    même technique que le script de référence."""
+    même technique que le script de référence. `intensite` multiplie
+    l'alpha calculé (1.0 = comportement historique inchangé) -- utilisé
+    pour le réglage INTENSITE_OMBRE, jamais pour la lueur d'accent."""
     petite_largeur = max(1, largeur // 4)
     petite_hauteur = max(1, hauteur // 4)
     image = Image.new("RGBA", (petite_largeur, petite_hauteur), (0, 0, 0, 0))
@@ -251,7 +258,7 @@ def _degrade_lineaire(largeur: int, hauteur: int, direction: str, couleur: tuple
     if direction == "gauche":
         for x in range(petite_largeur):
             proportion = max(0.0, 1.0 - x / (petite_largeur * 0.5))
-            alpha = int(190 * proportion**1.6)
+            alpha = min(255, int(190 * proportion**1.6 * intensite))
             if alpha:
                 for y in range(petite_hauteur):
                     pixels[x, y] = (*couleur, alpha)
@@ -259,7 +266,7 @@ def _degrade_lineaire(largeur: int, hauteur: int, direction: str, couleur: tuple
     elif direction == "bas":
         for y in range(petite_hauteur):
             proportion = max(0.0, (y - petite_hauteur * 0.45) / (petite_hauteur * 0.55))
-            alpha = int(200 * proportion**1.4)
+            alpha = min(255, int(200 * proportion**1.4 * intensite))
             if alpha:
                 for x in range(petite_largeur):
                     pixels[x, y] = (*couleur, alpha)
@@ -270,7 +277,7 @@ def _degrade_lineaire(largeur: int, hauteur: int, direction: str, couleur: tuple
             for y in range(petite_hauteur):
                 distance = math.hypot(x, petite_hauteur - y)
                 base = max(0.0, 1.0 - (distance / diagonale_max) / 0.6)
-                alpha = int(220 * base**2.0)
+                alpha = int(220 * base**2.0 * intensite)
                 if alpha:
                     pixels[x, y] = (*couleur, min(255, alpha))
 
@@ -283,18 +290,19 @@ def appliquer_degrade(canvas: Image.Image, accent: tuple[int, int, int]) -> Imag
     lueur diffuse de la couleur d'accent en haut-droite."""
     largeur, hauteur = canvas.size
 
-    degrade_gauche = _degrade_lineaire(largeur, hauteur, "gauche")
-    degrade_bas = _degrade_lineaire(largeur, hauteur, "bas")
-    degrade_coin = _degrade_lineaire(largeur, hauteur, "coin_bas_gauche")
+    degrade_gauche = _degrade_lineaire(largeur, hauteur, "gauche", intensite=INTENSITE_OMBRE)
+    degrade_bas = _degrade_lineaire(largeur, hauteur, "bas", intensite=INTENSITE_OMBRE)
+    degrade_coin = _degrade_lineaire(largeur, hauteur, "coin_bas_gauche", intensite=INTENSITE_OMBRE)
 
     resultat = Image.alpha_composite(canvas, degrade_coin)
     resultat = Image.alpha_composite(resultat, degrade_gauche)
     resultat = Image.alpha_composite(resultat, degrade_bas)
 
-    # Lueur d'accent diffuse, coin haut-droite
+    # Lueur d'accent diffuse, coin haut-droite -- intensité NON affectée par
+    # INTENSITE_OMBRE (réglage séparé, voir outils/reglage-style-mosaique.html)
     petite_lueur = _degrade_lineaire(largeur // 4, hauteur // 4, "coin_bas_gauche", couleur=accent)
     lueur = petite_lueur.rotate(180).resize((largeur, hauteur), Image.Resampling.BILINEAR)
-    lueur = lueur.filter(ImageFilter.GaussianBlur(radius=max(24, largeur // 70)))
+    lueur = lueur.filter(ImageFilter.GaussianBlur(radius=max(RAYON_FLOU_LUEUR_MIN, largeur // 70)))
     resultat = Image.alpha_composite(resultat, lueur)
 
     return resultat

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réglage du style mosaïque — Backdrops Nuvio</title>
+<style>
+  :root {
+    --bg: #121214;
+    --surface: #1c1c1f;
+    --surface-2: #232326;
+    --border: #33333a;
+    --text: #ececef;
+    --text-secondary: #9a9aa3;
+    --accent: #7f77dd;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 48px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .conteneur { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  .sous-titre { font-size: 14px; color: var(--text-secondary); margin: 0 0 24px; line-height: 1.5; }
+  .panneau-preview {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0a0a0c;
+    margin-bottom: 20px;
+  }
+  canvas { display: block; width: 100%; height: auto; }
+  .actions { display: flex; gap: 10px; margin-bottom: 24px; }
+  button {
+    flex: 1;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:hover { background: #2a2a2e; }
+  button:active { transform: scale(0.98); }
+  .grille-controles {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .ligne { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .ligne:last-child { margin-bottom: 0; }
+  .ligne label {
+    min-width: 150px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+  .ligne input[type=range] {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+  .ligne .valeur {
+    min-width: 46px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .ligne input[type=color] {
+    width: 48px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+  }
+  .case-a-cocher { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-secondary); }
+  .separateur { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-secondary); margin: 24px 0 12px; }
+  pre#sortie {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: "SF Mono", Consolas, Monaco, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    margin-top: 20px;
+  }
+  .note {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-top: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="conteneur">
+  <h1>Réglage du style mosaïque</h1>
+  <p class="sous-titre">
+    Aperçu approximatif (canvas HTML) de la grille de tuiles + vignette
+    utilisée par <code>scripts/mosaique.py</code>. Ajuste les curseurs,
+    copie le bloc de valeurs en bas dans le script une fois satisfait.
+    Ceci est un outil de préréglage visuel, pas le vrai moteur de rendu
+    PIL -- à confirmer sur un run réel avant adoption définitive.
+  </p>
+
+  <div class="panneau-preview">
+    <canvas id="preview" width="800" height="450"></canvas>
+  </div>
+
+  <div class="actions">
+    <button id="shuffle">↻ Régénérer les affiches</button>
+    <button id="reset">Réinitialiser les valeurs</button>
+  </div>
+
+  <div class="grille-controles">
+    <h2 style="margin-top:0">Grille de tuiles</h2>
+    <div class="ligne">
+      <label for="tuileLargeur">Largeur tuile</label>
+      <input type="range" id="tuileLargeur" min="150" max="500" step="2" value="372">
+      <span class="valeur" id="tuileLargeurOut">372</span>
+    </div>
+    <div class="ligne">
+      <label for="tuileHauteur">Hauteur tuile</label>
+      <input type="range" id="tuileHauteur" min="80" max="280" step="2" value="210">
+      <span class="valeur" id="tuileHauteurOut">210</span>
+    </div>
+    <div class="ligne">
+      <label for="ecart">Écart entre tuiles</label>
+      <input type="range" id="ecart" min="0" max="30" step="1" value="9">
+      <span class="valeur" id="ecartOut">9</span>
+    </div>
+    <div class="ligne">
+      <label for="rayon">Arrondi des coins</label>
+      <input type="range" id="rayon" min="0" max="40" step="1" value="9">
+      <span class="valeur" id="rayonOut">9</span>
+    </div>
+    <div class="ligne">
+      <label for="decalage">Décalage cascade</label>
+      <input type="range" id="decalage" min="0" max="100" step="5" value="50">
+      <span class="valeur" id="decalageOut">50%</span>
+    </div>
+    <div class="ligne">
+      <label for="inclinaison">Inclinaison</label>
+      <input type="range" id="inclinaison" min="-25" max="25" step="1" value="10">
+      <span class="valeur" id="inclinaisonOut">10°</span>
+    </div>
+
+    <hr class="separateur">
+    <h2 style="margin-top:0">Ombre et lueur</h2>
+    <div class="ligne">
+      <label for="ombre">Intensité ombre</label>
+      <input type="range" id="ombre" min="0" max="200" step="5" value="100">
+      <span class="valeur" id="ombreOut">100%</span>
+    </div>
+    <div class="ligne">
+      <label for="flou">Flou de la lueur</label>
+      <input type="range" id="flou" min="0" max="80" step="2" value="24">
+      <span class="valeur" id="flouOut">24</span>
+    </div>
+    <div class="ligne">
+      <label for="accentColor">Couleur d'accent</label>
+      <input type="color" id="accentColor" value="#7f77dd">
+      <span class="case-a-cocher">
+        <input type="checkbox" id="glowToggle" checked> Lueur activée
+      </span>
+    </div>
+  </div>
+
+  <pre id="sortie"></pre>
+  <div style="display:flex; gap:10px; margin-top:12px;">
+    <button id="copierJson" style="flex:1;">📋 Copier en JSON</button>
+  </div>
+  <p class="note">
+    Copie le JSON puis applique-le directement :<br>
+    <code>python3 scripts/appliquer_style_mosaique.py --json-inline '&lt;coller ici&gt;'</code>
+  </p>
+  <p class="note">
+    L'intensité de l'ombre et le flou de la lueur sont maintenant des
+    constantes modifiables dans <code>mosaique.py</code>
+    (<code>INTENSITE_OMBRE</code>, <code>RAYON_FLOU_LUEUR_MIN</code>).
+  </p>
+</div>
+
+<script>
+(function(){
+  var canvas = document.getElementById('preview');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:10, ombre:100, flou:24, accentColor:'#7f77dd', glowToggle:true};
+
+  var ids = ['tuileLargeur','tuileHauteur','ecart','rayon','decalage','inclinaison','ombre','flou'];
+  var els = {};
+  ids.forEach(function(id){ els[id] = document.getElementById(id); });
+  var accentColor = document.getElementById('accentColor');
+  var glowToggle = document.getElementById('glowToggle');
+  var sortie = document.getElementById('sortie');
+  var derniereValeurJson = {};
+
+  var posters = [];
+
+  function hexToRgba(hex, alpha){
+    var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
+  function genererAffiches(){
+    var palette = [
+      ['#7f77dd','#3c3489'], ['#1d9e75','#085041'], ['#d85a30','#712b13'],
+      ['#d4537e','#72243e'], ['#378add','#0c447c'], ['#639922','#27500a'],
+      ['#ef9f27','#854f0b'], ['#e24b4a','#791f1f']
+    ];
+    var ordre = palette.slice();
+    for (var i = ordre.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = ordre[i]; ordre[i] = ordre[j]; ordre[j] = tmp;
+    }
+    posters = ordre.map(function(paire, i){
+      var c = document.createElement('canvas');
+      c.width = 300; c.height = 450;
+      var cx = c.getContext('2d');
+      var grad = cx.createLinearGradient(0, 0, 300, 450);
+      grad.addColorStop(0, paire[0]);
+      grad.addColorStop(1, paire[1]);
+      cx.fillStyle = grad;
+      cx.fillRect(0, 0, 300, 450);
+      cx.fillStyle = 'rgba(255,255,255,0.15)';
+      cx.beginPath();
+      cx.arc(150 + ((i % 3) - 1) * 40, 170, 95, 0, Math.PI * 2);
+      cx.fill();
+      return c;
+    });
+  }
+
+  function dessinerTuile(gctx, img, x, y, w, h, r){
+    gctx.save();
+    gctx.beginPath();
+    gctx.roundRect(x, y, w, h, Math.max(0, r));
+    gctx.clip();
+    var scale = Math.max(w / img.width, h / img.height);
+    var dw = img.width * scale, dh = img.height * scale;
+    gctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+    gctx.restore();
+  }
+
+  function appliquerOmbre(intensite){
+    var g = ctx.createLinearGradient(0, 0, W * 0.6, 0);
+    g.addColorStop(0, 'rgba(6,6,8,' + (0.75 * intensite) + ')');
+    g.addColorStop(1, 'rgba(6,6,8,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    g = ctx.createLinearGradient(0, H * 0.45, 0, H);
+    g.addColorStop(0, 'rgba(6,6,8,0)');
+    g.addColorStop(1, 'rgba(6,6,8,' + (0.78 * intensite) + ')');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    g = ctx.createRadialGradient(0, H, 0, 0, H, Math.hypot(W, H) * 0.6);
+    g.addColorStop(0, 'rgba(6,6,8,' + (0.86 * intensite) + ')');
+    g.addColorStop(1, 'rgba(6,6,8,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  }
+
+  function appliquerLueur(hex, flouPx){
+    ctx.save();
+    ctx.filter = 'blur(' + flouPx + 'px)';
+    var g = ctx.createRadialGradient(W, 0, 0, W, 0, Math.hypot(W, H) * 0.55);
+    g.addColorStop(0, hexToRgba(hex, 0.55));
+    g.addColorStop(1, hexToRgba(hex, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
+  function render(){
+    var v = {};
+    ids.forEach(function(id){ v[id] = parseInt(els[id].value, 10); });
+
+    document.getElementById('tuileLargeurOut').textContent = v.tuileLargeur;
+    document.getElementById('tuileHauteurOut').textContent = v.tuileHauteur;
+    document.getElementById('ecartOut').textContent = v.ecart;
+    document.getElementById('rayonOut').textContent = v.rayon;
+    document.getElementById('decalageOut').textContent = v.decalage + '%';
+    document.getElementById('inclinaisonOut').textContent = v.inclinaison + '\u00b0';
+    document.getElementById('ombreOut').textContent = v.ombre + '%';
+    document.getElementById('flouOut').textContent = v.flou;
+
+    var echelle = W / 1920;
+    var tl = Math.max(1, Math.round(v.tuileLargeur * echelle));
+    var th = Math.max(1, Math.round(v.tuileHauteur * echelle));
+    var ec = Math.max(1, Math.round(v.ecart * echelle));
+    var ry = Math.max(2, Math.round(v.rayon * echelle));
+    var marge = 3;
+    var colonnes = Math.ceil(W / (tl + ec)) + marge;
+    var lignes = Math.ceil(H / (th + ec)) + marge;
+    var decalagePx = Math.round((v.decalage / 100) * (tl + ec));
+
+    var gridW = colonnes * (tl + ec) + lignes * decalagePx;
+    var gridH = lignes * (th + ec);
+
+    var gridCanvas = document.createElement('canvas');
+    gridCanvas.width = Math.max(1, gridW);
+    gridCanvas.height = Math.max(1, gridH);
+    var gctx = gridCanvas.getContext('2d');
+
+    var idx = 0;
+    for (var ligne = 0; ligne < lignes; ligne++){
+      for (var colonne = 0; colonne < colonnes; colonne++){
+        var poster = posters[idx % posters.length]; idx++;
+        var x = ligne * decalagePx + colonne * (tl + ec);
+        var y = ligne * (th + ec);
+        dessinerTuile(gctx, poster, x, y, tl, th, ry);
+      }
+    }
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0a0a0c';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    ctx.translate(W / 2, H / 2);
+    ctx.rotate(v.inclinaison * Math.PI / 180);
+    ctx.drawImage(gridCanvas, -gridW / 2, -gridH / 2);
+    ctx.restore();
+
+    appliquerOmbre(v.ombre / 100);
+    if (glowToggle.checked){
+      appliquerLueur(accentColor.value, v.flou * echelle);
+    }
+
+    sortie.textContent =
+      '# Valeurs choisies -- à reporter dans scripts/mosaique.py\n' +
+      'TUILE_LARGEUR = ' + v.tuileLargeur + '\n' +
+      'TUILE_HAUTEUR = ' + v.tuileHauteur + '\n' +
+      'ECART = ' + v.ecart + '\n' +
+      'RAYON_COIN = ' + v.rayon + '\n' +
+      'DECALAGE_LIGNE = ' + (v.decalage / 100).toFixed(2) + '\n' +
+      'INCLINAISON_DEG = ' + v.inclinaison + '\n\n' +
+      '# Intensité ombre : ' + v.ombre + '% -- multiplie l\'alpha des 3 dégradés\n' +
+      '# Flou lueur : ' + v.flou + 'px -- rayon du flou dans appliquer_degrade\n' +
+      '# Accent : ' + accentColor.value + (glowToggle.checked ? '' : ' (lueur désactivée)');
+
+    derniereValeurJson = {
+      tuile_largeur: v.tuileLargeur,
+      tuile_hauteur: v.tuileHauteur,
+      ecart: v.ecart,
+      rayon_coin: v.rayon,
+      decalage_ligne: parseFloat((v.decalage / 100).toFixed(2)),
+      inclinaison_deg: v.inclinaison,
+      intensite_ombre: parseFloat((v.ombre / 100).toFixed(2)),
+      flou_lueur: v.flou,
+      accent: accentColor.value,
+      lueur_active: glowToggle.checked
+    };
+  }
+
+  ids.forEach(function(id){ els[id].addEventListener('input', render); });
+  accentColor.addEventListener('input', render);
+  glowToggle.addEventListener('change', render);
+
+  document.getElementById('shuffle').addEventListener('click', function(){
+    genererAffiches();
+    render();
+  });
+  document.getElementById('reset').addEventListener('click', function(){
+    ids.forEach(function(id){ els[id].value = defaults[id]; });
+    accentColor.value = defaults.accentColor;
+    glowToggle.checked = defaults.glowToggle;
+    render();
+  });
+  document.getElementById('copierJson').addEventListener('click', function(){
+    var texte = JSON.stringify(derniereValeurJson);
+    var bouton = document.getElementById('copierJson');
+    function confirmer(){
+      var texteOriginal = '📋 Copier en JSON';
+      bouton.textContent = '✅ Copié !';
+      setTimeout(function(){ bouton.textContent = texteOriginal; }, 1500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texte).then(confirmer, function(){
+        window.prompt('Copie manuelle (Ctrl/Cmd+C) :', texte);
+      });
+    } else {
+      window.prompt('Copie manuelle (Ctrl/Cmd+C) :', texte);
+    }
+  });
+
+  genererAffiches();
+  render();
+})();
+</script>
+</body>
+</html>

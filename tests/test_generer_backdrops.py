@@ -33,6 +33,7 @@ from generer_backdrops import (  # noqa: E402
     analyser_url_mdblist,
     charger_catalogues_aiometadata,
     charger_collections,
+    charger_images_manuelles,
     construire_requetes,
     corriger_url_catalogue_mal_formee,
     dossier_actif,
@@ -114,6 +115,56 @@ def test_decouvrir_filtre_inclusion_exclusion():
     assert dossier_actif(GROUPE_DECOUVRIR, "Populaire") is True
     assert dossier_actif(GROUPE_DECOUVRIR, "Tendance TV") is False  # exclu
     assert dossier_actif(GROUPE_DECOUVRIR, "Autre chose") is False  # pas dans inclure
+
+
+def test_groupe_inconnu_est_actif_par_defaut():
+    """Un groupe ajouté dans Nuvio (donc absent de CRITERES_GROUPES) doit
+    être traité automatiquement -- opt-out, pas opt-in -- pour qu'un ajout
+    de collection soit pris en compte sans retoucher le script."""
+    assert dossier_actif("Une Toute Nouvelle Collection", "N'importe quel dossier") is True
+
+
+def test_images_manuelles_absentes_donne_dict_vide(tmp_path):
+    assert charger_images_manuelles(None) == {}
+    assert charger_images_manuelles(tmp_path / "n_existe_pas.json") == {}
+
+
+def test_images_manuelles_charge_le_mapping(tmp_path):
+    chemin = tmp_path / "images-manuelles.json"
+    chemin.write_text(json.dumps({"Netflix": "https://exemple.test/netflix.jpg"}), encoding="utf-8")
+    assert charger_images_manuelles(chemin) == {"Netflix": "https://exemple.test/netflix.jpg"}
+
+
+def test_images_manuelles_refuse_un_json_qui_n_est_pas_un_objet(tmp_path):
+    import pytest
+
+    chemin = tmp_path / "images-manuelles.json"
+    chemin.write_text(json.dumps(["pas", "un", "objet"]), encoding="utf-8")
+    with pytest.raises(ValueError):
+        charger_images_manuelles(chemin)
+
+
+def test_detecter_backdrops_orphelins_signale_les_fichiers_sans_dossier_actif(tmp_path):
+    from generer_backdrops import NOM_DOSSIER_BACKDROPS, detecter_backdrops_orphelins, nom_fichier_backdrop
+
+    collections = [
+        {"title": "🎭 Genres", "folders": [{"title": "Action", "sources": []}]},
+    ]
+
+    dossier_backdrops = tmp_path / "Genres" / NOM_DOSSIER_BACKDROPS
+    dossier_backdrops.mkdir(parents=True)
+    (dossier_backdrops / f"{nom_fichier_backdrop('Action')}.jpg").write_bytes(b"actif")
+    (dossier_backdrops / f"{nom_fichier_backdrop('Comédie Supprimée')}.jpg").write_bytes(b"orphelin")
+
+    orphelins = detecter_backdrops_orphelins(collections, tmp_path)
+    assert len(orphelins) == 1
+    assert orphelins[0].name == f"{nom_fichier_backdrop('Comédie Supprimée')}.jpg"
+
+
+def test_detecter_backdrops_orphelins_sans_dossier_de_sortie(tmp_path):
+    from generer_backdrops import detecter_backdrops_orphelins
+
+    assert detecter_backdrops_orphelins([], tmp_path / "n_existe_pas") == []
 
 
 # ---------------------------------------------------------------------------

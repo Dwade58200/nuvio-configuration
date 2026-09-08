@@ -126,7 +126,7 @@ def test_generer_tout_avertit_sur_groupe_du_json_non_reconnu(capsys):
     generateur.generer_tout(collections)
 
     sortie = capsys.readouterr().out
-    assert "non reconnu" in sortie
+    assert "Nouveau groupe détecté" in sortie
     assert "Groupe Jamais Vu" in sortie
 
 
@@ -145,6 +145,36 @@ def test_generer_tout_reconnait_un_groupe_avec_emoji_different(capsys):
 
     sortie = capsys.readouterr().out
     assert "non reconnu" not in sortie
+    assert "Nouveau groupe détecté" not in sortie
+
+
+def test_image_manuelle_court_circuite_la_resolution_tmdb(tmp_path):
+    """Un dossier listé dans images_manuelles doit utiliser directement
+    l'image fournie, SANS passer par ClientTMDB/ClientFanart -- même sur
+    un groupe normalement désactivé (Franchises)."""
+    from generer_backdrops import GROUPE_FRANCHISES
+
+    session_mock = MagicMock()
+    session_mock.get.return_value = FausseReponse(content=_image_factice_bytes())
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle",
+        cle_fanart=None,
+        repertoire_sortie=tmp_path,
+        dry_run=False,
+        images_manuelles={"007": "https://exemple.test/007.jpg"},
+    )
+    generateur.session = session_mock
+    generateur.tmdb.session = session_mock
+
+    resultat = generateur.traiter_dossier(GROUPE_FRANCHISES, {"title": "007", "sources": []})
+
+    assert resultat.statut == "genere"
+    assert "image manuelle" in resultat.detail
+    assert (tmp_path / resultat.chemin).exists()
+    # Une seule requête HTTP : celle vers l'image manuelle -- aucun appel
+    # de résolution TMDB/discover ne doit avoir eu lieu.
+    assert session_mock.get.call_count == 1
 
 
 if __name__ == "__main__":

@@ -10,17 +10,22 @@ adapté à la structure de collections propre à ce dépôt.
 
 1. Comment ça marche
 2. Mode mosaïque
-3. Couverture actuelle
-4. Configuration requise
-5. Utilisation
-6. Export AIOMetadata
-7. MDBList
-8. Catalogues Stremio "custom" (Bingecat & co)
-9. Mise à jour des URLs
-10. Structure de fichiers
-11. Dépannage
-12. Résilience aux renommages de groupes
-13. Idées pour plus tard
+3. Régler le style visuellement
+4. Couverture actuelle
+5. Configuration requise
+6. Utilisation
+7. Export AIOMetadata
+8. MDBList
+9. Catalogues Stremio "custom" (Bingecat & co)
+10. Images manuelles (sans passer par la génération)
+11. Ajout/suppression d'une collection dans Nuvio
+12. Où éditer la configuration
+13. Tableau de bord des backdrops
+14. Mise à jour des URLs
+15. Structure de fichiers
+16. Dépannage
+17. Résilience aux renommages de groupes
+18. Idées pour plus tard
 
 ## 🎯 Comment ça marche
 
@@ -141,16 +146,54 @@ fois. TMDB n'impose pas de quota fixe d'appels par run (juste une
 limitation de débit, gérée par des tentatives avec délai croissant en cas
 de réponse `429`).
 
+## 🎛️ Régler le style visuellement
+
+`outils/reglage-style-mosaique.html` est un outil autonome (aucune
+dépendance, ouvrable directement dans un navigateur) qui prévisualise en
+direct la grille de tuiles + la vignette du mode mosaïque : taille des
+tuiles, écart, arrondi des coins, décalage cascade, inclinaison, intensité
+de l'ombre, flou et couleur de la lueur d'accent.
+
+**Déployé automatiquement sur GitHub Pages** (`.github/workflows/deployer-outils.yml`,
+déclenché à chaque modification de `outils/`) : accessible à
+`https://<utilisateur>.github.io/<nom-du-repo>/`. **Première utilisation
+seulement** : le premier déploiement échoue systématiquement avec une
+erreur `404 Not Found` sur `configure-pages` tant que Pages n'a jamais été
+activé sur le repo -- dans **Settings → Pages** du repository GitHub,
+mettre *Build and deployment → Source* sur **GitHub Actions**, puis
+relancer le workflow (*Actions* → *Re-run all jobs*). Une fois fait, plus
+besoin d'y retoucher.
+
+Une fois des valeurs choisies, le bouton **📋 Copier en JSON** les copie
+dans le presse-papier au format attendu par le script suivant, qui les
+applique directement dans `scripts/mosaique.py` :
+
+```bash
+python3 scripts/appliquer_style_mosaique.py --json-inline '<coller le JSON copié>'
+python3 scripts/appliquer_style_mosaique.py --json fichier.json          # ou depuis un fichier
+python3 scripts/appliquer_style_mosaique.py --json-inline '...' --dry-run  # aperçu sans écrire
+```
+
+Seules les clés présentes dans le JSON sont modifiées (`tuile_largeur`,
+`tuile_hauteur`, `ecart`, `rayon_coin`, `decalage_ligne`,
+`inclinaison_deg`, `intensite_ombre`, `flou_lueur` -- `accent` et
+`lueur_active` sont informatifs, la couleur d'accent réelle reste calculée
+automatiquement par affiche). Toujours relancer
+`pytest tests/test_mosaique.py tests/test_mosaique_integration.py` et un
+`generer_backdrops.py --dry-run` après coup pour confirmer le rendu réel
+(le rendu de l'outil est une approximation Canvas, pas le moteur PIL
+exact).
+
 ## 📊 Couverture actuelle
 
 Tous les groupes de collections ne sont pas ciblés par le script -- soit
 parce qu'un catalogue n'a pas d'équivalent TMDB exploitable, soit par
-choix délibéré. Sur ceux qui **sont** ciblés (63 dossiers), la couverture
+choix délibéré. Sur ceux qui **sont** ciblés (64 dossiers), la couverture
 est désormais complète (voir note sur "Recommandation" ci-dessous) :
 
 | Groupe | Ciblé | Résolus | Notes |
 |---|---|---|---|
-| 🔭 Découvrir | 4 / 6 dossiers | 4 / 4 | "TV" et "Magnet" volontairement exclus ; "Recommandation" résolu via les catalogues Bingecat (`source: "custom"` dans l'export AIOMetadata, voir section dédiée) -- les listes MDBList "recommandation personnalisée" restent explicitement ignorées (non résolvables), mais ne bloquent plus rien puisque Bingecat couvre le même dossier |
+| 🔭 Découvrir | 5 / 7 dossiers | 5 / 5 | "TV" et "Magnet" volontairement exclus ; "Recommandation" résolu via les catalogues Bingecat (`source: "custom"` dans l'export AIOMetadata, voir section dédiée) -- les listes MDBList "recommandation personnalisée" restent explicitement ignorées (non résolvables), mais ne bloquent plus rien puisque Bingecat couvre le même dossier ; "Français" ajouté -- 2 sources MDBList + 2 discover TMDB `with_original_language=fr` / `watch_region=FR`, résolus directement depuis l'export AIOMetadata (catalogues recréés côté AIOMetadata) |
 | 🎬 Services de Streaming | 9 / 9 dossiers | 9 / 9 | ✅ résolu via l'export AIOMetadata (vrai `with_watch_providers` par plateforme, voir section dédiée) |
 | 🎭 Genres | 15 / 15 dossiers | 15 / 15 | ✅ |
 | 🎨 Thématiques | 14 / 14 dossiers | 14 / 14 | ✅ (résolu via l'export AIOMetadata + MDBList) |
@@ -223,6 +266,8 @@ Options utiles de `generer_backdrops.py` :
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
 | `--profil {standard,haute,compresse}` | Taille/qualité de sortie |
+| `--images-manuelles chemin.json` | Surcharges manuelles titre→image, court-circuitent la résolution (défaut : `Templates/images-manuelles.json`, ignoré si absent) |
+| `--signaler-orphelins` | Liste en fin d'exécution les backdrops sur disque sans dossier actif correspondant (rapport seul) |
 | `-v` | Logs détaillés |
 
 ### Depuis GitHub Actions
@@ -420,6 +465,163 @@ Avec ce mécanisme, les recommandations MDBList personnalisées
 être remplacées par les catalogues Bingecat équivalents pour le dossier
 "Recommandation", qui eux fonctionnent bien via ce chemin.
 
+## 🖼️ Images manuelles (sans passer par la génération)
+
+Pour imposer une image précise à un dossier sans passer par toute la
+résolution TMDB/Fanart/MDBList (ex : une image que tu as choisie toi-même,
+ou un dossier dont le catalogue ne donne jamais un visuel satisfaisant),
+crée un fichier `Templates/images-manuelles.json` :
+
+```json
+{
+  "Netflix": "https://exemple.com/mon-backdrop-netflix.jpg",
+  "Noël": "chemin/local/vers/image-noel.jpg"
+}
+```
+
+- Clé = titre **exact** du dossier, tel qu'il apparaît dans le JSON de
+  collections (accents/emoji compris).
+- Valeur = une URL `http(s)://` (téléchargée) ou un chemin de fichier local
+  (lu directement sur disque) -- dans les deux cas, l'image est simplement
+  redimensionnée/compressée selon `--profil`, sans aucune requête de
+  résolution de catalogue.
+- Ce fichier est **optionnel** : absent, le pipeline fonctionne exactement
+  comme avant. Il n'est pas suivi par le schéma de collections (ce n'est
+  pas le même fichier).
+- Priorité **absolue** : un dossier listé ici est traité même si son groupe
+  est désactivé (Franchises, Sports...) -- c'est le seul cas où
+  `CRITERES_GROUPES` peut être court-circuité.
+- Chemin personnalisable via `--images-manuelles chemin/vers/fichier.json`
+  (défaut : `Templates/images-manuelles.json`).
+
+Une fois le fichier généré, lance `mettre_a_jour_urls.py` normalement --
+il détecte le fichier sur disque comme n'importe quel autre backdrop généré
+et met à jour `heroBackdropUrl` en conséquence.
+
+**Outil dédié** (au lieu d'éditer le JSON à la main) :
+
+```bash
+# Enregistre la surcharge ET génère immédiatement le fichier
+python3 scripts/definir_image_manuelle.py "Netflix" https://exemple.com/image.jpg
+python3 scripts/definir_image_manuelle.py "Noël" images/noel.jpg
+
+# Juste enregistrer, génération différée au prochain run complet
+python3 scripts/definir_image_manuelle.py "Netflix" https://exemple.com/image.jpg --sans-generer
+
+# Retirer une surcharge (retour au comportement normal -- TMDB au prochain run)
+python3 scripts/definir_image_manuelle.py "Netflix" --retirer
+```
+
+La protection contre l'écrasement est native au mécanisme : tant que
+l'entrée reste dans `images-manuelles.json`, elle est relue en priorité
+absolue à **chaque** run futur de `generer_backdrops.py` -- pas besoin
+d'un manifeste séparé pour la "protéger".
+
+## 🆕 Ajout/suppression d'une collection dans Nuvio
+
+Un groupe ou un dossier ajouté dans Nuvio (donc dans un nouvel export du
+JSON de collections) est **pris en compte automatiquement** dès la
+prochaine exécution -- aucune retouche du script n'est nécessaire. Un
+groupe absent de `CRITERES_GROUPES` est traité par défaut avec les réglages
+génériques (actif, sans filtre de dossiers, nom de dossier de sortie dérivé
+automatiquement de son titre). Un message `🆕 Nouveau groupe détecté...`
+s'affiche à titre informatif -- tu n'as besoin d'ajouter une entrée dans
+`CRITERES_GROUPES`/`GROUPE_SLUGS` (dans `scripts/config_collections.py`,
+voir section suivante) que pour :
+
+- **exclure** ce groupe de la génération (comme Sports/Franchises) ;
+- **filtrer** certains de ses dossiers (comme Découvrir) ;
+- lui donner un **nom de dossier de sortie** différent du repli automatique.
+
+Pour une collection ou un dossier **supprimé** dans Nuvio : rien ne casse
+(il n'est simplement plus traité), mais son image reste orpheline sur
+disque. Pour repérer ces fichiers (rapport seul, rien n'est supprimé) :
+
+```bash
+python3 scripts/generer_backdrops.py --dry-run --signaler-orphelins
+```
+
+**Voir précisément ce qui a changé** entre deux exports Nuvio (nouveau
+groupe, dossier renommé, dossier supprimé...) avant de committer :
+
+```bash
+# Compare le fichier actuel à la dernière version commitée (Git)
+python3 scripts/comparer_collections.py
+
+# Compare à un commit précis, ou deux fichiers explicites (sans Git)
+python3 scripts/comparer_collections.py --ref HEAD~3
+python3 scripts/comparer_collections.py --ancien old.json --nouveau new.json
+```
+
+Ce script reconnaît qu'un groupe est le même malgré un simple changement
+d'emoji/espace/accent (même normalisation que le pipeline) -- il ne
+signale que les changements structurels réels (groupe ou dossier
+réellement ajouté/supprimé/renommé).
+
+**Persister les groupes auto-détectés** (au lieu de les laisser implicites
+dans le comportement par défaut) :
+
+```bash
+python3 scripts/synchroniser_config.py
+```
+
+Maintient `Templates/groupes-config.json` : chaque groupe présent dans le
+JSON de collections mais absent de `CRITERES_GROUPES` (dans
+`config_collections.py`) y est ajouté avec des réglages par défaut (actif,
+sans filtre, slug dérivé du titre). Un groupe disparu du JSON est signalé
+(rapport seul par défaut ; `--purger-supprimes` pour nettoyer). Ce fichier
+est ensuite fusionné automatiquement par `generer_backdrops.py` et
+`mettre_a_jour_urls.py` (option `--config-groupes`, activée par défaut,
+sans effet si le fichier n'existe pas) -- totalement optionnel, l'absence
+de ce fichier ne change rien au comportement par défaut.
+
+## ⚙️ Où éditer la configuration
+
+Toute la configuration destinée à être modifiée à la main --
+`CRITERES_GROUPES`, `GROUPE_SLUGS`, `NOMS_BACKDROP_PERSONNALISES`,
+`GENRE_TMDB_IDS`, `NETWORK_TMDB_IDS`... -- vit dans
+**`scripts/config_collections.py`**, séparé de la logique du pipeline
+(`generer_backdrops.py`). C'est le seul fichier à ouvrir pour ce type de
+changement ; il ne contient que des constantes, pas d'appel réseau ni de
+logique de résolution.
+
+**Vérifier la cohérence de cette config** (collisions de noms, filtres
+contradictoires, entrées obsolètes) :
+
+```bash
+python3 scripts/lint_config.py
+```
+
+Détecte : un groupe présent dans `CRITERES_GROUPES` mais absent de
+`GROUPE_SLUGS` (ou l'inverse) ; deux groupes qui partagent le même nom de
+dossier de sortie ; deux dossiers de `NOMS_BACKDROP_PERSONNALISES` qui
+produisent le même nom de fichier ; un mot présent à la fois dans
+`inclure` et `exclure` d'un même groupe (contradiction -- ces dossiers ne
+seraient alors jamais actifs) ; une entrée de `NOMS_BACKDROP_PERSONNALISES`
+dont le dossier n'existe plus dans le JSON de collections actuel (nom
+probablement obsolète). Code de sortie 1 s'il trouve au moins un
+avertissement (utilisable en CI, en complément de `valider_collections.py`
+qui vérifie la structure du JSON plutôt que la config Python).
+
+## 📊 Tableau de bord des backdrops
+
+Vue d'ensemble en lecture seule de l'état de chaque dossier -- sans
+attendre un run complet :
+
+```bash
+python3 scripts/etat_backdrops.py
+python3 scripts/etat_backdrops.py --groupe Genres
+python3 scripts/etat_backdrops.py --seulement-manquants
+```
+
+Pour chaque dossier, un statut parmi : `généré`, `manquant`, `image
+manuelle` / `image manuelle (pas encore générée)`, ou `ignoré
+(groupe/filtre désactivé)` -- plus le nombre de fichiers orphelins en fin
+de rapport (voir `--signaler-orphelins` pour le détail). Rassemble en une
+seule commande ce que `comparer_collections.py` (ce qui a changé),
+`images-manuelles.json` (les surcharges) et la détection d'orphelins
+faisaient déjà séparément.
+
 ## 🔗 Mise à jour des URLs (`heroBackdropUrl`)
 
 Un second script, `scripts/mettre_a_jour_urls.py`, met à jour le champ
@@ -479,12 +681,13 @@ cas connus.
 fichiers ~7 jours ; le workflow purge automatiquement le cache après chaque
 commit, mais tu peux aussi lancer `python3 scripts/purger_cache.py` toi-même.
 
-**"⚠️ Groupe non reconnu dans le JSON"** → un groupe entier a été renommé
-dans Nuvio au-delà d'un simple emoji/espace/accent (ce que le script gère
-déjà tout seul). Il faut ajouter ce nouveau nom au script : dans
-`scripts/generer_backdrops.py`, section `CRITERES_GROUPES`/`GROUPE_SLUGS`
-en haut du fichier. Le message indique le titre normalisé pour t'aider à
-identifier de quel groupe canonique il s'agit.
+**"🆕 Nouveau groupe détecté dans le JSON"** → un groupe a été ajouté dans
+Nuvio, ou renommé au-delà d'un simple emoji/espace/accent. Ce n'est PAS un
+problème : le groupe est déjà traité automatiquement avec les réglages par
+défaut. Le message est informatif -- ajoute une entrée dans
+`CRITERES_GROUPES`/`GROUPE_SLUGS` (section `⚙️ ZONE ÉDITABLE` en haut de
+`scripts/generer_backdrops.py`) uniquement si tu veux l'exclure, filtrer
+certains de ses dossiers, ou lui donner un nom de dossier de sortie précis.
 
 **"⚠️ Groupe(s) attendu(s) mais absent(s) du JSON"** → l'inverse : un
 groupe que le script s'attend à trouver (ex: "vibe") n'apparaît nulle part
@@ -511,21 +714,26 @@ espaces réduits) plutôt qu'en texte exact. Concrètement :
 - `"🎭Genres"`, `"🎭 Genres"`, `"🆕 Genres"` sont tous reconnus comme le
   même groupe "Genres".
 - Un renommage plus profond (ex: "Vibe" → "Ambiances") n'est PAS deviné
-  automatiquement -- mais il déclenche un avertissement explicite au lieu
-  d'échouer en silence (voir « Dépannage »), avec le nom exact
-  à ajouter au script.
+  automatiquement -- mais depuis la mise à jour "ajout automatique" (voir
+  section *Ajout/suppression d'une collection dans Nuvio*), ça ne bloque
+  plus rien : le groupe est traité avec les réglages par défaut, un simple
+  message `🆕 Nouveau groupe détecté...` s'affiche à titre informatif, avec
+  le nom exact à ajouter à `CRITERES_GROUPES` si tu veux affiner son
+  traitement (l'exclure, filtrer ses dossiers, etc.).
 
 ## 🗺️ Idées pour plus tard (non planifiées)
 
-Le projet s'arrête ici pour l'instant (mosaïque + accent color + validation
-par schéma = dernières phases prévues). Pistes possibles si tu veux
-reprendre un jour :
+Pistes possibles si tu veux reprendre un jour (voir `AMELIORATIONS.md`
+pour le détail et le suivi) :
 
 - Génération de variantes `.webp` en plus du `.jpg`.
-- Intégrer les Animés dans l'export AIOMetadata puis dans les backdrops.
-- Modifier AIOStream pour intégrer les animés (regex/filtres propres) et
-  ajuster le style du texte du lien.
-- Faciliter les modifications du style des Backdrops avec un outil visuel.
+
+Écarté du périmètre de ce dépôt : l'intégration des Animés dans
+AIOMetadata/backdrops est déjà en place (groupe `🎌 Animés`, résolu via
+MDBList/`aio-metadata`) ; modifier le filtrage AIOStreams relève de la
+config d'une instance AIOStreams externe, pas de ce dépôt. L'outil visuel
+de réglage du style est également fait (voir *Régler le style
+visuellement* ci-dessus).
 
 ---
 
