@@ -1,0 +1,11 @@
+{
+  "catalogs": [
+    {
+      "id": "1d5e3b0.fankai_catalog",
+      "type": "tv",
+      "source": "custom",
+      "sourceUrl": "https://streamio.fankai.fr/<TON_CONFIG_ENCODE_EN_BASE64>/catalog/anime/fankai_catalog.json",
+      "champImage": "poster"
+    }
+  ]
+}
