@@ -6,6 +6,7 @@ sans avoir besoin d'une vraie clé API ni d'accès réseau à TMDB.
 """
 
 import io
+import json
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -175,6 +176,70 @@ def test_image_manuelle_court_circuite_la_resolution_tmdb(tmp_path):
     # Une seule requête HTTP : celle vers l'image manuelle -- aucun appel
     # de résolution TMDB/discover ne doit avoir eu lieu.
     assert session_mock.get.call_count == 1
+
+
+def test_fankai_genere_une_mosaique_a_partir_des_images_directes_du_catalogue(tmp_path):
+    """Cas réel (FanKai) : un catalogue "custom" dont les items n'ont pas
+    d'id IMDb exploitable doit quand même produire une vraie mosaïque, en
+    utilisant directement les posters du catalogue -- bout en bout, sans
+    aucun appel TMDB (le média n'a pas de tmdb_id)."""
+    from generer_backdrops import GROUPE_ANIMES
+
+    fixture = json.loads(
+        (Path(__file__).resolve().parent / "fixtures" / "fankai_catalog_sample.json").read_text(encoding="utf-8")
+    )
+    url_catalogue = "https://streamio.fankai.fr/x/catalog/anime/fankai_catalog.json"
+
+    def _repondre(url, timeout=None, **kwargs):
+        if url.rstrip("?") == url_catalogue or url.startswith(url_catalogue):
+            return FausseReponse(json_data=fixture)
+        # toute autre URL = une image de poster à télécharger
+        return FausseReponse(content=_image_factice_bytes())
+
+    session_mock = MagicMock()
+    session_mock.get.side_effect = _repondre
+
+    catalogues = {
+        "1d5e3b0.fankai_catalog": {
+            "kind": "custom_catalogue",
+            "media_type": "tv",
+            "url": url_catalogue,
+            "champ_image": "poster",
+        }
+    }
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle",
+        cle_fanart=None,
+        repertoire_sortie=tmp_path,
+        dry_run=False,
+        mosaique=True,
+        catalogues_aiometadata=catalogues,
+    )
+    generateur.session = session_mock
+    generateur.tmdb.session = session_mock
+    generateur.catalogue_custom.session = session_mock
+
+    dossier = {
+        "title": "FanKai",
+        "sources": [
+            {
+                "provider": "addon",
+                "addonId": "com.aiostreams.viren070.5a21f0f2-961",
+                "catalogId": "1d5e3b0.fankai_catalog",
+                "type": "anime",
+            }
+        ],
+    }
+
+    resultat = generateur.traiter_dossier(GROUPE_ANIMES, dossier)
+
+    assert resultat.statut == "genere"
+    assert (tmp_path / resultat.chemin).exists()
+    # Aucun appel TMDB : seule ClientTMDB.session aurait pu servir à un
+    # /find IMDb->TMDB, jamais déclenché ici (aucun id "tt...").
+    urls_appelees = [c.args[0] if c.args else c.kwargs.get("url") for c in session_mock.get.call_args_list]
+    assert not any("themoviedb.org" in u for u in urls_appelees if u)
 
 
 if __name__ == "__main__":

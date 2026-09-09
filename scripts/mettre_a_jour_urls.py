@@ -21,7 +21,7 @@ Usage :
         --collections Templates/Nuvio-Collections-Dwade58200.json \
         --sortie Collections \
         --depot Dwade58200/nuvio-configuration \
-        --branche feature/backdrops-automation
+        --branche main
 """
 
 from __future__ import annotations
@@ -101,7 +101,7 @@ def main() -> int:
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
     parser.add_argument("--sortie", default=NOM_DOSSIER_RACINE)
     parser.add_argument("--depot", default="Dwade58200/nuvio-configuration")
-    parser.add_argument("--branche", default="feature/backdrops-automation")
+    parser.add_argument("--branche", default="main")
     parser.add_argument("--dry-run", action="store_true", help="N'écrit rien, affiche juste ce qui changerait")
     parser.add_argument("--config-groupes", default="Templates/groupes-config.json", help="JSON maintenu par synchroniser_config.py, fusionné dans CRITERES_GROUPES/GROUPE_SLUGS (optionnel)")
     args = parser.parse_args()

@@ -106,7 +106,7 @@ Pour une exécution réelle, deux secrets GitHub sont nécessaires
 ## Qualité & CI
 
 À chaque push/PR, `.github/workflows/tests.yml` fait tourner :
-- **pytest** (182 tests) -- résolution des sources, composition des
+- **pytest** (191 tests) -- résolution des sources, composition des
   mosaïques, mise à jour des URLs, validation du schéma ;
 - **ruff** -- lint (bloquant) ;
 - **mypy** -- vérification de types (bloquant) ;

@@ -6,6 +6,102 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
+## ✅ Fait (session du 8 septembre 2026 -- backdrop pour FanKai, comme Bingecat)
+
+- [x] **FanKai résolu comme un catalogue "custom" (comme Bingecat)** :
+      son addon réel est **FKStream** (`https://streamio.fankai.fr/...`),
+      agrégé via AIOStreams -- son addonId n'est donc pas `aio-metadata`.
+      `generer_backdrops.py` élargi pour accepter n'importe quel addon dès
+      lors que son `catalogId` est enregistré comme catalogue `custom`
+      dans l'export fourni (mêmes garde-fous : les heuristiques de repli
+      restent réservées à `aio-metadata`, pas de risque de résolution
+      hasardeuse pour un addon inconnu).
+- [x] **Nouveau mode "images directes"** pour les catalogues sans id IMDb
+      exploitable : FKStream utilise des ids `fk:N` (confirmé par
+      `idPrefixes: ["fk"]` dans son manifeste, `imdb_id` toujours `null`
+      dans ses items) -- la conversion IMDb->TMDB de Bingecat est donc
+      inopérante ici. Ajout d'un champ optionnel `"champImage": "poster"`
+      dans l'entrée de catalogue (`ClientCatalogueCustom.recuperer_images_directes`) :
+      les URLs de ce champ sont utilisées telles quelles, sans passer par
+      TMDB. Dédoublonnage corrigé au passage : sans `tmdb_id`, la clé de
+      dédoublonnage utilisait `(media_type, None)` pour TOUS les items
+      (bug qui aurait fait disparaître 99% des affiches FanKai) -- bascule
+      sur l'URL d'image elle-même comme clé quand `tmdb_id` est absent.
+- [x] **`Templates/catalogues-personnalises.json`** (fusionné par-dessus
+      `--aiometadata`) : registre séparé pour ces catalogues non couverts
+      par l'export AIOMetadata standard. Fichier gabarit
+      (`.example.json`) committé, vrai fichier dans `.gitignore` (contient
+      une URL avec la config AIOStreams -- et donc une clé de service
+      debrid -- encodée en base64). Automatisable en CI via un secret
+      GitHub `CATALOGUES_PERSONNALISES`, matérialisé sur le runner par
+      une nouvelle étape du workflow (jamais loggé).
+- [x] 8 nouveaux tests (dont un test d'intégration bout en bout avec un
+      extrait réel du catalogue FanKai transmis par l'utilisateur --
+      mosaïque générée avec zéro appel TMDB, confirmé), 191/191 verts au
+      total ; `ruff`/`mypy` propres ; run réel sans régression (toujours
+      64 générés / 0 erreur sans le fichier personnalisé, FanKai sort
+      bien de "provider non géré" une fois le fichier gabarit fourni).
+      Documentation à jour (`BACKDROPS_SETUP.md`, nouvelle sous-section
+      *Catalogues sans id IMDb*).
+
+---
+
+## ✅ Fait (session du 7 septembre 2026 -- check-up complet du dépôt réel)
+
+Audit demandé sur un export réel du repo GitHub (`Dwade58200/nuvio-configuration`,
+branche `main`) plutôt que sur l'état de travail habituel -- a révélé 3
+vrais bugs, invisibles jusqu'ici car jamais exercés en CI sur ce contenu
+précis :
+
+- [x] **Schéma JSON désynchronisé (régression, cassait la CI)** : le vrai
+      `Templates/Nuvio-Collections-Dwade58200.json` contient désormais 22
+      sources `provider: "trakt"` (sous-listes James Bond par acteur, dans
+      le groupe Franchises -- pour la sélection de contenu Nuvio, sans
+      rapport avec la résolution des backdrops) que `schema/nuvio-collections.schema.json`
+      ne connaissait pas (`enum` limité à `tmdb`/`addon`/`mdblist`).
+      `pytest` échouait sur `test_le_vrai_fichier_de_collections_est_conforme_au_schema`.
+      Corrigé : `trakt` ajouté à l'énumération + sous-règle dédiée
+      (`traktListId` + `mediaType` requis, `sortBy`/`sortHow` optionnels,
+      calquée sur les 22 occurrences réelles). Sans rapport avec le retrait
+      de Trakt comme *outil de catalogues* (toujours d'actualité, voir plus
+      bas) -- Nuvio lui-même sait très bien consommer des sources Trakt
+      pour peupler un dossier, ce n'est pas la même chose.
+- [x] **`lint_config.py` jamais exécuté en CI** : construit pour ça (voir
+      session précédente) mais l'étape n'avait jamais été ajoutée à
+      `.github/workflows/tests.yml`. Ajoutée juste après la validation du
+      schéma.
+- [x] **Valeur par défaut de `--branche` obsolète** dans
+      `mettre_a_jour_urls.py` et `purger_cache.py` (`feature/backdrops-automation`,
+      une branche de développement d'une session antérieure) alors que la
+      branche réelle du repo est `main` depuis un moment -- sans impact sur
+      le workflow automatisé (qui passe toujours `github.ref_name`
+      explicitement), mais un run manuel sans `--branche` aurait généré des
+      URLs CDN pointant vers la mauvaise branche. Corrigé dans les deux
+      scripts (défaut + docstring d'usage).
+- [x] Suite complète revérifiée après coup : 182/182 tests verts,
+      `ruff`/`mypy`/`lint_config.py`/`valider_collections.py` propres, run
+      réel (`--aiometadata` inclus) toujours cohérent (64 générés / 0
+      erreur).
+
+### 🔵 Points identifiés, pas encore traités
+
+- [x] ~~`🎌 Animés / FanKai` n'a aucune source résoluble en image~~ --
+      résolu, voir la session du 8 septembre 2026 ci-dessus.
+- [ ] **`mdblist_recherche.py` et `purger_cache.py` n'ont aucun test**,
+      contrairement à tous les autres scripts. Les deux contiennent de la
+      logique pure testable sans réseau (construction d'URL de recherche/
+      de purge, découpage `chemin_depot`/`chemin_encode`) qui pourrait être
+      extraite et couverte avec des appels réseau mockés, sur le modèle des
+      tests existants.
+- [ ] **Nettoyage mineur** : l'étape "Nettoyer l'ancienne arborescence
+      (`collections/` -> `Collections/`)" dans `generer-backdrops.yml` est
+      une migration ponctuelle d'une ancienne session, presque certainement
+      obsolète aujourd'hui (le dossier en minuscule ne devrait plus jamais
+      exister) -- candidate à suppression après confirmation qu'elle ne se
+      déclenche plus jamais depuis quelques runs.
+
+---
+
 ## ✅ Fait (session du 5 septembre 2026, suite -- outil visuel de style)
 
 - [x] **Outil interactif de réglage du style mosaïque** :
@@ -279,7 +375,14 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ## 🔵 Reste à faire
 
-Rien en attente actuellement.
+- [ ] Couvrir `mdblist_recherche.py` et `purger_cache.py` par des tests
+      (seuls scripts du dossier sans aucun test actuellement).
+- [ ] Vérifier si l'étape de migration `collections/` -> `Collections/`
+      dans `generer-backdrops.yml` est encore nécessaire, et la retirer
+      si elle ne s'est plus déclenchée depuis plusieurs runs.
+- [ ] Une fois le secret `CATALOGUES_PERSONNALISES` configuré côté
+      GitHub : vérifier sur un vrai run (pas juste `--dry-run`) que
+      FanKai génère effectivement sa mosaïque en conditions réelles.
 
 ---
 

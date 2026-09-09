@@ -262,6 +262,7 @@ Options utiles de `generer_backdrops.py` :
 | `--dry-run` | Ne fait aucun appel réseau, affiche juste ce qui serait généré |
 | `--mosaique` | Grille multi-titres + couleur d'accent (repli auto si < 3 titres) |
 | `--aiometadata chemin.json` | Export AIOMetadata pour résoudre les catalogues avec leurs vrais filtres/URLs |
+| `--catalogues-personnalises chemin.json` | Catalogues "custom" supplémentaires non couverts par l'export AIOMetadata (ex: FanKai), fusionnés par-dessus (défaut : `Templates/catalogues-personnalises.json`, ignoré si absent) |
 | `--cle-mdblist clé` | Clé API MDBList.com (ou variable `MDBLIST_API_KEY`) |
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
@@ -464,6 +465,49 @@ Avec ce mécanisme, les recommandations MDBList personnalisées
 (`mdblist.recommended.*`, voir ci-dessus, jamais résolvables) peuvent
 être remplacées par les catalogues Bingecat équivalents pour le dossier
 "Recommandation", qui eux fonctionnent bien via ce chemin.
+
+### Catalogues sans id IMDb (ex: FanKai)
+
+Certains catalogues Stremio "custom" n'utilisent PAS d'id IMDb (ex:
+**FanKai** / addon **FKStream**, ids au format `fk:N`) -- la conversion
+`/find` TMDB décrite ci-dessus ne peut alors renvoyer aucun résultat. Pour
+ces catalogues, ajoute `"champImage": "poster"` (ou `"background"` s'il
+existe) à l'entrée dans ton export : les images de ce champ sont utilisées
+**directement**, sans passer par TMDB.
+
+Comme ces catalogues ne figurent généralement pas dans l'export
+AIOMetadata standard (ce sont d'autres addons, agrégés via AIOStreams),
+utilise le fichier séparé `Templates/catalogues-personnalises.json`
+(voir `Templates/catalogues-personnalises.example.json` pour le format,
+fusionné automatiquement par-dessus `--aiometadata`) :
+
+```json
+{
+  "catalogs": [
+    {
+      "id": "1d5e3b0.fankai_catalog",
+      "type": "tv",
+      "source": "custom",
+      "sourceUrl": "https://streamio.fankai.fr/<ta-config-encodée>/catalog/anime/fankai_catalog.json",
+      "champImage": "poster"
+    }
+  ]
+}
+```
+
+**⚠️ Ce fichier contient une URL avec un identifiant/clé personnel encodé
+dedans (config AIOStreams en base64, incluant une clé de service debrid)
+-- ne JAMAIS le committer.** Il est déjà dans `.gitignore`. Pour
+l'automatiser en CI, mets son contenu JSON complet dans un secret GitHub
+nommé `CATALOGUES_PERSONNALISES` (Settings → Secrets and variables →
+Actions) -- le workflow `generer-backdrops.yml` le matérialise sur le
+runner à chaque exécution, sans jamais l'écrire dans les logs.
+
+Pour retrouver l'`id` et le `type` exacts qu'un addon tiers déclare pour
+son propre catalogue (souvent différents du `catalogId` préfixé vu côté
+Nuvio, ex: `1d5e3b0.fankai_catalog` vs `fankai_catalog`), ouvre l'URL de
+son manifeste Stremio (`.../manifest.json`) et regarde le tableau
+`"catalogs"`.
 
 ## 🖼️ Images manuelles (sans passer par la génération)
 

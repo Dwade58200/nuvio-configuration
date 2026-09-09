@@ -720,7 +720,58 @@ def test_catalogue_custom_de_l_export_produit_une_requete_custom_catalogue():
     assert requetes[0].params == {
         "url": "https://bingecat.com/stremio/ace6ec91-449a-4f74-928a-3243ac4d3fc1/nuvio?bcv=6/catalog/movie/aicat_list_118227.json",
     }
+
+
+def test_catalogue_custom_resolu_meme_avec_un_addonid_different_de_aio_metadata():
+    """Cas réel (FanKai, dossier "Animés") : un addon tiers (ex: AIOStreams)
+    dont le catalogId est malgré tout enregistré comme catalogue "custom"
+    dans l'export doit se résoudre exactement comme un catalogue Bingecat,
+    même si son addonId n'est pas "aio-metadata"."""
+    catalogues = {
+        "1d5e3b0.fankai_catalog": {
+            "kind": "custom_catalogue",
+            "media_type": "tv",
+            "url": "https://exemple.test/fankai/catalog/series/fankai_catalog.json",
+        }
+    }
+    dossier = {
+        "title": "FanKai",
+        "sources": [
+            {
+                "provider": "addon",
+                "addonId": "com.aiostreams.viren070.5a21f0f2-961",
+                "catalogId": "1d5e3b0.fankai_catalog",
+                "type": "anime",
+            }
+        ],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_ANIMES, dossier, catalogues)
+    assert len(requetes) == 1
+    assert requetes[0].kind == "custom_catalogue"
+    assert requetes[0].params == {"url": "https://exemple.test/fankai/catalog/series/fankai_catalog.json"}
     assert ignorees == []
+
+
+def test_addon_tiers_sans_entree_custom_connue_reste_ignore():
+    """Un addon différent de aio-metadata dont le catalogId n'est PAS
+    enregistré comme catalogue "custom" (aucun export ne le connaît) ne
+    doit PAS déclencher les heuristiques de repli (genre/réseau/thématique)
+    -- celles-ci restent réservées à aio-metadata pour éviter un repli
+    hasardeux sur un addon totalement inconnu."""
+    dossier = {
+        "title": "Autre chose",
+        "sources": [
+            {
+                "provider": "addon",
+                "addonId": "com.un.addon.quelconque",
+                "catalogId": "un.catalog.id.non.enregistre",
+                "type": "tv",
+            }
+        ],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_ANIMES, dossier, {})
+    assert requetes == []
+    assert any("provider non géré" in r for r in ignorees)
 
 
 def test_catalogue_mdblist_sans_export_reste_ignore():
@@ -1115,6 +1166,81 @@ def test_client_catalogue_custom_echec_reseau_retourne_liste_vide():
 
     client = ClientCatalogueCustom(session=_SessionEnErreur())
     assert client.recuperer_ids_imdb("https://x.example/catalog.json", limite=10) == []
+
+
+FIXTURE_FANKAI = Path(__file__).resolve().parent / "fixtures" / "fankai_catalog_sample.json"
+
+
+def test_client_catalogue_custom_recupere_les_images_directes_sur_un_echantillon_reel():
+    """Cas réel (FanKai) : catalogue Stremio dont les items n'ont PAS d'id
+    IMDb exploitable (ids "fk:N", imdb_id toujours null) -- on doit
+    récupérer directement les URLs du champ "poster" de chaque item, dans
+    l'ordre, sans tenter de conversion IMDb->TMDB."""
+    payload = json.loads(FIXTURE_FANKAI.read_text(encoding="utf-8"))
+    client = ClientCatalogueCustom(session=_FausseSessionCatalogueCustom(payload))
+
+    urls = client.recuperer_images_directes("https://streamio.fankai.fr/x/catalog/anime/fankai_catalog.json", "poster", limite=10)
+
+    assert urls == [
+        "https://metadata.fankai.fr/series/1/image/poster?t=1774045805",
+        "https://metadata.fankai.fr/series/6/image/poster?t=1774045805",
+        "https://metadata.fankai.fr/series/7/image/poster?t=1774045805",
+        "https://metadata.fankai.fr/series/8/image/poster?t=1774468203",
+        "https://metadata.fankai.fr/series/10/image/poster?t=1774045805",
+    ]
+
+
+def test_client_catalogue_custom_images_directes_respecte_la_limite():
+    payload = json.loads(FIXTURE_FANKAI.read_text(encoding="utf-8"))
+    client = ClientCatalogueCustom(session=_FausseSessionCatalogueCustom(payload))
+    urls = client.recuperer_images_directes("https://x.example/catalog.json", "poster", limite=2)
+    assert len(urls) == 2
+
+
+def test_client_catalogue_custom_images_directes_ignore_un_champ_absent():
+    payload = {"metas": [{"id": "fk:1", "name": "Sans poster"}]}
+    client = ClientCatalogueCustom(session=_FausseSessionCatalogueCustom(payload))
+    assert client.recuperer_images_directes("https://x.example/catalog.json", "background", limite=10) == []
+
+
+def test_client_catalogue_custom_images_directes_echec_reseau_retourne_liste_vide():
+    class _SessionEnErreur:
+        def get(self, url, timeout=None, **kwargs):
+            raise __import__("requests").ConnectionError("panne")
+
+    client = ClientCatalogueCustom(session=_SessionEnErreur())
+    assert client.recuperer_images_directes("https://x.example/catalog.json", "poster", limite=10) == []
+
+
+def test_charger_catalogues_aiometadata_propage_champ_image(tmp_path):
+    """Un catalogue "custom" avec un champ champImage (FanKai) doit être
+    indexé avec la clé champ_image -- absent sinon (Bingecat)."""
+    export = {
+        "catalogs": [
+            {"id": "1d5e3b0.fankai_catalog", "type": "tv", "source": "custom", "sourceUrl": "https://x.example/c.json", "champImage": "poster"},
+            {"id": "custom.bingecat", "type": "movie", "source": "custom", "sourceUrl": "https://bingecat.example/c.json"},
+        ]
+    }
+    chemin = tmp_path / "export.json"
+    chemin.write_text(json.dumps(export), encoding="utf-8")
+
+    index = charger_catalogues_aiometadata(chemin)
+
+    assert index["1d5e3b0.fankai_catalog"]["champ_image"] == "poster"
+    assert "champ_image" not in index["custom.bingecat"]
+
+
+def test_construire_requetes_transmet_champ_image_dans_les_params():
+    catalogues = {
+        "1d5e3b0.fankai_catalog": {"kind": "custom_catalogue", "media_type": "tv", "url": "https://x.example/c.json", "champ_image": "poster"}
+    }
+    dossier = {
+        "title": "FanKai",
+        "sources": [{"provider": "addon", "addonId": "com.aiostreams.viren070.5a21f0f2-961", "catalogId": "1d5e3b0.fankai_catalog", "type": "anime"}],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_ANIMES, dossier, catalogues)
+    assert len(requetes) == 1
+    assert requetes[0].params == {"url": "https://x.example/c.json", "champ_image": "poster"}
 
 
 def test_resoudre_imdb_vers_tmdb_extrait_le_bon_type_et_les_bons_champs():

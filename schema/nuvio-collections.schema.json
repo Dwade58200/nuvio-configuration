@@ -85,20 +85,6 @@
         },
         {
           "if": {
-            "properties": { "provider": { "const": "trakt" } }
-          },
-          "then": {
-            "required": ["traktListId", "mediaType"],
-            "properties": {
-              "traktListId": { "type": "integer" },
-              "mediaType": { "type": "string", "enum": ["MOVIE", "TV"] },
-              "sortBy": { "type": "string" },
-              "sortHow": { "type": "string", "enum": ["asc", "desc"] }
-            }
-          }
-        },
-        {
-          "if": {
             "properties": { "provider": { "const": "mdblist" } }
           },
           "then": {
@@ -112,6 +98,20 @@
               "mdblistId": { "type": "integer" },
               "mdblistUser": { "type": "string", "minLength": 1 },
               "mdblistSlug": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "provider": { "const": "trakt" } }
+          },
+          "then": {
+            "required": ["traktListId", "mediaType"],
+            "properties": {
+              "traktListId": { "type": "integer" },
+              "mediaType": { "type": "string", "enum": ["MOVIE", "TV"] },
+              "sortBy": { "type": "string" },
+              "sortHow": { "type": "string", "enum": ["asc", "desc"] }
             }
           }
         }

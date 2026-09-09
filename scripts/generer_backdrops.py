@@ -328,7 +328,14 @@ def charger_catalogues_aiometadata(chemin: Path | None) -> dict[str, dict[str, A
         if entree.get("source") == "custom" and entree.get("sourceUrl"):
             media_type_brut = entree.get("type") or "movie"
             media_type = "tv" if media_type_brut in ("tv", "series", "show", "shows") else "movie"
-            index[catalog_id] = {"kind": "custom_catalogue", "media_type": media_type, "url": entree["sourceUrl"]}
+            entree_index: dict[str, Any] = {"kind": "custom_catalogue", "media_type": media_type, "url": entree["sourceUrl"]}
+            # Champ optionnel : présent pour un catalogue dont les items n'ont
+            # PAS d'id IMDb exploitable (ex: FanKai, ids "fk:N") -- dans ce
+            # cas on utilise directement l'image de ce champ (poster/background
+            # du catalogue lui-même) au lieu de convertir vers TMDB.
+            if entree.get("champImage"):
+                entree_index["champ_image"] = entree["champImage"]
+            index[catalog_id] = entree_index
 
     return index
 
@@ -377,7 +384,19 @@ def construire_requetes(
             else:
                 ignorees.append(f"tmdb/{type_source or '?'} sans identifiant exploitable")
 
-        elif provider == "addon" and source.get("addonId") == "aio-metadata":
+        elif provider == "addon" and (
+            source.get("addonId") == "aio-metadata"
+            # Élargi pour couvrir les catalogues "custom" exposés par un AUTRE
+            # addon que aio-metadata (ex: FanKai via AIOStreams) : dès lors que
+            # son catalogId est enregistré comme catalogue "custom" dans
+            # l'export fourni (même mécanisme que Bingecat), on le résout de
+            # la même façon quel que soit l'addonId d'origine. Les heuristiques
+            # de repli ci-dessous (genre/réseau/thématique par texte) restent
+            # réservées à aio-metadata : un addon tiers sans entrée "custom"
+            # connue continue de tomber dans le cas générique "provider non
+            # géré" plutôt que de déclencher un repli hasardeux.
+            or (catalogues_aiometadata or {}).get(source.get("catalogId") or "", {}).get("kind") == "custom_catalogue"
+        ):
             catalog_id = source.get("catalogId") or ""
             # Le champ "type" du JSON n'est pas toujours en anglais minuscule
             # ("movie"/"tv") -- certains dossiers (ex: "Découvrir > Français")
@@ -404,11 +423,14 @@ def construire_requetes(
                     )
                     continue
             if info_aiometadata and info_aiometadata.get("kind") == "custom_catalogue":
+                params_requete = {"url": info_aiometadata["url"]}
+                if info_aiometadata.get("champ_image"):
+                    params_requete["champ_image"] = info_aiometadata["champ_image"]
                 requetes.append(
                     RequeteTMDB(
                         kind="custom_catalogue",
                         media_type=info_aiometadata["media_type"],
-                        params={"url": info_aiometadata["url"]},
+                        params=params_requete,
                     )
                 )
                 continue
@@ -1171,6 +1193,7 @@ class ClientCatalogueCustom:
     def __init__(self, session: requests.Session | None = None):
         self.session = session or requests.Session()
         self._cache: dict[str, list[str]] = {}
+        self._cache_images: dict[str, list[str]] = {}
         self._verrou = threading.Lock()  # client partagé entre threads, comme ClientTMDB/ClientFanart/ClientMDBList
 
     def recuperer_ids_imdb(self, url: str, limite: int) -> list[str]:
@@ -1191,6 +1214,31 @@ class ClientCatalogueCustom:
         with self._verrou:
             self._cache[url] = ids
         return ids[:limite]
+
+    def recuperer_images_directes(self, url: str, champ: str, limite: int) -> list[str]:
+        """Pour un catalogue dont les items n'ont PAS d'id IMDb exploitable
+        (ex: FanKai, ids "fk:N") : renvoie directement les URLs d'image du
+        champ demandé (typiquement "poster", certains catalogues Stremio
+        n'exposent pas de "background"), sans passer par TMDB. Ne lève
+        jamais d'exception : liste vide en cas d'échec."""
+        cle_cache = f"{url}::{champ}"
+        with self._verrou:
+            if cle_cache in self._cache_images:
+                return self._cache_images[cle_cache][:limite]
+        urls: list[str] = []
+        try:
+            r = self.session.get(corriger_url_catalogue_mal_formee(url), timeout=15)
+            r.raise_for_status()
+            data = r.json()
+            for meta in data.get("metas") or []:
+                valeur = meta.get(champ)
+                if valeur:
+                    urls.append(valeur)
+        except (requests.RequestException, ValueError):
+            urls = []
+        with self._verrou:
+            self._cache_images[cle_cache] = urls
+        return urls[:limite]
 
 
 # ---------------------------------------------------------------------------
@@ -1258,7 +1306,16 @@ class GenerateurBackdrops:
         except Exception:  # noqa: BLE001
             return None
 
-    def _resoudre_image_tuile(self, candidat: tuple[str | None, int, str, str | None]) -> Image.Image | None:
+    @staticmethod
+    def _url_image_depuis_chemin(chemin: str) -> str:
+        """`chemin` est soit une URL absolue déjà exploitable telle quelle
+        (catalogue à images directes, ex: FanKai), soit un `backdrop_path`
+        relatif TMDB (ex: "/abc123.jpg") à préfixer par TMDB_IMAGE_BASE."""
+        if chemin.startswith("http://") or chemin.startswith("https://"):
+            return chemin
+        return f"{TMDB_IMAGE_BASE}/w1280{chemin}"
+
+    def _resoudre_image_tuile(self, candidat: tuple[str | None, int | None, str, str | None]) -> Image.Image | None:
         """Cascade de résolution pour une tuile, dans l'ordre demandé (revu
         pour limiter le nombre de requêtes et privilégier les sources ayant
         le plus de chances de porter un vrai titre incrusté) :
@@ -1283,7 +1340,7 @@ class GenerateurBackdrops:
 
         if not tmdb_id:
             logging.debug("[TUILE] Pas de tmdb_id -> backdrop brut du candidat directement")
-            return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path}") if backdrop_path else None
+            return self._telecharger_une_image(self._url_image_depuis_chemin(backdrop_path)) if backdrop_path else None
 
         images_tmdb = self.tmdb.recuperer_images(tmdb_id, media_type, langue_originale)
 
@@ -1359,7 +1416,7 @@ class GenerateurBackdrops:
         return None
 
     def _telecharger_images_pour_mosaique(
-        self, candidats: list[tuple[str | None, int, str, str | None]]
+        self, candidats: list[tuple[str | None, int | None, str, str | None]]
     ) -> list[Image.Image]:
         """Résout (cascade TMDB langue -> Fanart -> sans texte) et
         télécharge en parallèle les images des candidats ; retourne les
@@ -1379,7 +1436,7 @@ class GenerateurBackdrops:
 
     def _resoudre_liste_candidats(
         self, requete: RequeteTMDB, cible: int, pages: int
-    ) -> Sequence[tuple[str | None, int, str, str | None]]:
+    ) -> Sequence[tuple[str | None, int | None, str, str | None]]:
         """Résout une requête en liste de candidats (backdrop_path, tmdb_id,
         media_type, langue_originale) -- gère aussi bien les requêtes TMDB
         classiques que les listes MDBList (`kind == "mdblist_liste"`) et les
@@ -1393,11 +1450,20 @@ class GenerateurBackdrops:
                 )
             return [(None, tmdb_id, media_type, None) for tmdb_id, media_type in items]
         if requete.kind == "custom_catalogue":
+            champ_image = requete.params.get("champ_image")
+            if champ_image:
+                # Catalogue sans id IMDb exploitable (ex: FanKai) -- on
+                # utilise directement les URLs d'image du catalogue, sans
+                # passer par TMDB.
+                urls_images = self.catalogue_custom.recuperer_images_directes(
+                    requete.params["url"], champ_image, limite=cible
+                )
+                return [(url, None, requete.media_type, None) for url in urls_images]
             # On demande un peu plus d'ids IMDb que la cible : certains ne se
             # résolvent pas côté TMDB (retiré/introuvable), autant limiter le
             # risque de retomber sous la cible après conversion.
             ids_imdb = self.catalogue_custom.recuperer_ids_imdb(requete.params["url"], limite=cible * 2)
-            candidats: list[tuple[str | None, int, str, str | None]] = []
+            candidats: list[tuple[str | None, int | None, str, str | None]] = []
             for imdb_id in ids_imdb:
                 resolu = self.tmdb.resoudre_imdb_vers_tmdb(imdb_id)
                 if resolu:
@@ -1420,8 +1486,8 @@ class GenerateurBackdrops:
         cible = mosaique_module.nombre_cellules_grille(largeur, hauteur, echelle=largeur / 1920)
         pages_necessaires = min(6, math.ceil(cible / 18) + 1)
 
-        candidats: list[tuple[str | None, int, str, str | None]] = []
-        vus: set[tuple[str, int]] = set()
+        candidats: list[tuple[str | None, int | None, str, str | None]] = []
+        vus: set[tuple[str, int | str | None]] = set()
 
         # on interleave les requêtes pour ne pas être dominé par la première
         listes_par_requete = [
@@ -1432,7 +1498,11 @@ class GenerateurBackdrops:
             for liste in listes_par_requete:
                 if i < len(liste):
                     backdrop_path, tmdb_id, media_type, langue_originale = liste[i]
-                    cle = (media_type, tmdb_id)
+                    # Sans tmdb_id (catalogue à images directes, ex: FanKai),
+                    # le dédoublonnage se fait sur l'URL d'image elle-même --
+                    # sinon tous les candidats partageraient la même clé
+                    # (media_type, None) et s'écraseraient les uns les autres.
+                    cle = (media_type, tmdb_id if tmdb_id is not None else backdrop_path)
                     if cle not in vus:
                         vus.add(cle)
                         candidats.append((backdrop_path, tmdb_id, media_type, langue_originale))
@@ -1669,6 +1739,7 @@ def main() -> int:
     parser.add_argument("--cle-fanart", default=None, help="Clé API Fanart.tv (optionnel)")
     parser.add_argument("--cle-mdblist", default=None, help="Clé API MDBList.com, pour résoudre les sources provider=mdblist (optionnel, ou variable MDBLIST_API_KEY)")
     parser.add_argument("--aiometadata", default=None, help="Chemin vers un export AIOMetadata (JSON) pour résoudre les catalogues avec leurs vrais filtres TMDB (optionnel)")
+    parser.add_argument("--catalogues-personnalises", default="Templates/catalogues-personnalises.json", help="JSON supplémentaire (même format que --aiometadata) pour des catalogues \"custom\" non couverts par l'export AIOMetadata (ex: FanKai) -- fusionné par-dessus, optionnel, ignoré si le fichier n'existe pas")
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
     parser.add_argument("--sortie", default=NOM_DOSSIER_RACINE)
     parser.add_argument("--profil", choices=list(PROFILS_QUALITE), default="standard")
@@ -1704,7 +1775,12 @@ def main() -> int:
         mosaique=args.mosaique,
         langue_preferee=args.langue_preferee,
         cle_mdblist=args.cle_mdblist or os.environ.get("MDBLIST_API_KEY"),
-        catalogues_aiometadata=charger_catalogues_aiometadata(Path(args.aiometadata) if args.aiometadata else None),
+        catalogues_aiometadata={
+            **charger_catalogues_aiometadata(Path(args.aiometadata) if args.aiometadata else None),
+            **charger_catalogues_aiometadata(
+                Path(args.catalogues_personnalises) if args.catalogues_personnalises else None
+            ),
+        },
         images_manuelles=charger_images_manuelles(Path(args.images_manuelles) if args.images_manuelles else None),
     )
 
