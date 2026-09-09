@@ -31,6 +31,9 @@ jobs:
       - name: Valider la structure du JSON de collections
         run: python3 scripts/valider_collections.py
 
+      - name: Vérifier la cohérence de la configuration (groupes, slugs, filtres)
+        run: python3 scripts/lint_config.py
+
       - name: Vérification des types (mypy)
         run: mypy scripts/ --ignore-missing-imports
 

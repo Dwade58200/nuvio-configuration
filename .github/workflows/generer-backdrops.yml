@@ -66,6 +66,19 @@ jobs:
             echo "Ancienne arborescence 'collections/' supprimée (remplacée par 'Collections/')."
           fi
 
+      - name: "Préparer les catalogues personnalisés (ex: FanKai)"
+        # Contient une URL avec un identifiant/clé perso encodé dedans -- ne
+        # doit JAMAIS être committé ni apparaître dans les logs. Écrase le
+        # fichier local avec le secret à chaque run. Rien ne se passe si le
+        # secret n'est pas configuré (fonctionnalité optionnelle).
+        env:
+          CATALOGUES_PERSONNALISES: ${{ secrets.CATALOGUES_PERSONNALISES }}
+        run: |
+          if [ -n "$CATALOGUES_PERSONNALISES" ]; then
+            printf '%s' "$CATALOGUES_PERSONNALISES" > Templates/catalogues-personnalises.json
+            echo "Catalogues personnalisés chargés depuis le secret."
+          fi
+
       - name: Générer les backdrops
         env:
           PYTHONDONTWRITEBYTECODE: "1"
