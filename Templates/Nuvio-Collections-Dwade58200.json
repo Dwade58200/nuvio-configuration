@@ -3540,21 +3540,21 @@
         "sources": [
           {
             "type": "Série",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.207754"
           },
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.29911"
           },
           {
             "type": "Film",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.7764"
@@ -3563,23 +3563,26 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🆕",
-        "focusGifUrl": "https://i.ibb.co/RKWkVK0/Nouveautes.png",
+        "focusGifUrl": "",
         "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Animes/Logos/Anime_Nouveautes_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Animes/Covers/Anime_Nouveautes.png?raw=true",
         "catalogSources": [
           {
             "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.207754"
           },
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.29911"
           },
           {
             "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.7764"
           }
@@ -3593,14 +3596,14 @@
         "sources": [
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.29910"
           },
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.29928"
@@ -3609,18 +3612,20 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔥",
-        "focusGifUrl": "https://i.ibb.co/BHqty0jC/Populaires.png",
+        "focusGifUrl": "",
         "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Animes/Logos/Anime_Populaires_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Animes/Covers/Anime_Populaires.png?raw=true",
         "catalogSources": [
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.29910"
           },
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.29928"
           }
@@ -3634,14 +3639,14 @@
         "sources": [
           {
             "type": "series",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.30461"
           },
           {
             "type": "Film",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.195911"
@@ -3650,18 +3655,20 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏆",
-        "focusGifUrl": "https://i.ibb.co/6RJftCGS/Les-mieux-notes.png",
+        "focusGifUrl": "",
         "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Animes/Logos/Anime_Les_mieux_notes_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Animes/Covers/Anime_Les_mieux_notes.png?raw=true",
         "catalogSources": [
           {
             "type": "series",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.30461"
           },
           {
             "type": "Film",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.195911"
           }
@@ -3704,7 +3711,7 @@
         "sources": [
           {
             "type": "movie",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.29927"
@@ -3713,13 +3720,14 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "⛩️",
-        "focusGifUrl": "https://i.ibb.co/0p7ZBJpG/Studio-Ghibli.png",
+        "focusGifUrl": "",
         "heroVideoUrl": "",
         "titleLogoUrl": "https://i.ibb.co/yBpNhBcG/Studio-Ghibli.png",
-        "coverImageUrl": "https://i.ibb.co/nqpHqD44/Studio-Ghibli.png",
+        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Animes/Covers/Anime_Studio-Ghibli.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.29927"
           }
@@ -3733,7 +3741,7 @@
         "sources": [
           {
             "type": "Série",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.25240"
@@ -3749,6 +3757,7 @@
         "catalogSources": [
           {
             "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.25240"
           }
@@ -3762,7 +3771,7 @@
         "sources": [
           {
             "type": "Série",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.25241"
@@ -3778,6 +3787,7 @@
         "catalogSources": [
           {
             "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.25241"
           }
@@ -3791,7 +3801,7 @@
         "sources": [
           {
             "type": "Série",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.25242"
@@ -3807,6 +3817,7 @@
         "catalogSources": [
           {
             "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.25242"
           }
@@ -3820,7 +3831,7 @@
         "sources": [
           {
             "type": "Série",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.25243"
@@ -3836,6 +3847,7 @@
         "catalogSources": [
           {
             "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.25243"
           }
@@ -3849,7 +3861,7 @@
         "sources": [
           {
             "type": "Série",
-            "genre": "",
+            "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "mdblist.25244"
@@ -3865,6 +3877,7 @@
         "catalogSources": [
           {
             "type": "Série",
+            "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "mdblist.25244"
           }
