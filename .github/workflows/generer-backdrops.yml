@@ -67,16 +67,18 @@ jobs:
           fi
 
       - name: "Préparer les catalogues personnalisés (ex: FanKai)"
-        # Contient une URL avec un identifiant/clé perso encodé dedans -- ne
-        # doit JAMAIS être committé ni apparaître dans les logs. Écrase le
-        # fichier local avec le secret à chaque run. Rien ne se passe si le
-        # secret n'est pas configuré (fonctionnalité optionnelle).
+        # Ne stocke que l'URL en secret (contient un identifiant/clé perso
+        # encodé dedans) -- le reste (id, type, champ image) est fixe et
+        # sans risque, assemblé ici. Rien ne se passe si le secret n'est
+        # pas configuré (fonctionnalité optionnelle). La valeur du secret
+        # n'apparaît jamais dans les logs (masquée automatiquement par
+        # GitHub Actions, et de toute façon jamais affichée ici).
         env:
-          CATALOGUES_PERSONNALISES: ${{ secrets.CATALOGUES_PERSONNALISES }}
+          FANKAI_CATALOG_URL: ${{ secrets.FANKAI_CATALOG_URL }}
         run: |
-          if [ -n "$CATALOGUES_PERSONNALISES" ]; then
-            printf '%s' "$CATALOGUES_PERSONNALISES" > Templates/catalogues-personnalises.json
-            echo "Catalogues personnalisés chargés depuis le secret."
+          if [ -n "$FANKAI_CATALOG_URL" ]; then
+            python3 -c "import json, os; json.dump({'catalogs': [{'id': '1d5e3b0.fankai_catalog', 'type': 'tv', 'source': 'custom', 'sourceUrl': os.environ['FANKAI_CATALOG_URL'], 'champImage': 'poster'}]}, open('Templates/catalogues-personnalises.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)"
+            echo "Catalogue FanKai assemblé depuis le secret FANKAI_CATALOG_URL."
           fi
 
       - name: Générer les backdrops
