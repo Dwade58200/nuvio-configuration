@@ -29,12 +29,13 @@ de qualité professionnelle, pas des correctifs urgents.
       sur l'URL d'image elle-même comme clé quand `tmdb_id` est absent.
 - [x] **`Templates/catalogues-personnalises.json`** (fusionné par-dessus
       `--aiometadata`) : registre séparé pour ces catalogues non couverts
-      par l'export AIOMetadata standard. Fichier gabarit
-      (`.example.json`) committé, vrai fichier dans `.gitignore` (contient
-      une URL avec la config AIOStreams -- et donc une clé de service
-      debrid -- encodée en base64). Automatisable en CI via un secret
-      GitHub `CATALOGUES_PERSONNALISES`, matérialisé sur le runner par
-      une nouvelle étape du workflow (jamais loggé).
+      par l'export AIOMetadata standard. Ce fichier n'existe JAMAIS dans
+      le repo (ni en local, ni committé) : seule l'URL (contenant la
+      config AIOStreams encodée, donc une clé de service debrid) est
+      stockée, comme secret GitHub `FANKAI_CATALOG_URL` -- le workflow
+      assemble le JSON complet à la volée sur le runner à chaque
+      exécution (id/type/champImage fixes, non sensibles, écrits en dur
+      dans le workflow) et ne l'écrit jamais dans les logs.
 - [x] 8 nouveaux tests (dont un test d'intégration bout en bout avec un
       extrait réel du catalogue FanKai transmis par l'utilisateur --
       mosaïque générée avec zéro appel TMDB, confirmé), 191/191 verts au
@@ -380,7 +381,7 @@ précis :
 - [ ] Vérifier si l'étape de migration `collections/` -> `Collections/`
       dans `generer-backdrops.yml` est encore nécessaire, et la retirer
       si elle ne s'est plus déclenchée depuis plusieurs runs.
-- [ ] Une fois le secret `CATALOGUES_PERSONNALISES` configuré côté
+- [ ] Une fois le secret `FANKAI_CATALOG_URL` configuré côté
       GitHub : vérifier sur un vrai run (pas juste `--dry-run`) que
       FanKai génère effectivement sa mosaïque en conditions réelles.
 

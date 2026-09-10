@@ -471,15 +471,14 @@ Avec ce mécanisme, les recommandations MDBList personnalisées
 Certains catalogues Stremio "custom" n'utilisent PAS d'id IMDb (ex:
 **FanKai** / addon **FKStream**, ids au format `fk:N`) -- la conversion
 `/find` TMDB décrite ci-dessus ne peut alors renvoyer aucun résultat. Pour
-ces catalogues, ajoute `"champImage": "poster"` (ou `"background"` s'il
-existe) à l'entrée dans ton export : les images de ce champ sont utilisées
+ces catalogues, un champ `champImage` (`"poster"`, ou `"background"` s'il
+existe) indique quel champ du catalogue utiliser comme image
 **directement**, sans passer par TMDB.
 
-Comme ces catalogues ne figurent généralement pas dans l'export
+Comme ce genre de catalogue ne figure généralement pas dans l'export
 AIOMetadata standard (ce sont d'autres addons, agrégés via AIOStreams),
-utilise le fichier séparé `Templates/catalogues-personnalises.json`
-(voir `Templates/catalogues-personnalises.example.json` pour le format,
-fusionné automatiquement par-dessus `--aiometadata`) :
+il passe par un fichier séparé, `Templates/catalogues-personnalises.json`
+(fusionné automatiquement par-dessus `--aiometadata`) -- au format :
 
 ```json
 {
@@ -495,13 +494,27 @@ fusionné automatiquement par-dessus `--aiometadata`) :
 }
 ```
 
-**⚠️ Ce fichier contient une URL avec un identifiant/clé personnel encodé
-dedans (config AIOStreams en base64, incluant une clé de service debrid)
--- ne JAMAIS le committer.** Il est déjà dans `.gitignore`. Pour
-l'automatiser en CI, mets son contenu JSON complet dans un secret GitHub
-nommé `CATALOGUES_PERSONNALISES` (Settings → Secrets and variables →
-Actions) -- le workflow `generer-backdrops.yml` le matérialise sur le
-runner à chaque exécution, sans jamais l'écrire dans les logs.
+**⚠️ `sourceUrl` contient un identifiant/clé personnel encodé dedans**
+(config AIOStreams en base64, incluant une clé de service debrid) --
+**ce fichier ne doit jamais exister dans le repo, ni en local ni
+committé.** C'est pour ça que ce n'est PAS un fichier à créer/éditer à la
+main : seule l'URL elle-même est stockée, comme secret GitHub, et le
+workflow assemble ce JSON tout seul à chaque exécution, uniquement sur le
+runner, jamais écrit dans les logs.
+
+Mise en place, en une fois :
+1. **Settings → Secrets and variables → Actions → New repository secret**
+2. Nom : `FANKAI_CATALOG_URL`
+3. Valeur : l'URL complète du catalogue (celle qui contient ta config
+   encodée)
+
+C'est tout -- aucun fichier à ajouter au repo. `.github/workflows/generer-backdrops.yml`
+matérialise `Templates/catalogues-personnalises.json` à partir de ce
+secret avant de lancer `generer_backdrops.py`, et le supprime avec le
+reste du runner à la fin du job (les runners GitHub sont éphémères). Si
+tu veux tester en local sans passer par la CI, tu peux créer ce fichier
+toi-même temporairement (il est dans `.gitignore`, donc jamais commité
+par erreur) -- mais ce n'est utile que pour du débogage ponctuel.
 
 Pour retrouver l'`id` et le `type` exacts qu'un addon tiers déclare pour
 son propre catalogue (souvent différents du `catalogId` préfixé vu côté
