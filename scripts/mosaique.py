@@ -22,7 +22,7 @@ import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 # ---------------------------------------------------------------------------
 # Réglages de la grille inclinée
@@ -347,3 +347,107 @@ def generer_mosaique(
 
 def image_depuis_bytes(donnees: bytes) -> Image.Image:
     return Image.open(io.BytesIO(donnees))
+
+
+# ---------------------------------------------------------------------------
+# Incrustation de titre sur un backdrop "nu" (sans texte)
+# ---------------------------------------------------------------------------
+# Utilisé pour les catalogues "champTitre" (ex: FanKai, voir
+# generer_backdrops._resoudre_tuile_titre_sur_backdrop_nu) : le backdrop
+# vient de TMDB sans aucun texte incrusté, et le SEUL titre disponible est
+# celui du catalogue lui-même -- on l'écrit donc nous-mêmes, ici.
+
+_POLICE_TAILLE_MIN = 16
+_POLICE_TAILLE_RATIO = 0.11  # proportion de la hauteur du canvas
+_MARGE_RATIO = 0.045
+
+
+_UnePolice = ImageFont.ImageFont | ImageFont.FreeTypeFont
+
+
+def _charger_police(taille: int, chemin_police: str | None) -> _UnePolice:
+    """Charge la police TTF fournie (ex: la police bundlée du dépôt) à la
+    taille demandée ; repli sur la police par défaut de Pillow (mise à
+    l'échelle, disponible depuis Pillow 10.1) si le fichier est introuvable
+    ou invalide -- jamais d'exception, un titre moche vaut mieux qu'un
+    backdrop en erreur."""
+    if chemin_police:
+        try:
+            return ImageFont.truetype(str(chemin_police), taille)
+        except OSError:
+            pass
+    try:
+        return ImageFont.load_default(size=taille)
+    except TypeError:  # Pillow < 10.1 : load_default() ne prend pas `size`
+        return ImageFont.load_default()
+
+
+def _decouper_en_lignes(dessin: ImageDraw.ImageDraw, texte: str, police: _UnePolice, largeur_max: float) -> list[str]:
+    """Découpe `texte` en lignes tenant chacune dans `largeur_max` px,
+    en coupant sur les espaces (jamais au milieu d'un mot)."""
+    mots = texte.split()
+    if not mots:
+        return [texte] if texte else []
+    lignes: list[str] = []
+    ligne_courante = mots[0]
+    for mot in mots[1:]:
+        essai = f"{ligne_courante} {mot}"
+        if dessin.textlength(essai, font=police) <= largeur_max:
+            ligne_courante = essai
+        else:
+            lignes.append(ligne_courante)
+            ligne_courante = mot
+    lignes.append(ligne_courante)
+    return lignes
+
+
+def incruster_titre(
+    image: Image.Image,
+    titre: str,
+    largeur: int,
+    hauteur: int,
+    chemin_police: str | None = None,
+) -> Image.Image:
+    """Recadre `image` (cover) sur (largeur, hauteur), puis écrit `titre`
+    en bas à gauche par-dessus un léger dégradé sombre (pour la
+    lisibilité) -- pensé pour un backdrop TMDB "nu" (sans aucun texte
+    d'origine). La taille de police est réduite automatiquement si le
+    titre ne tient pas en 2 lignes. Ne lève jamais d'exception à cause du
+    texte : un backdrop sans titre lisible reste préférable à un échec
+    total (l'appelant a de toute façon un repli, voir
+    generer_backdrops._resoudre_tuile_titre_sur_backdrop_nu)."""
+    fond = recadrer_pour_tuile(image, largeur, hauteur).convert("RGBA")
+    if not (titre or "").strip():
+        return fond.convert("RGB")
+
+    marge = max(12, int(largeur * _MARGE_RATIO))
+    largeur_max_texte = max(1, largeur - marge * 2)
+    taille_police = max(_POLICE_TAILLE_MIN, int(hauteur * _POLICE_TAILLE_RATIO))
+
+    dessin_mesure = ImageDraw.Draw(fond)
+    police = _charger_police(taille_police, chemin_police)
+    lignes = _decouper_en_lignes(dessin_mesure, titre.strip(), police, largeur_max_texte)
+    while len(lignes) > 2 and taille_police > _POLICE_TAILLE_MIN:
+        taille_police -= 2
+        police = _charger_police(taille_police, chemin_police)
+        lignes = _decouper_en_lignes(dessin_mesure, titre.strip(), police, largeur_max_texte)
+
+    interligne = int(taille_police * 1.2)
+    hauteur_bloc_texte = interligne * len(lignes)
+
+    # Dégradé sombre en bas (réutilise le dégradé "bas" du style mosaïque,
+    # en plus prononcé) pour garantir la lisibilité du texte quel que soit
+    # le contenu du backdrop dessous.
+    scrim = _degrade_lineaire(largeur, hauteur, "bas", couleur=(4, 4, 6), intensite=1.4)
+    resultat = Image.alpha_composite(fond, scrim)
+
+    dessin = ImageDraw.Draw(resultat)
+    y = max(marge, hauteur - marge - hauteur_bloc_texte)
+    for ligne in lignes:
+        # ombre portée légère puis texte blanc, pour rester lisible même
+        # sur un fond clair localement.
+        dessin.text((marge + 2, y + 2), ligne, font=police, fill=(0, 0, 0, 170))
+        dessin.text((marge, y), ligne, font=police, fill=(255, 255, 255, 255))
+        y += interligne
+
+    return resultat.convert("RGB")

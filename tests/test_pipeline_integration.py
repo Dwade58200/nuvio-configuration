@@ -242,6 +242,137 @@ def test_fankai_genere_une_mosaique_a_partir_des_images_directes_du_catalogue(tm
     assert not any("themoviedb.org" in u for u in urls_appelees if u)
 
 
+def test_fankai_avec_champ_titre_cherche_un_backdrop_tmdb_nu_et_incruste_le_titre(tmp_path):
+    """Nouveau (champTitre) : au lieu des posters bruts du catalogue, on
+    cherche chaque titre sur TMDB, on prend son backdrop NU (iso_639_1
+    absent), et on écrit le titre du catalogue par-dessus -- contrairement
+    au test ci-dessus, TMDB DOIT être appelé ici."""
+    from generer_backdrops import GROUPE_ANIMES
+
+    fixture = json.loads(
+        (Path(__file__).resolve().parent / "fixtures" / "fankai_catalog_sample.json").read_text(encoding="utf-8")
+    )
+    url_catalogue = "https://streamio.fankai.fr/x/catalog/anime/fankai_catalog.json"
+
+    def _repondre(url, timeout=None, params=None, **kwargs):
+        if url.rstrip("?") == url_catalogue or url.startswith(url_catalogue):
+            return FausseReponse(json_data=fixture)
+        if "/search/tv" in url or "/search/movie" in url:
+            return FausseReponse(json_data={"results": [{"id": 999, "popularity": 42.0}]})
+        if "/images" in url:
+            return FausseReponse(json_data={"backdrops": [{"file_path": "/nu.jpg", "iso_639_1": None, "vote_average": 8.0}]})
+        # toute autre URL (téléchargement d'image, poster de repli...) = une image factice
+        return FausseReponse(content=_image_factice_bytes())
+
+    session_mock = MagicMock()
+    session_mock.get.side_effect = _repondre
+
+    catalogues = {
+        "1d5e3b0.fankai_catalog": {
+            "kind": "custom_catalogue",
+            "media_type": "tv",
+            "url": url_catalogue,
+            "champ_image": "poster",
+            "champ_titre": "name",
+            "suffixes_titre_ignorer": ["Henshū", "Kaï", "Kai"],
+        }
+    }
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle",
+        cle_fanart=None,
+        repertoire_sortie=tmp_path,
+        dry_run=False,
+        mosaique=True,
+        catalogues_aiometadata=catalogues,
+    )
+    generateur.session = session_mock
+    generateur.tmdb.session = session_mock
+    generateur.catalogue_custom.session = session_mock
+
+    dossier = {
+        "title": "FanKai",
+        "sources": [
+            {
+                "provider": "addon",
+                "addonId": "com.aiostreams.viren070.5a21f0f2-961",
+                "catalogId": "1d5e3b0.fankai_catalog",
+                "type": "anime",
+            }
+        ],
+    }
+
+    resultat = generateur.traiter_dossier(GROUPE_ANIMES, dossier)
+
+    assert resultat.statut == "genere"
+    assert (tmp_path / resultat.chemin).exists()
+    urls_appelees = [c.args[0] if c.args else c.kwargs.get("url") for c in session_mock.get.call_args_list]
+    assert any("/search/tv" in u or "/search/movie" in u for u in urls_appelees if u)
+    assert any("/images" in u for u in urls_appelees if u)
+
+
+def test_fankai_champ_titre_retombe_sur_le_poster_si_tmdb_ne_trouve_rien(tmp_path):
+    """Si la recherche TMDB échoue pour un titre (aucun résultat), le
+    poster brut du catalogue (champ_image, filet de sécurité) doit quand
+    même servir de tuile -- jamais d'échec total pour un seul titre raté."""
+    from generer_backdrops import GROUPE_ANIMES
+
+    fixture = json.loads(
+        (Path(__file__).resolve().parent / "fixtures" / "fankai_catalog_sample.json").read_text(encoding="utf-8")
+    )
+    url_catalogue = "https://streamio.fankai.fr/x/catalog/anime/fankai_catalog.json"
+
+    def _repondre(url, timeout=None, params=None, **kwargs):
+        if url.rstrip("?") == url_catalogue or url.startswith(url_catalogue):
+            return FausseReponse(json_data=fixture)
+        if "/search/tv" in url or "/search/movie" in url:
+            return FausseReponse(json_data={"results": []})  # TMDB ne trouve jamais rien
+        return FausseReponse(content=_image_factice_bytes())
+
+    session_mock = MagicMock()
+    session_mock.get.side_effect = _repondre
+
+    catalogues = {
+        "1d5e3b0.fankai_catalog": {
+            "kind": "custom_catalogue",
+            "media_type": "tv",
+            "url": url_catalogue,
+            "champ_image": "poster",
+            "champ_titre": "name",
+            "suffixes_titre_ignorer": ["Henshū", "Kaï", "Kai"],
+        }
+    }
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle",
+        cle_fanart=None,
+        repertoire_sortie=tmp_path,
+        dry_run=False,
+        mosaique=True,
+        catalogues_aiometadata=catalogues,
+    )
+    generateur.session = session_mock
+    generateur.tmdb.session = session_mock
+    generateur.catalogue_custom.session = session_mock
+
+    dossier = {
+        "title": "FanKai",
+        "sources": [
+            {
+                "provider": "addon",
+                "addonId": "com.aiostreams.viren070.5a21f0f2-961",
+                "catalogId": "1d5e3b0.fankai_catalog",
+                "type": "anime",
+            }
+        ],
+    }
+
+    resultat = generateur.traiter_dossier(GROUPE_ANIMES, dossier)
+
+    assert resultat.statut == "genere"
+    assert (tmp_path / resultat.chemin).exists()
+
+
 if __name__ == "__main__":
     import pytest
 

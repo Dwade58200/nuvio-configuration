@@ -38,6 +38,7 @@ from generer_backdrops import (  # noqa: E402
     corriger_url_catalogue_mal_formee,
     dossier_actif,
     meilleur_backdrop_tmdb_langue,
+    nettoyer_titre_pour_recherche,
     normaliser,
     slugifier,
 )
@@ -585,6 +586,8 @@ def test_charger_catalogues_aiometadata_indexe_les_listes_mdblist_avec_url():
         "kind": "mdblist",
         "media_type": "tv",
         "mdblist_url": "https://mdblist.com/lists/polynomialproton/top-sitcoms",
+        "mdblist_sort": "imdbpopular",
+        "mdblist_order": "asc",
     }
 
 
@@ -699,7 +702,12 @@ def test_catalogue_mdblist_de_l_export_produit_une_requete_mdblist_liste():
     assert len(requetes) == 1
     assert requetes[0].kind == "mdblist_liste"
     assert requetes[0].media_type == "tv"
-    assert requetes[0].params == {"mdblist_user": "polynomialproton", "mdblist_slug": "top-sitcoms"}
+    assert requetes[0].params == {
+        "mdblist_user": "polynomialproton",
+        "mdblist_slug": "top-sitcoms",
+        "mdblist_sort": "imdbpopular",
+        "mdblist_order": "asc",
+    }
     assert ignorees == []
 
 
@@ -750,6 +758,53 @@ def test_catalogue_custom_resolu_meme_avec_un_addonid_different_de_aio_metadata(
     assert requetes[0].kind == "custom_catalogue"
     assert requetes[0].params == {"url": "https://exemple.test/fankai/catalog/series/fankai_catalog.json"}
     assert ignorees == []
+
+
+def test_champ_titre_est_transmis_avec_les_suffixes_a_ignorer():
+    """Cas réel (FanKai, nouveau format) : quand l'entrée "custom" porte un
+    "champTitre" (en plus ou à la place de "champImage"), la requête doit
+    transporter le nom du champ ET la liste de suffixes de branding à
+    retirer avant la recherche TMDB -- voir nettoyer_titre_pour_recherche."""
+    catalogues = {
+        "1d5e3b0.fankai_catalog": {
+            "kind": "custom_catalogue",
+            "media_type": "tv",
+            "url": "https://exemple.test/fankai/catalog/series/fankai_catalog.json",
+            "champ_image": "poster",
+            "champ_titre": "name",
+            "suffixes_titre_ignorer": ["Henshū", "Kaï", "Kai"],
+        }
+    }
+    dossier = {
+        "title": "FanKai",
+        "sources": [
+            {"provider": "addon", "addonId": "com.aiostreams.viren070.5a21f0f2-961", "catalogId": "1d5e3b0.fankai_catalog", "type": "anime"}
+        ],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_ANIMES, dossier, catalogues)
+    assert len(requetes) == 1
+    assert requetes[0].params == {
+        "url": "https://exemple.test/fankai/catalog/series/fankai_catalog.json",
+        "champ_image": "poster",
+        "champ_titre": "name",
+        "suffixes_titre_ignorer": ["Henshū", "Kaï", "Kai"],
+    }
+    assert ignorees == []
+
+
+def test_nettoyer_titre_pour_recherche_retire_les_suffixes_de_branding():
+    """Les suffixes FanKai désignent un montage fan, absent du titre
+    officiel TMDB -- ils doivent disparaître pour la recherche, mais un mot
+    qui fait partie du vrai titre (ex: "Saga" dans "Vinland Saga") doit
+    rester si ce n'est pas lui-même listé comme suffixe à ignorer."""
+    suffixes = ["Henshū", "Kaï", "Kai"]
+    assert nettoyer_titre_pour_recherche("Black Lagoon Henshū", suffixes) == "Black Lagoon"
+    assert nettoyer_titre_pour_recherche("Boruto Kaï", suffixes) == "Boruto"
+    assert nettoyer_titre_pour_recherche("Vinland Saga Henshū", suffixes) == "Vinland Saga"
+    # Aucun suffixe présent -> titre inchangé.
+    assert nettoyer_titre_pour_recherche("One Piece", suffixes) == "One Piece"
+    # Titre vide -> ne casse rien, retourne tel quel.
+    assert nettoyer_titre_pour_recherche("", suffixes) == ""
 
 
 def test_addon_tiers_sans_entree_custom_connue_reste_ignore():
@@ -1212,6 +1267,91 @@ def test_client_catalogue_custom_images_directes_echec_reseau_retourne_liste_vid
     assert client.recuperer_images_directes("https://x.example/catalog.json", "poster", limite=10) == []
 
 
+def test_client_catalogue_custom_recupere_titre_et_image_de_repli():
+    """Nouveau : pour "champTitre" (ex: FanKai), on veut le TITRE de chaque
+    item (champ "name") ET son image de repli (champ "poster"), pas juste
+    l'image seule -- dans l'ordre du catalogue."""
+    payload = json.loads(FIXTURE_FANKAI.read_text(encoding="utf-8"))
+    client = ClientCatalogueCustom(session=_FausseSessionCatalogueCustom(payload))
+
+    items = client.recuperer_items_avec_titre(
+        "https://streamio.fankai.fr/x/catalog/anime/fankai_catalog.json", "name", "poster", limite=10
+    )
+
+    assert items[0] == ("Black Lagoon Henshū", "https://metadata.fankai.fr/series/1/image/poster?t=1774045805")
+    assert items[3] == ("Boruto Kaï", "https://metadata.fankai.fr/series/8/image/poster?t=1774468203")
+    assert len(items) == 5
+
+
+def test_client_catalogue_custom_titres_sans_image_de_repli_configuree():
+    """champ_image_repli=None (aucun repli configuré) -> image toujours
+    None, seul le titre est renseigné."""
+    payload = {"metas": [{"id": "fk:1", "name": "Un titre", "poster": "https://x.example/p.jpg"}]}
+    client = ClientCatalogueCustom(session=_FausseSessionCatalogueCustom(payload))
+    items = client.recuperer_items_avec_titre("https://x.example/catalog.json", "name", None, limite=10)
+    assert items == [("Un titre", None)]
+
+
+def test_client_catalogue_custom_titres_echec_reseau_retourne_liste_vide():
+    class _SessionEnErreur:
+        def get(self, url, timeout=None, **kwargs):
+            raise __import__("requests").ConnectionError("panne")
+
+    client = ClientCatalogueCustom(session=_SessionEnErreur())
+    assert client.recuperer_items_avec_titre("https://x.example/catalog.json", "name", "poster", limite=10) == []
+
+
+def test_rechercher_titre_choisit_le_media_type_le_plus_populaire():
+    """Cas réel FanKai : le catalogue dit "anime" (donc tv en priorité),
+    mais le titre nettoyé peut très bien être un film d'animation sur TMDB
+    -- le plus populaire des deux types l'emporte."""
+    class _FausseSessionRecherche:
+        def get(self, url, params=None, timeout=None, **kwargs):
+            if "/search/tv" in url:
+                return _FausseReponseCatalogueCustom({"results": [{"id": 10, "popularity": 5.0}]})
+            if "/search/movie" in url:
+                return _FausseReponseCatalogueCustom({"results": [{"id": 20, "popularity": 99.0}]})
+            raise AssertionError(f"URL inattendue: {url}")
+
+    client = ClientTMDB(cle_api="fake", session=_FausseSessionRecherche())
+    assert client.rechercher_titre("Boruto", media_type_hint="tv") == (20, "movie")
+
+
+def test_rechercher_titre_introuvable_retourne_none():
+    class _FausseSessionRechercheVide:
+        def get(self, url, params=None, timeout=None, **kwargs):
+            return _FausseReponseCatalogueCustom({"results": []})
+
+    client = ClientTMDB(cle_api="fake", session=_FausseSessionRechercheVide())
+    assert client.rechercher_titre("Titre Introuvable Xyz") is None
+
+
+def test_recuperer_backdrop_nu_filtre_les_backdrops_sans_texte_et_prend_le_mieux_note():
+    class _FausseSessionImages:
+        def get(self, url, params=None, timeout=None, **kwargs):
+            return _FausseReponseCatalogueCustom(
+                {
+                    "backdrops": [
+                        {"file_path": "/tagge-fr.jpg", "iso_639_1": "fr", "vote_average": 9.9},
+                        {"file_path": "/nu-moyen.jpg", "iso_639_1": None, "vote_average": 5.0},
+                        {"file_path": "/nu-le-mieux-note.jpg", "iso_639_1": None, "vote_average": 8.0},
+                    ]
+                }
+            )
+
+    client = ClientTMDB(cle_api="fake", session=_FausseSessionImages())
+    assert client.recuperer_backdrop_nu(42, "tv") == "/nu-le-mieux-note.jpg"
+
+
+def test_recuperer_backdrop_nu_retourne_none_si_aucun_backdrop_sans_texte():
+    class _FausseSessionImagesSansNu:
+        def get(self, url, params=None, timeout=None, **kwargs):
+            return _FausseReponseCatalogueCustom({"backdrops": [{"file_path": "/fr.jpg", "iso_639_1": "fr", "vote_average": 9.0}]})
+
+    client = ClientTMDB(cle_api="fake", session=_FausseSessionImagesSansNu())
+    assert client.recuperer_backdrop_nu(42, "tv") is None
+
+
 def test_charger_catalogues_aiometadata_propage_champ_image(tmp_path):
     """Un catalogue "custom" avec un champ champImage (FanKai) doit être
     indexé avec la clé champ_image -- absent sinon (Bingecat)."""
@@ -1241,6 +1381,33 @@ def test_construire_requetes_transmet_champ_image_dans_les_params():
     requetes, ignorees = construire_requetes(GROUPE_ANIMES, dossier, catalogues)
     assert len(requetes) == 1
     assert requetes[0].params == {"url": "https://x.example/c.json", "champ_image": "poster"}
+
+
+def test_charger_catalogues_aiometadata_propage_champ_titre(tmp_path):
+    """Comme champImage, mais pour champTitre + suffixesTitreIgnorer (backdrop
+    TMDB nu + titre incrusté, ex: FanKai) -- absent si non configuré."""
+    export = {
+        "catalogs": [
+            {
+                "id": "1d5e3b0.fankai_catalog",
+                "type": "tv",
+                "source": "custom",
+                "sourceUrl": "https://x.example/c.json",
+                "champImage": "poster",
+                "champTitre": "name",
+                "suffixesTitreIgnorer": ["Henshū", "Kaï"],
+            },
+            {"id": "custom.bingecat", "type": "movie", "source": "custom", "sourceUrl": "https://bingecat.example/c.json"},
+        ]
+    }
+    chemin = tmp_path / "export.json"
+    chemin.write_text(json.dumps(export), encoding="utf-8")
+
+    index = charger_catalogues_aiometadata(chemin)
+
+    assert index["1d5e3b0.fankai_catalog"]["champ_titre"] == "name"
+    assert index["1d5e3b0.fankai_catalog"]["suffixes_titre_ignorer"] == ["Henshū", "Kaï"]
+    assert "champ_titre" not in index["custom.bingecat"]
 
 
 def test_resoudre_imdb_vers_tmdb_extrait_le_bon_type_et_les_bons_champs():

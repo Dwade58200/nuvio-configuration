@@ -116,6 +116,8 @@
         "name": "Top Sitcoms",
         "enabled": true,
         "source": "mdblist",
+        "sort": "imdbpopular",
+        "order": "asc",
         "metadata": {
           "itemCount": 360,
           "author": "polynomialproton",

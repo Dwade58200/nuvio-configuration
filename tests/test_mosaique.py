@@ -18,6 +18,7 @@ from mosaique import (  # noqa: E402
     construire_grille_inclinee,
     couleur_accent_deterministe,
     generer_mosaique,
+    incruster_titre,
     recadrer_pour_tuile,
 )
 
@@ -238,6 +239,45 @@ def test_generer_mosaique_echelle_avec_petit_canvas():
     resultat = generer_mosaique(images, 780, 439, titre_repli="Comédie")
     assert resultat is not None
     assert resultat.image.size == (780, 439)
+
+
+# ---------------------------------------------------------------------------
+# Incrustation de titre sur un backdrop nu (ex: FanKai)
+# ---------------------------------------------------------------------------
+
+def test_incruster_titre_dimensions_et_assombrissement_bas_gauche():
+    """Le résultat doit avoir exactement les dimensions demandées, et la
+    zone où le texte est écrit (bas-gauche) doit être plus sombre que
+    l'image d'origine (dégradé de lisibilité), même sans lire le texte lui-même."""
+    fond = _image_couleur((200, 200, 200), taille=(1280, 720))
+    resultat = incruster_titre(fond, "Boruto Kaï", 1280, 720)
+    assert resultat.size == (1280, 720)
+    assert resultat.mode == "RGB"
+    pixel_bas_gauche = resultat.getpixel((20, 700))
+    assert sum(pixel_bas_gauche) < sum((200, 200, 200))  # assombri par le dégradé
+
+
+def test_incruster_titre_ne_plante_pas_avec_un_titre_tres_long():
+    """Un titre trop long pour tenir en 2 lignes ne doit jamais lever
+    d'exception -- la police doit se réduire automatiquement."""
+    fond = _image_couleur((10, 10, 10), taille=(640, 360))
+    long_titre = "Un Titre D'Anime Absolument Interminable Avec Beaucoup De Mots En Trop"
+    resultat = incruster_titre(fond, long_titre, 640, 360)
+    assert resultat.size == (640, 360)
+
+
+def test_incruster_titre_avec_titre_vide_retourne_juste_le_fond_recadre():
+    fond = _image_couleur((50, 60, 70), taille=(1280, 720))
+    resultat = incruster_titre(fond, "", 1280, 720)
+    assert resultat.size == (1280, 720)
+
+
+def test_incruster_titre_police_introuvable_retombe_sur_la_police_par_defaut():
+    """Un chemin de police invalide ne doit jamais faire planter -- juste
+    utiliser le repli Pillow."""
+    fond = _image_couleur((30, 30, 30), taille=(1280, 720))
+    resultat = incruster_titre(fond, "Titre", 1280, 720, chemin_police="/chemin/inexistant.ttf")
+    assert resultat.size == (1280, 720)
 
 
 if __name__ == "__main__":

@@ -61,7 +61,7 @@ def _generateur(cle_fanart="fausse-cle-fanart", langue_preferee="fr"):
     )
 
 
-CANDIDAT_FILM = ("/brut.jpg", 42, "movie", "en")
+CANDIDAT_FILM = ("/brut.jpg", 42, "movie", "en", None)
 
 
 # ---------------------------------------------------------------------------
@@ -258,7 +258,7 @@ def test_sans_texte_seulement_si_ni_francais_ni_anglais():
     backdrop TMDB générique non tagué -- Fanart n'est plus sollicité du
     tout à ce stade (contrairement à l'ancienne cascade)."""
     generateur = _generateur()
-    candidat_sans_natif_distinct = ("/brut.jpg", 42, "movie", "fr")  # natif == préférée, pas de palier 4
+    candidat_sans_natif_distinct = ("/brut.jpg", 42, "movie", "fr", None)  # natif == préférée, pas de palier 4
 
     def fausse_get(url, params=None, timeout=None, **kwargs):
         if "/movie/42/images" in url:
@@ -321,7 +321,7 @@ def test_repli_final_sur_backdrop_path_brut_sans_cle_fanart():
 
 def test_serie_utilise_tvdb_id_pour_interroger_fanart():
     generateur = _generateur()
-    candidat_serie = ("/brut_serie.jpg", 77, "tv", "en")
+    candidat_serie = ("/brut_serie.jpg", 77, "tv", "en", None)
 
     def fausse_get(url, params=None, timeout=None, **kwargs):
         if "/tv/77/images" in url:
@@ -469,11 +469,11 @@ def test_deduplique_un_film_present_via_collection_et_discover(tmp_path):
     for i in range(max_len):
         for liste in listes_par_requete:
             if i < len(liste):
-                backdrop_path, tmdb_id, media_type, langue = liste[i]
+                backdrop_path, tmdb_id, media_type, langue, titre = liste[i]
                 cle = (media_type, tmdb_id)
                 if cle not in vus:
                     vus.add(cle)
-                    candidats.append((backdrop_path, tmdb_id, media_type, langue))
+                    candidats.append((backdrop_path, tmdb_id, media_type, langue, titre))
 
     ids_films = [c[1] for c in candidats]
     assert ids_films.count(1) == 1, f"le film id=1 apparaît {ids_films.count(1)} fois, devrait être 1"
