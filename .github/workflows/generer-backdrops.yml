@@ -77,7 +77,7 @@ jobs:
           FANKAI_CATALOG_URL: ${{ secrets.FANKAI_CATALOG_URL }}
         run: |
           if [ -n "$FANKAI_CATALOG_URL" ]; then
-            python3 -c "import json, os; json.dump({'catalogs': [{'id': '1d5e3b0.fankai_catalog', 'type': 'tv', 'source': 'custom', 'sourceUrl': os.environ['FANKAI_CATALOG_URL'], 'champImage': 'poster'}]}, open('Templates/catalogues-personnalises.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)"
+            python3 -c "import json, os; json.dump({'catalogs': [{'id': '1d5e3b0.fankai_catalog', 'type': 'tv', 'source': 'custom', 'sourceUrl': os.environ['FANKAI_CATALOG_URL'], 'champImage': 'poster', 'champTitre': 'name', 'suffixesTitreIgnorer': ['Henshū', 'Kaï', 'Kai']}]}, open('Templates/catalogues-personnalises.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)"
             echo "Catalogue FanKai assemblé depuis le secret FANKAI_CATALOG_URL."
           fi
 
