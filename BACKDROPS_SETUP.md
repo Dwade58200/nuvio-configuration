@@ -516,6 +516,23 @@ le backdrop reste toujours l'original, inchangé) -- pour FanKai, par
 exemple, `["Henshū", "Kaï", "Kai"]` transforme "Boruto Kaï" en "Boruto"
 pour la recherche, sans jamais toucher au "Boruto Kaï" écrit sur l'image.
 
+Deux champs optionnels supplémentaires affinent cette variante :
+
+- `champLogo` : champ du catalogue portant un logo officiel (image avec
+  transparence, ex: `"logo"`) à coller sur le backdrop nu **à la place**
+  du texte -- rendu plus fidèle qu'un simple texte écrit par le script.
+  Si l'item n'a pas de logo (`null` dans le catalogue -- cas réel avec
+  FanKai, ex : Frieren) ou que son téléchargement échoue, on retombe
+  automatiquement sur le texte de `champTitre`.
+- `genreObligatoire: "anime"` : restreint la recherche TMDB aux résultats
+  tagués genre Animation **et** langue originale japonaise. Sans ce
+  filtre, un titre ambigu comme "Monster" peut faire remonter une série
+  ou un film homonyme sans rapport (souvent bien plus populaire sur TMDB
+  que le véritable anime) -- avec le filtre, si rien ne correspond des
+  deux côtés (film/série), la recherche est considérée comme un échec et
+  le pipeline retombe sur le poster brut du catalogue plutôt que de
+  choisir un mauvais résultat.
+
 Comme ce genre de catalogue ne figure généralement pas dans l'export
 AIOMetadata standard (ce sont d'autres addons, agrégés via AIOStreams),
 il passe par un fichier séparé, `Templates/catalogues-personnalises.json`
@@ -531,15 +548,17 @@ il passe par un fichier séparé, `Templates/catalogues-personnalises.json`
       "sourceUrl": "https://streamio.fankai.fr/<ta-config-encodée>/catalog/anime/fankai_catalog.json",
       "champImage": "poster",
       "champTitre": "name",
-      "suffixesTitreIgnorer": ["Henshū", "Kaï", "Kai"]
+      "suffixesTitreIgnorer": ["Henshū", "Kaï", "Kai"],
+      "champLogo": "logo",
+      "genreObligatoire": "anime"
     }
   ]
 }
 ```
 
-(`champTitre`/`suffixesTitreIgnorer` sont optionnels -- un catalogue qui
-n'a que `champImage`, comme Bingecat, continue à utiliser directement ses
-propres images comme avant.)
+(`champTitre`/`suffixesTitreIgnorer`/`champLogo`/`genreObligatoire` sont
+tous optionnels -- un catalogue qui n'a que `champImage`, comme Bingecat,
+continue à utiliser directement ses propres images comme avant.)
 
 **⚠️ `sourceUrl` contient un identifiant/clé personnel encodé dedans**
 (config AIOStreams en base64, incluant une clé de service debrid) --

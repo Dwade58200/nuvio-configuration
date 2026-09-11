@@ -451,3 +451,32 @@ def incruster_titre(
         y += interligne
 
     return resultat.convert("RGB")
+
+
+def incruster_logo(image: Image.Image, logo: Image.Image, largeur: int, hauteur: int) -> Image.Image:
+    """Recadre `image` (cover) sur (largeur, hauteur), puis colle `logo`
+    (image avec transparence, ex: logo-titre officiel fourni par un
+    catalogue comme FanKai) en bas à gauche, par-dessus un léger dégradé
+    sombre -- alternative à `incruster_titre()` quand une image de logo
+    est disponible plutôt qu'un simple texte : rendu plus fidèle à
+    l'identité visuelle de l'oeuvre. `logo` est redimensionné (ratio
+    conservé) pour tenir dans une zone raisonnable du canvas, jamais
+    agrandi au-delà de sa taille d'origine."""
+    fond = recadrer_pour_tuile(image, largeur, hauteur).convert("RGBA")
+    marge = max(12, int(largeur * _MARGE_RATIO))
+
+    logo = logo.convert("RGBA")
+    largeur_max_logo = int(largeur * 0.62)
+    hauteur_max_logo = int(hauteur * 0.32)
+    ratio = min(largeur_max_logo / max(1, logo.width), hauteur_max_logo / max(1, logo.height), 1.0)
+    nouvelle_taille = (max(1, int(logo.width * ratio)), max(1, int(logo.height * ratio)))
+    logo_redimensionne = logo.resize(nouvelle_taille, Image.Resampling.LANCZOS)
+
+    scrim = _degrade_lineaire(largeur, hauteur, "bas", couleur=(4, 4, 6), intensite=1.2)
+    resultat = Image.alpha_composite(fond, scrim)
+
+    x = marge
+    y = max(0, hauteur - marge - logo_redimensionne.height)
+    resultat.alpha_composite(logo_redimensionne, (x, y))
+
+    return resultat.convert("RGB")

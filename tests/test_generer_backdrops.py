@@ -792,6 +792,41 @@ def test_champ_titre_est_transmis_avec_les_suffixes_a_ignorer():
     assert ignorees == []
 
 
+def test_champ_logo_et_filtre_anime_sont_transmis_dans_les_params():
+    """Nouveau : "champLogo" (indexé en "champ_logo") et "genreObligatoire":
+    "anime" (indexé en "filtre_anime": True) doivent aussi être transmis à
+    la requête, quand configurés."""
+    catalogues = {
+        "1d5e3b0.fankai_catalog": {
+            "kind": "custom_catalogue",
+            "media_type": "tv",
+            "url": "https://exemple.test/fankai/catalog/series/fankai_catalog.json",
+            "champ_image": "poster",
+            "champ_titre": "name",
+            "suffixes_titre_ignorer": ["Henshū", "Kaï", "Kai"],
+            "champ_logo": "logo",
+            "filtre_anime": True,
+        }
+    }
+    dossier = {
+        "title": "FanKai",
+        "sources": [
+            {"provider": "addon", "addonId": "com.aiostreams.viren070.5a21f0f2-961", "catalogId": "1d5e3b0.fankai_catalog", "type": "anime"}
+        ],
+    }
+    requetes, ignorees = construire_requetes(GROUPE_ANIMES, dossier, catalogues)
+    assert len(requetes) == 1
+    assert requetes[0].params == {
+        "url": "https://exemple.test/fankai/catalog/series/fankai_catalog.json",
+        "champ_image": "poster",
+        "champ_titre": "name",
+        "suffixes_titre_ignorer": ["Henshū", "Kaï", "Kai"],
+        "champ_logo": "logo",
+        "filtre_anime": True,
+    }
+    assert ignorees == []
+
+
 def test_nettoyer_titre_pour_recherche_retire_les_suffixes_de_branding():
     """Les suffixes FanKai désignent un montage fan, absent du titre
     officiel TMDB -- ils doivent disparaître pour la recherche, mais un mot
@@ -1242,6 +1277,7 @@ def test_client_catalogue_custom_recupere_les_images_directes_sur_un_echantillon
         "https://metadata.fankai.fr/series/7/image/poster?t=1774045805",
         "https://metadata.fankai.fr/series/8/image/poster?t=1774468203",
         "https://metadata.fankai.fr/series/10/image/poster?t=1774045805",
+        "https://metadata.fankai.fr/series/76/image/poster?t=1774045805",
     ]
 
 
@@ -1278,9 +1314,36 @@ def test_client_catalogue_custom_recupere_titre_et_image_de_repli():
         "https://streamio.fankai.fr/x/catalog/anime/fankai_catalog.json", "name", "poster", limite=10
     )
 
-    assert items[0] == ("Black Lagoon Henshū", "https://metadata.fankai.fr/series/1/image/poster?t=1774045805")
-    assert items[3] == ("Boruto Kaï", "https://metadata.fankai.fr/series/8/image/poster?t=1774468203")
-    assert len(items) == 5
+    assert items[0] == ("Black Lagoon Henshū", "https://metadata.fankai.fr/series/1/image/poster?t=1774045805", None)
+    assert items[3] == ("Boruto Kaï", "https://metadata.fankai.fr/series/8/image/poster?t=1774468203", None)
+    assert len(items) == 6
+
+
+def test_client_catalogue_custom_recupere_aussi_le_logo_quand_champ_logo_est_fourni():
+    """Le champ optionnel `champ_logo` (ex: "logo") doit être récupéré en
+    plus du titre et de l'image de repli -- None pour un item qui n'en a
+    pas (ex: Frieren dans la fixture réelle FanKai)."""
+    payload = json.loads(FIXTURE_FANKAI.read_text(encoding="utf-8"))
+    client = ClientCatalogueCustom(session=_FausseSessionCatalogueCustom(payload))
+
+    items = client.recuperer_items_avec_titre(
+        "https://streamio.fankai.fr/x/catalog/anime/fankai_catalog.json",
+        "name",
+        "poster",
+        limite=10,
+        champ_logo="logo",
+    )
+
+    assert items[0] == (
+        "Black Lagoon Henshū",
+        "https://metadata.fankai.fr/series/1/image/poster?t=1774045805",
+        "https://metadata.fankai.fr/series/1/image/logo?t=1774045805",
+    )
+    assert items[-1] == (
+        "Frieren Henshū",
+        "https://metadata.fankai.fr/series/76/image/poster?t=1774045805",
+        None,
+    )
 
 
 def test_client_catalogue_custom_titres_sans_image_de_repli_configuree():
@@ -1289,7 +1352,7 @@ def test_client_catalogue_custom_titres_sans_image_de_repli_configuree():
     payload = {"metas": [{"id": "fk:1", "name": "Un titre", "poster": "https://x.example/p.jpg"}]}
     client = ClientCatalogueCustom(session=_FausseSessionCatalogueCustom(payload))
     items = client.recuperer_items_avec_titre("https://x.example/catalog.json", "name", None, limite=10)
-    assert items == [("Un titre", None)]
+    assert items == [("Un titre", None, None)]
 
 
 def test_client_catalogue_custom_titres_echec_reseau_retourne_liste_vide():
@@ -1324,6 +1387,43 @@ def test_rechercher_titre_introuvable_retourne_none():
 
     client = ClientTMDB(cle_api="fake", session=_FausseSessionRechercheVide())
     assert client.rechercher_titre("Titre Introuvable Xyz") is None
+
+
+def test_rechercher_titre_filtre_anime_ecarte_un_resultat_non_animation():
+    """Cas réel FanKai : "Monster" doit trouver l'ANIME (genre Animation +
+    langue japonaise), pas la série/le film homonyme bien plus populaire
+    mais sans rapport, quand `filtre_anime=True`."""
+    class _FausseSessionRecherche:
+        def get(self, url, params=None, timeout=None, **kwargs):
+            if "/search/tv" in url:
+                return _FausseReponseCatalogueCustom(
+                    {
+                        "results": [
+                            {"id": 999, "popularity": 500.0, "genre_ids": [18, 80], "original_language": "en"},
+                            {"id": 42, "popularity": 12.0, "genre_ids": [16, 18], "original_language": "ja"},
+                        ]
+                    }
+                )
+            if "/search/movie" in url:
+                return _FausseReponseCatalogueCustom({"results": []})
+            raise AssertionError(f"URL inattendue: {url}")
+
+    client = ClientTMDB(cle_api="fake", session=_FausseSessionRecherche())
+    assert client.rechercher_titre("Monster", filtre_anime=True) == (42, "tv")
+
+
+def test_rechercher_titre_filtre_anime_retourne_none_si_rien_ne_correspond():
+    """Aucun résultat Animation+japonais des deux côtés (movie/tv) -> None,
+    plutôt qu'un mauvais résultat -- l'appelant retombe alors sur le
+    poster brut du catalogue."""
+    class _FausseSessionRechercheSansAnime:
+        def get(self, url, params=None, timeout=None, **kwargs):
+            return _FausseReponseCatalogueCustom(
+                {"results": [{"id": 1, "popularity": 100.0, "genre_ids": [18], "original_language": "en"}]}
+            )
+
+    client = ClientTMDB(cle_api="fake", session=_FausseSessionRechercheSansAnime())
+    assert client.rechercher_titre("Monster", filtre_anime=True) is None
 
 
 def test_recuperer_backdrop_nu_filtre_les_backdrops_sans_texte_et_prend_le_mieux_note():
@@ -1408,6 +1508,36 @@ def test_charger_catalogues_aiometadata_propage_champ_titre(tmp_path):
     assert index["1d5e3b0.fankai_catalog"]["champ_titre"] == "name"
     assert index["1d5e3b0.fankai_catalog"]["suffixes_titre_ignorer"] == ["Henshū", "Kaï"]
     assert "champ_titre" not in index["custom.bingecat"]
+    assert "champ_logo" not in index["1d5e3b0.fankai_catalog"]
+    assert "filtre_anime" not in index["1d5e3b0.fankai_catalog"]
+
+
+def test_charger_catalogues_aiometadata_propage_champ_logo_et_genre_obligatoire(tmp_path):
+    """Nouveau : "champLogo" (logo officiel à coller au lieu du texte) et
+    "genreObligatoire": "anime" (restreint la recherche TMDB au genre
+    Animation + langue japonaise) doivent être indexés quand présents."""
+    export = {
+        "catalogs": [
+            {
+                "id": "1d5e3b0.fankai_catalog",
+                "type": "tv",
+                "source": "custom",
+                "sourceUrl": "https://x.example/c.json",
+                "champImage": "poster",
+                "champTitre": "name",
+                "suffixesTitreIgnorer": ["Henshū", "Kaï"],
+                "champLogo": "logo",
+                "genreObligatoire": "anime",
+            },
+        ]
+    }
+    chemin = tmp_path / "export.json"
+    chemin.write_text(json.dumps(export), encoding="utf-8")
+
+    index = charger_catalogues_aiometadata(chemin)
+
+    assert index["1d5e3b0.fankai_catalog"]["champ_logo"] == "logo"
+    assert index["1d5e3b0.fankai_catalog"]["filtre_anime"] is True
 
 
 def test_resoudre_imdb_vers_tmdb_extrait_le_bon_type_et_les_bons_champs():

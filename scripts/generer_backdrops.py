@@ -253,17 +253,26 @@ def slugifier(texte: str) -> str:
 # Résolution des requêtes TMDB à partir des `sources` d'un dossier
 # ---------------------------------------------------------------------------
 
-# (backdrop_path, tmdb_id, media_type, langue_originale, titre_a_incruster) :
-# le 5e élément est un couple (titre_affiche, titre_recherche), renseigné
-# (non-None) QUE pour les candidats "champ_titre" (ex: FanKai) -- il
-# indique que `backdrop_path` est un repli (l'image brute du catalogue) et
-# que, tant qu'on n'a pas essayé, on doit d'abord chercher `titre_recherche`
-# sur TMDB (suffixes de branding du catalogue déjà retirés, voir
-# `nettoyer_titre_pour_recherche`), prendre son backdrop nu, et y écrire
-# `titre_affiche` (l'original, INCHANGÉ) nous-mêmes (voir
+# (backdrop_path, tmdb_id, media_type, langue_originale, info_titre) :
+# le 5e élément est une `InfoTitreCatalogue`, renseignée (non-None) QUE
+# pour les candidats "champ_titre" (ex: FanKai) -- elle indique que
+# `backdrop_path` est un repli (l'image brute du catalogue) et que, tant
+# qu'on n'a pas essayé, on doit d'abord chercher `titre_recherche` sur
+# TMDB (suffixes de branding du catalogue déjà retirés, voir
+# `nettoyer_titre_pour_recherche`), prendre son backdrop nu, et y coller
+# soit le logo du catalogue (`url_logo`) soit, à défaut, le texte
+# `titre_affiche` (l'original, INCHANGÉ) écrit nous-mêmes (voir
 # GenerateurBackdrops._resoudre_image_tuile, étape 0). Pour tous les
 # autres candidats, toujours None.
-CandidatTuile = tuple[str | None, int | None, str, str | None, tuple[str, str] | None]
+@dataclass
+class InfoTitreCatalogue:
+    titre_affiche: str
+    titre_recherche: str
+    url_logo: str | None = None
+    filtre_anime: bool = False
+
+
+CandidatTuile = tuple[str | None, int | None, str, str | None, InfoTitreCatalogue | None]
 
 
 @dataclass
@@ -402,11 +411,24 @@ def charger_catalogues_aiometadata(chemin: Path | None) -> dict[str, dict[str, A
             # branding du catalogue (ex: "Henshū", "Kaï") avant la RECHERCHE
             # TMDB uniquement -- le titre AFFICHÉ sur le backdrop reste
             # toujours le titre original du catalogue, inchangé.
+            # "champLogo" (optionnel) : champ du catalogue portant un logo
+            # officiel (image transparente) à coller sur le backdrop NU à la
+            # place du texte -- si absent, ou si son téléchargement échoue,
+            # on retombe sur le texte de "champTitre" incrusté nous-mêmes.
+            # "genreObligatoire" (optionnel, seule valeur supportée : "anime")
+            # restreint la recherche TMDB aux résultats tagués Animation +
+            # langue originale japonaise -- utile pour un catalogue comme
+            # FanKai où un titre (ex: "Monster") peut sinon faire remonter
+            # une série/un film homonyme sans rapport plutôt que l'anime.
             if entree.get("champTitre"):
                 entree_index["champ_titre"] = entree["champTitre"]
                 entree_index["suffixes_titre_ignorer"] = [
                     str(s) for s in (entree.get("suffixesTitreIgnorer") or [])
                 ]
+                if entree.get("champLogo"):
+                    entree_index["champ_logo"] = entree["champLogo"]
+                if entree.get("genreObligatoire") == "anime":
+                    entree_index["filtre_anime"] = True
             index[catalog_id] = entree_index
 
     return index
@@ -506,6 +528,10 @@ def construire_requetes(
                 if info_aiometadata.get("champ_titre"):
                     params_requete["champ_titre"] = info_aiometadata["champ_titre"]
                     params_requete["suffixes_titre_ignorer"] = info_aiometadata.get("suffixes_titre_ignorer") or []
+                    if info_aiometadata.get("champ_logo"):
+                        params_requete["champ_logo"] = info_aiometadata["champ_logo"]
+                    if info_aiometadata.get("filtre_anime"):
+                        params_requete["filtre_anime"] = True
                 requetes.append(
                     RequeteTMDB(
                         kind="custom_catalogue",
@@ -807,15 +833,19 @@ class ClientTMDB:
             self._cache_images[cle_cache] = resultat
         return resultat
 
-    def rechercher_titre(self, titre: str, media_type_hint: str | None = None) -> tuple[int, str] | None:
+    def rechercher_titre(
+        self, titre: str, media_type_hint: str | None = None, filtre_anime: bool = False
+    ) -> tuple[int, str] | None:
         """Cherche `titre` sur TMDB (films ET séries -- un titre catalogué
         "anime" côté Stremio peut très bien être un film d'animation côté
         TMDB) et retourne (tmdb_id, media_type) du résultat le plus
-        populaire. `media_type_hint` ("movie"/"tv") est tenté EN PREMIER ;
-        si son meilleur résultat est franchement peu populaire, l'autre
-        type est aussi tenté et le plus populaire des deux l'emporte.
-        Retourne None si rien de probant (aucun résultat sur les deux
-        types)."""
+        populaire, parmi les deux types. Si `filtre_anime` est vrai, ne
+        retient QUE les résultats tagués genre Animation (id TMDB 16) ET en
+        langue originale japonaise -- indispensable pour un titre ambigu
+        comme "Monster" (l'anime de 2004 vs la série/le film homonyme sans
+        rapport, bien plus populaire sur TMDB) : dans ce cas, retourne None
+        plutôt qu'un mauvais résultat si rien ne correspond des deux côtés.
+        Retourne aussi None si rien de probant (aucun résultat du tout)."""
         titre = (titre or "").strip()
         if not titre:
             return None
@@ -828,6 +858,12 @@ class ClientTMDB:
             except requests.RequestException:
                 continue
             resultats = data.get("results") or []
+            if filtre_anime:
+                resultats = [
+                    r
+                    for r in resultats
+                    if 16 in (r.get("genre_ids") or []) and r.get("original_language") == "ja"
+                ]
             if resultats:
                 top = max(resultats, key=lambda r: r.get("popularity") or 0)
                 popularite = top.get("popularity") or 0
@@ -1337,7 +1373,7 @@ class ClientCatalogueCustom:
         self.session = session or requests.Session()
         self._cache: dict[str, list[str]] = {}
         self._cache_images: dict[str, list[str]] = {}
-        self._cache_titres: dict[str, list[tuple[str, str | None]]] = {}
+        self._cache_titres: dict[str, list[tuple[str, str | None, str | None]]] = {}
         self._verrou = threading.Lock()  # client partagé entre threads, comme ClientTMDB/ClientFanart/ClientMDBList
 
     def recuperer_ids_imdb(self, url: str, limite: int) -> list[str]:
@@ -1385,21 +1421,24 @@ class ClientCatalogueCustom:
         return urls[:limite]
 
     def recuperer_items_avec_titre(
-        self, url: str, champ_titre: str, champ_image_repli: str | None, limite: int
-    ) -> list[tuple[str, str | None]]:
+        self, url: str, champ_titre: str, champ_image_repli: str | None, limite: int, champ_logo: str | None = None
+    ) -> list[tuple[str, str | None, str | None]]:
         """Pour un catalogue custom dont on veut le TITRE affiché (champ
         `champ_titre`, ex: "name") plutôt que son image directement -- ce
         titre sert à chercher un backdrop TMDB nu (sans texte) sur lequel
-        on écrira ce titre nous-mêmes. Retourne une liste de tuples
-        (titre, url_image_repli_ou_None) : `url_image_repli` (champ
-        `champ_image_repli`, ex: "poster") sert de filet de sécurité si la
-        recherche TMDB n'aboutit à rien pour ce titre. Ne lève jamais
-        d'exception : liste vide en cas d'échec."""
-        cle_cache = f"{url}::titres::{champ_titre}::{champ_image_repli}"
+        on collera le logo du catalogue (`champ_logo`, ex: "logo") ou, à
+        défaut, ce titre écrit nous-mêmes. Retourne une liste de tuples
+        (titre, url_image_repli_ou_None, url_logo_ou_None) : `url_image_repli`
+        (champ `champ_image_repli`, ex: "poster") sert de filet de sécurité
+        si la recherche TMDB n'aboutit à rien pour ce titre ; `url_logo`
+        peut être None même quand `champ_logo` est fourni (catalogue sans
+        logo pour cet item précis -- voir fixture FanKai, ex: Frieren).
+        Ne lève jamais d'exception : liste vide en cas d'échec."""
+        cle_cache = f"{url}::titres::{champ_titre}::{champ_image_repli}::{champ_logo}"
         with self._verrou:
             if cle_cache in self._cache_titres:
                 return self._cache_titres[cle_cache][:limite]
-        items: list[tuple[str, str | None]] = []
+        items: list[tuple[str, str | None, str | None]] = []
         try:
             r = self.session.get(corriger_url_catalogue_mal_formee(url), timeout=15)
             r.raise_for_status()
@@ -1408,7 +1447,8 @@ class ClientCatalogueCustom:
                 titre = meta.get(champ_titre)
                 if titre:
                     image_repli = meta.get(champ_image_repli) if champ_image_repli else None
-                    items.append((str(titre), image_repli))
+                    url_logo = meta.get(champ_logo) if champ_logo else None
+                    items.append((str(titre), image_repli, url_logo))
         except (requests.RequestException, ValueError):
             items = []
         with self._verrou:
@@ -1529,12 +1569,18 @@ class GenerateurBackdrops:
         # disponible, téléchargement en échec...) -- jamais d'échec total
         # pour la seule raison que cette recherche a raté.
         if titre_a_incruster:
-            titre_affiche, titre_recherche = titre_a_incruster
-            image_avec_titre = self._resoudre_tuile_titre_sur_backdrop_nu(titre_affiche, titre_recherche, media_type)
+            image_avec_titre = self._resoudre_tuile_titre_sur_backdrop_nu(titre_a_incruster, media_type)
             if image_avec_titre is not None:
-                logging.info("[TUILE] titre=%r -> retenu (0) : backdrop TMDB nu + titre incrusté", titre_affiche)
+                logging.info(
+                    "[TUILE] titre=%r -> retenu (0) : backdrop TMDB nu + %s",
+                    titre_a_incruster.titre_affiche,
+                    "logo incrusté" if titre_a_incruster.url_logo else "titre incrusté",
+                )
                 return image_avec_titre
-            logging.debug("[TUILE] titre=%r : échec recherche/backdrop nu -> repli sur l'image brute du catalogue", titre_affiche)
+            logging.debug(
+                "[TUILE] titre=%r : échec recherche/backdrop nu -> repli sur l'image brute du catalogue",
+                titre_a_incruster.titre_affiche,
+            )
             return self._telecharger_une_image(self._url_image_depuis_chemin(backdrop_path)) if backdrop_path else None
 
         if not tmdb_id:
@@ -1615,15 +1661,20 @@ class GenerateurBackdrops:
         return None
 
     def _resoudre_tuile_titre_sur_backdrop_nu(
-        self, titre_affiche: str, titre_recherche: str, media_type_hint: str | None
+        self, info: InfoTitreCatalogue, media_type_hint: str | None
     ) -> Image.Image | None:
         """Pour un candidat "champ_titre" (ex: FanKai) : cherche
-        `titre_recherche` sur TMDB, télécharge son backdrop NU (sans aucun
-        texte incrusté), puis y écrit `titre_affiche` par-dessus. Retourne
-        None si une étape échoue (titre introuvable, pas de backdrop nu
-        disponible, téléchargement en échec) -- l'appelant retombe alors
-        sur l'image brute du catalogue, jamais d'exception propagée."""
-        trouve = self.tmdb.rechercher_titre(titre_recherche, media_type_hint)
+        `info.titre_recherche` sur TMDB (restreint au genre Animation +
+        langue japonaise si `info.filtre_anime`, pour éviter qu'un titre
+        ambigu comme "Monster" ne fasse remonter une série homonyme sans
+        rapport plutôt que l'anime), télécharge son backdrop NU (sans aucun
+        texte incrusté), puis y colle le logo du catalogue (`info.url_logo`)
+        si disponible, ou à défaut y écrit `info.titre_affiche` par-dessus.
+        Retourne None si une étape échoue (titre introuvable, pas de
+        backdrop nu disponible, téléchargement en échec) -- l'appelant
+        retombe alors sur l'image brute du catalogue, jamais d'exception
+        propagée."""
+        trouve = self.tmdb.rechercher_titre(info.titre_recherche, media_type_hint, filtre_anime=info.filtre_anime)
         if not trouve:
             return None
         tmdb_id, media_type = trouve
@@ -1633,14 +1684,23 @@ class GenerateurBackdrops:
         image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_nu}")
         if image is None:
             return None
+
+        # On compose directement sur l'image telle que téléchargée (taille
+        # native ~1280 de large) -- elle sera ensuite recadrée à la taille
+        # d'une tuile comme n'importe quelle autre image de mosaïque (voir
+        # mosaique.preparer_tuile), logo/texte suivent donc le même
+        # recadrage "cover" que le reste de l'image.
+        if info.url_logo:
+            logo = self._telecharger_une_image(info.url_logo)
+            if logo is not None:
+                try:
+                    return mosaique_module.incruster_logo(image, logo, image.width, image.height)
+                except Exception:  # noqa: BLE001 -- un logo raté retombe sur le texte, jamais une exception
+                    pass
+
         try:
-            # On écrit le titre directement sur l'image telle que téléchargée
-            # (taille native ~1280 de large) -- elle sera ensuite recadrée à
-            # la taille d'une tuile comme n'importe quelle autre image de
-            # mosaïque (voir mosaique.preparer_tuile), le texte suit donc le
-            # même recadrage "cover" que le reste de l'image.
             return mosaique_module.incruster_titre(
-                image, titre_affiche, image.width, image.height, str(self.chemin_police_titre) if self.chemin_police_titre else None
+                image, info.titre_affiche, image.width, image.height, str(self.chemin_police_titre) if self.chemin_police_titre else None
             )
         except Exception:  # noqa: BLE001 -- ne jamais faire échouer toute la mosaïque pour un rendu de texte raté
             return None
@@ -1694,16 +1754,22 @@ class GenerateurBackdrops:
                 # "champ_image" (si configuré) reste le repli si cette
                 # recherche échoue pour tel ou tel titre.
                 champ_image_repli = requete.params.get("champ_image")
+                champ_logo = requete.params.get("champ_logo")
+                filtre_anime = bool(requete.params.get("filtre_anime"))
                 suffixes = requete.params.get("suffixes_titre_ignorer") or []
                 items_titres = self.catalogue_custom.recuperer_items_avec_titre(
-                    requete.params["url"], champ_titre, champ_image_repli, limite=cible
+                    requete.params["url"], champ_titre, champ_image_repli, limite=cible, champ_logo=champ_logo
                 )
                 candidats_titre: list[CandidatTuile] = []
-                for titre_affiche, image_repli in items_titres:
+                for titre_affiche, image_repli, url_logo in items_titres:
                     titre_recherche = nettoyer_titre_pour_recherche(titre_affiche, suffixes)
-                    candidats_titre.append(
-                        (image_repli, None, requete.media_type, None, (titre_affiche, titre_recherche))
+                    info = InfoTitreCatalogue(
+                        titre_affiche=titre_affiche,
+                        titre_recherche=titre_recherche,
+                        url_logo=url_logo,
+                        filtre_anime=filtre_anime,
                     )
+                    candidats_titre.append((image_repli, None, requete.media_type, None, info))
                 return candidats_titre
             champ_image = requete.params.get("champ_image")
             if champ_image:
@@ -1759,7 +1825,7 @@ class GenerateurBackdrops:
                     # sur le titre affiché lui-même -- sinon tous les
                     # candidats partageraient la même clé (media_type, None)
                     # et s'écraseraient les uns les autres.
-                    cle_repli = titre_a_incruster[0] if titre_a_incruster else backdrop_path
+                    cle_repli = titre_a_incruster.titre_affiche if titre_a_incruster else backdrop_path
                     cle = (media_type, tmdb_id if tmdb_id is not None else cle_repli)
                     if cle not in vus:
                         vus.add(cle)

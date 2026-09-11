@@ -1,6 +1,45 @@
 # Session du 11 septembre 2026 — backdrop TMDB nu + titre incrusté (FanKai), tri MDBList respecté
+# + session suivante (même jour) — logo FanKai + filtre genre anime (bug "Monster" corrigé)
 # + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
+
+## 🎴 FanKai : logo officiel + filtre genre anime (correctifs suite au premier déploiement)
+
+Le premier déploiement de la fonctionnalité "backdrop TMDB nu + titre
+incrusté" (voir plus bas) tournait, mais deux soucis remontés après coup :
+
+1. **Un titre ambigu pouvait faire remonter le mauvais média** (ex :
+   "Monster" -> une série/un film homonyme sans rapport, bien plus
+   populaire sur TMDB que l'anime de 2004 par Naoki Urasawa). Corrigé :
+   `ClientTMDB.rechercher_titre()` accepte un nouveau paramètre
+   `filtre_anime` qui ne retient que les résultats tagués genre
+   Animation (id TMDB 16) ET langue originale japonaise -- si rien ne
+   correspond des deux côtés (film/série), retourne None plutôt qu'un
+   mauvais résultat (repli sur le poster brut du catalogue). Activable
+   par catalogue via `"genreObligatoire": "anime"` dans
+   `Templates/catalogues-personnalises.json`.
+2. **Le texte dessiné à la main était moins fidèle qu'un vrai logo** :
+   nouveau champ optionnel `"champLogo": "logo"` qui récupère le logo
+   officiel de chaque item du catalogue (image avec transparence) et le
+   colle sur le backdrop TMDB nu (`mosaique.incruster_logo`, nouvelle
+   fonction) à la place du texte -- repli automatique sur le texte
+   (`incruster_titre`) si l'item n'a pas de logo (cas réel FanKai, ex :
+   Frieren) ou si son téléchargement échoue.
+
+Refactor associé : le couple (titre_affiche, titre_recherche) porté par
+un candidat de mosaïque "champ_titre" devient une dataclass
+`InfoTitreCatalogue` (titre_affiche, titre_recherche, url_logo,
+filtre_anime) -- plus lisible qu'un tuple à mesure que les options
+s'accumulent. Workflow CI (`generer-backdrops.yml`) mis à jour pour
+activer réellement `champLogo`/`genreObligatoire` sur le catalogue
+FanKai réel.
+
+Tests : 207 -> 216 (nouveaux tests pour `rechercher_titre(filtre_anime=...)`,
+`incruster_logo`, le champ `logo` de `recuperer_items_avec_titre`, et la
+propagation `champLogo`/`genreObligatoire` de bout en bout). ruff + mypy
+toujours propres.
+
+# Session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — repartir du bon ZIP, bug schéma mdblist corrigé
 
 ## 🎴 FanKai : backdrop TMDB nu + titre incrusté

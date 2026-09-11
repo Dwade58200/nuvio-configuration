@@ -18,6 +18,7 @@ from mosaique import (  # noqa: E402
     construire_grille_inclinee,
     couleur_accent_deterministe,
     generer_mosaique,
+    incruster_logo,
     incruster_titre,
     recadrer_pour_tuile,
 )
@@ -277,6 +278,50 @@ def test_incruster_titre_police_introuvable_retombe_sur_la_police_par_defaut():
     utiliser le repli Pillow."""
     fond = _image_couleur((30, 30, 30), taille=(1280, 720))
     resultat = incruster_titre(fond, "Titre", 1280, 720, chemin_police="/chemin/inexistant.ttf")
+    assert resultat.size == (1280, 720)
+
+
+# ---------------------------------------------------------------------------
+# Incrustation de logo (alternative au texte, ex: logo officiel FanKai)
+# ---------------------------------------------------------------------------
+
+def test_incruster_logo_dimensions_et_assombrissement_bas_gauche():
+    """Le résultat doit avoir les dimensions demandées, et la zone où le
+    logo est collé doit être visiblement modifiée par rapport au fond uni
+    d'origine (dégradé + logo)."""
+    fond = _image_couleur((200, 200, 200), taille=(1280, 720))
+    logo = Image.new("RGBA", (400, 150), (255, 255, 255, 255))
+    resultat = incruster_logo(fond, logo, 1280, 720)
+    assert resultat.size == (1280, 720)
+    assert resultat.mode == "RGB"
+    pixel_bas_gauche = resultat.getpixel((20, 700))
+    assert pixel_bas_gauche != (200, 200, 200)
+
+
+def test_incruster_logo_ne_grossit_jamais_un_petit_logo():
+    """Un logo plus petit que la zone maximale ne doit jamais être agrandi
+    au-delà de sa taille d'origine (ratio plafonné à 1.0)."""
+    fond = _image_couleur((10, 10, 10), taille=(1280, 720))
+    logo = Image.new("RGBA", (50, 20), (255, 0, 0, 255))
+    resultat = incruster_logo(fond, logo, 1280, 720)
+    assert resultat.size == (1280, 720)
+
+
+def test_incruster_logo_redimensionne_un_grand_logo_en_conservant_le_ratio():
+    """Un logo plus large que la zone autorisée doit être réduit, sans
+    planter, quel que soit son ratio d'origine (ici très large et bas)."""
+    fond = _image_couleur((40, 40, 40), taille=(1280, 720))
+    logo = Image.new("RGBA", (3000, 400), (0, 255, 0, 255))
+    resultat = incruster_logo(fond, logo, 1280, 720)
+    assert resultat.size == (1280, 720)
+
+
+def test_incruster_logo_convertit_un_logo_sans_canal_alpha():
+    """Un logo fourni en RGB (sans transparence) ne doit pas faire
+    planter -- converti en RGBA avant collage."""
+    fond = _image_couleur((60, 60, 60), taille=(1280, 720))
+    logo = Image.new("RGB", (300, 100), (255, 255, 0))
+    resultat = incruster_logo(fond, logo, 1280, 720)
     assert resultat.size == (1280, 720)
 
 

@@ -1,9 +1,10 @@
 {
   "metas": [
-    {"id": "fk:1", "type": "anime", "name": "Black Lagoon Henshū", "poster": "https://metadata.fankai.fr/series/1/image/poster?t=1774045805", "imdb_id": null},
-    {"id": "fk:6", "type": "anime", "name": "My Hero Academia Henshū", "poster": "https://metadata.fankai.fr/series/6/image/poster?t=1774045805", "imdb_id": null},
-    {"id": "fk:7", "type": "anime", "name": "Vinland Saga Henshū", "poster": "https://metadata.fankai.fr/series/7/image/poster?t=1774045805", "imdb_id": null},
-    {"id": "fk:8", "type": "anime", "name": "Boruto Kaï", "poster": "https://metadata.fankai.fr/series/8/image/poster?t=1774468203", "imdb_id": null},
-    {"id": "fk:10", "type": "anime", "name": "Gintama Kaï", "poster": "https://metadata.fankai.fr/series/10/image/poster?t=1774045805", "imdb_id": null}
+    {"id": "fk:1", "type": "anime", "name": "Black Lagoon Henshū", "poster": "https://metadata.fankai.fr/series/1/image/poster?t=1774045805", "logo": "https://metadata.fankai.fr/series/1/image/logo?t=1774045805", "imdb_id": null},
+    {"id": "fk:6", "type": "anime", "name": "My Hero Academia Henshū", "poster": "https://metadata.fankai.fr/series/6/image/poster?t=1774045805", "logo": "https://metadata.fankai.fr/series/6/image/logo?t=1774045805", "imdb_id": null},
+    {"id": "fk:7", "type": "anime", "name": "Vinland Saga Henshū", "poster": "https://metadata.fankai.fr/series/7/image/poster?t=1774045805", "logo": "https://metadata.fankai.fr/series/7/image/logo?t=1774045805", "imdb_id": null},
+    {"id": "fk:8", "type": "anime", "name": "Boruto Kaï", "poster": "https://metadata.fankai.fr/series/8/image/poster?t=1774468203", "logo": "https://metadata.fankai.fr/series/8/image/logo?t=1774468203", "imdb_id": null},
+    {"id": "fk:10", "type": "anime", "name": "Gintama Kaï", "poster": "https://metadata.fankai.fr/series/10/image/poster?t=1774045805", "logo": "https://metadata.fankai.fr/series/10/image/logo?t=1774045805", "imdb_id": null},
+    {"id": "fk:76", "type": "anime", "name": "Frieren Henshū", "poster": "https://metadata.fankai.fr/series/76/image/poster?t=1774045805", "logo": null, "imdb_id": null}
   ]
 }
