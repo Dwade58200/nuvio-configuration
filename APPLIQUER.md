@@ -1,3 +1,50 @@
+# Session du 11 septembre 2026 — backdrop TMDB nu + titre incrusté (FanKai), tri MDBList respecté
+# + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
+# + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
+# + session suivante (même jour) — repartir du bon ZIP, bug schéma mdblist corrigé
+
+## 🎴 FanKai : backdrop TMDB nu + titre incrusté
+
+Jusqu'ici, la mosaïque du dossier "FanKai" utilisait directement les
+posters du catalogue (champ `champImage: "poster"`) -- des affiches
+fan-faites portant le nom du montage ("Boruto Kaï", "Black Lagoon
+Henshū"), pas le titre officiel. Nouveau champ optionnel `champTitre`
+(ex: `"name"`) dans `Templates/catalogues-personnalises.json` :
+recherche du titre nettoyé (`suffixesTitreIgnorer`, ex: `["Henshū",
+"Kaï", "Kai"]`) sur TMDB (`/search/tv` + `/search/movie`, le plus
+populaire des deux types gagne), récupération d'un backdrop **nu**
+(`iso_639_1` absent), puis incrustation du titre FanKai original
+par-dessus (`mosaique.incruster_titre`, police Anton bundlée dans
+`assets/fonts/`, licence OFL). `champImage` reste le filet de sécurité
+si TMDB ne trouve rien pour tel ou tel titre. Workflow CI mis à jour
+pour activer réellement ce nouveau champ sur le catalogue FanKai réel.
+Ajout de `CandidatTuile` (tuple à 5 éléments, le 5e portant le couple
+titre-affiché/titre-recherche) pour transporter cette info à travers
+`_resoudre_liste_candidats` -> `_resoudre_image_tuile` sans casser les
+autres chemins (mdblist, discover, collection...).
+
+## 🔀 Tri MDBList non respecté (dossiers "Animés" par décennie)
+
+Cause : le dossier "Animés 00s" vient d'une liste MDBList
+(`mdblist.25242`) configurée côté AIOMetadata avec
+`"sort": "imdbpopular", "order": "asc"` -- mais `ClientMDBList`
+n'utilisait jamais ces champs, récupérant la liste dans son ordre par
+défaut (curation/ajout), pas par popularité, d'où des mosaïques dans un
+ordre visiblement différent de ce que l'app affiche. Corrigé : `sort`/
+`order` sont maintenant lus depuis l'export AIOMetadata (et,
+symétriquement, `mdblistSort`/`mdblistOrder` pour une source `mdblist`
+ajoutée à la main) et transmis tels quels à l'API MDBList
+(`recuperer_items_liste`/`recuperer_items_liste_par_id`). Ne fonctionne
+que via l'API authentifiée (`MDBLIST_API_KEY`) -- le repli JSON public
+ne permet aucun tri côté serveur, limitation documentée dans
+`BACKDROPS_SETUP.md`.
+
+Tests : 191 -> 207 (nouveaux tests pour `nettoyer_titre_pour_recherche`,
+`rechercher_titre`, `recuperer_backdrop_nu`,
+`recuperer_items_avec_titre`, `incruster_titre`, propagation
+`champTitre`/`mdblist_sort`/`mdblist_order`, pipeline bout-en-bout avec
+et sans repli). ruff + mypy toujours propres.
+
 # Session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
 # + session suivante (même jour) — repartir du bon ZIP, bug schéma mdblist corrigé

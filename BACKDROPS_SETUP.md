@@ -398,6 +398,29 @@ Ce même format `provider: "mdblist"` est aussi ce qu'attend
 fichiers ») -- une source `mdblist` sans au moins
 un de ces trois identifiants est rejetée par la validation.
 
+### Ordre des images : respecter le tri configuré (`sort`/`order`)
+
+Pour un catalogue ajouté via l'addon AIOMetadata (`mdblist.<id>`), l'API
+MDBList est interrogée avec le **même tri** que celui configuré côté
+AIOMetadata pour ce catalogue (champs `sort`/`order` de l'export, ex :
+`"sort": "imdbpopular", "order": "asc"`) -- sans ça, l'ordre par défaut de
+MDBList (souvent son ordre de curation/ajout à la liste, pas la
+popularité) ne correspond pas à ce que l'app affiche réellement, et les
+images de la mosaïque semblent "dans le désordre" par rapport au
+catalogue (typique sur un long historique, ex : les dossiers "Animés" par
+décennie). Ce tri n'est utilisé QUE via l'API authentifiée (clé
+`MDBLIST_API_KEY`, voir plus haut) : le repli JSON public de MDBList ne
+permet aucun tri côté serveur, et reste donc dans l'ordre par défaut de la
+liste si la clé API est absente.
+
+Pour une source `provider: "mdblist"` ajoutée à la main (indépendamment de
+l'addon AIOMetadata), les mêmes valeurs sont acceptées via `mdblistSort`
+et `mdblistOrder` :
+
+```json
+{ "provider": "mdblist", "mdblistUrl": "https://mdblist.com/lists/ton-pseudo/nom-de-la-liste", "mdblistSort": "imdbpopular", "mdblistOrder": "asc" }
+```
+
 ### Chercher une liste par titre (`mdblist_recherche.py`)
 
 Pour trouver la bonne liste à mettre en `mdblistUrl` sans avoir à
@@ -475,6 +498,24 @@ ces catalogues, un champ `champImage` (`"poster"`, ou `"background"` s'il
 existe) indique quel champ du catalogue utiliser comme image
 **directement**, sans passer par TMDB.
 
+**Variante `champTitre` (backdrop TMDB nu + titre incrusté)** : pour un
+catalogue dont les images embarquent un titre qu'on ne veut PAS reprendre
+tel quel (ex: FanKai, dont les affiches portent le nom du montage fan --
+"Boruto Kaï", "Black Lagoon Henshū" -- pas le titre officiel), le champ
+`champTitre` indique quel champ du catalogue contient le titre à afficher
+(ex: `"name"`). Le pipeline cherche alors ce titre sur TMDB, prend son
+backdrop **nu** (sans aucun texte incrusté), et y écrit lui-même le titre
+du catalogue par-dessus (police bundlée dans `assets/fonts/`, licence
+OFL). `champImage` reste utile en repli : si TMDB ne trouve rien pour tel
+ou tel titre, le poster brut du catalogue est utilisé à la place, jamais
+d'échec total pour un seul titre raté.
+
+Le champ optionnel `suffixesTitreIgnorer` retire des suffixes de branding
+du catalogue **avant la recherche TMDB uniquement** (le titre AFFICHÉ sur
+le backdrop reste toujours l'original, inchangé) -- pour FanKai, par
+exemple, `["Henshū", "Kaï", "Kai"]` transforme "Boruto Kaï" en "Boruto"
+pour la recherche, sans jamais toucher au "Boruto Kaï" écrit sur l'image.
+
 Comme ce genre de catalogue ne figure généralement pas dans l'export
 AIOMetadata standard (ce sont d'autres addons, agrégés via AIOStreams),
 il passe par un fichier séparé, `Templates/catalogues-personnalises.json`
@@ -488,11 +529,17 @@ il passe par un fichier séparé, `Templates/catalogues-personnalises.json`
       "type": "tv",
       "source": "custom",
       "sourceUrl": "https://streamio.fankai.fr/<ta-config-encodée>/catalog/anime/fankai_catalog.json",
-      "champImage": "poster"
+      "champImage": "poster",
+      "champTitre": "name",
+      "suffixesTitreIgnorer": ["Henshū", "Kaï", "Kai"]
     }
   ]
 }
 ```
+
+(`champTitre`/`suffixesTitreIgnorer` sont optionnels -- un catalogue qui
+n'a que `champImage`, comme Bingecat, continue à utiliser directement ses
+propres images comme avant.)
 
 **⚠️ `sourceUrl` contient un identifiant/clé personnel encodé dedans**
 (config AIOStreams en base64, incluant une clé de service debrid) --

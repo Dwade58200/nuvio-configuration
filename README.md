@@ -41,6 +41,7 @@ nuvio-configuration/
 ├── Badges/
 │   └── Badges_Nuvio_Gold.json             # Config des badges qualité Nuvio (langue, résolution, source…), gérée à part
 ├── scripts/                                # Pipeline de génération -- voir BACKDROPS_SETUP.md
+├── assets/fonts/                           # Police bundlée (Anton, licence OFL) pour l'incrustation de titre (voir BACKDROPS_SETUP.md § FanKai)
 ├── tests/                                  # Tests automatisés (pytest)
 ├── .github/workflows/
 │   ├── generer-backdrops.yml              # Automatisation mensuelle des backdrops
@@ -106,7 +107,7 @@ Pour une exécution réelle, deux secrets GitHub sont nécessaires
 ## Qualité & CI
 
 À chaque push/PR, `.github/workflows/tests.yml` fait tourner :
-- **pytest** (191 tests) -- résolution des sources, composition des
+- **pytest** (207 tests) -- résolution des sources, composition des
   mosaïques, mise à jour des URLs, validation du schéma ;
 - **ruff** -- lint (bloquant) ;
 - **mypy** -- vérification de types (bloquant) ;
@@ -125,6 +126,10 @@ Pour une exécution réelle, deux secrets GitHub sont nécessaires
 ## Licence
 
 Le code (`scripts/`, `tests/`, `schema/`) est sous licence [MIT](LICENSE).
+La police bundlée dans `assets/fonts/` (Anton) est sous licence
+[SIL Open Font License 1.1](assets/fonts/OFL.txt), distincte du reste du
+dépôt -- voir ce fichier pour les termes exacts (réutilisation/
+redistribution libres, y compris commerciale).
 Le contenu de `Templates/Nuvio-Collections-Dwade58200.json` et
 `Templates/aiometadata-setup.json` reste une configuration personnelle
 (pas de garantie de compatibilité si réutilisé tel quel avec un autre
@@ -139,6 +144,10 @@ compte AIOMetadata/Nuvio).
 - **Imposer une image sans passer par la génération** → fichier
   `Templates/images-manuelles.json` (voir `BACKDROPS_SETUP.md`, section
   *Images manuelles*).
+- **Backdrop TMDB nu + titre incrusté pour un catalogue custom** (ex:
+  FanKai) → champs `champTitre`/`suffixesTitreIgnorer` dans
+  `Templates/catalogues-personnalises.json` (voir `BACKDROPS_SETUP.md`,
+  section *Catalogues sans id IMDb*).
 - **Ajouter une collection** → éditer `Templates/Nuvio-Collections-Dwade58200.json`
   (idéalement en suivant `schema/nuvio-collections.schema.json`), puis
   réimporter dans Nuvio.
