@@ -73,6 +73,20 @@ disposées en cascade inclinée -- même principe visuel que luckynumb3rs.
 Par-dessus : un dégradé sombre en vignette, et une lueur diffuse d'une
 **couleur d'accent** extraite automatiquement du premier titre trouvé.
 
+**L'ordre des tuiles suit le classement du catalogue** : le PREMIER
+résultat (celui que l'app affiche en tête) atterrit exactement au centre
+du backdrop -- l'endroit naturellement le plus regardé -- et les
+résultats suivants s'en éloignent progressivement vers les bords à mesure
+qu'ils sont plus loin dans le classement. Comme le nombre de titres
+disponibles est presque toujours inférieur au nombre de cases (~72), les
+derniers arrivés sont RÉPÉTÉS (cycle) pour compléter la grille -- ces
+répétitions, les moins pertinentes, se retrouvent donc logiquement sur les
+bords plutôt que dispersées au hasard. Voir "Ordre des images : respecter
+le tri configuré" plus bas : comme l'ordre du catalogue détermine
+maintenant aussi la POSITION visuelle (pas seulement quels titres
+apparaissent), un mauvais tri côté catalogue devient encore plus visible
+qu'avant.
+
 C'est le comportement **par défaut** (`--mosaique`, activé aussi dans le
 workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
 de 3 titres distincts résolus, le script repasse automatiquement sur

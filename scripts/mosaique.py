@@ -194,6 +194,37 @@ def nombre_cellules_grille(largeur_canvas: int, hauteur_canvas: int, echelle: fl
     return colonnes * lignes
 
 
+def _ordre_cellules_centre_vers_bord(
+    colonnes: int, lignes: int, tuile_largeur: int, tuile_hauteur: int, ecart: int, decalage_px: int
+) -> list[tuple[int, int]]:
+    """Retourne toutes les cellules (ligne, colonne) de la grille,
+    triées par distance croissante à son centre géométrique (en pixels,
+    AVANT rotation). Une rotation étant un déplacement rigide autour du
+    centre de l'image, la distance au centre d'une cellule est inchangée
+    après rotation -- et le recentrage sur le canvas final (voir
+    construire_grille_inclinee) utilise ce même centre -- donc "distance
+    au centre de la grille" correspond exactement à "distance au centre
+    du backdrop final affiché à l'écran".
+
+    Le tri est stable (`(distance, ligne, colonne)`) : à distance égale
+    (cellules symétriques), l'ordre reste déterministe -- important pour
+    des tests reproductibles."""
+    grille_largeur = colonnes * (tuile_largeur + ecart) + lignes * decalage_px
+    grille_hauteur = lignes * (tuile_hauteur + ecart)
+    centre_x = grille_largeur / 2
+    centre_y = grille_hauteur / 2
+
+    def _distance_au_centre(cellule: tuple[int, int]) -> float:
+        ligne, colonne = cellule
+        x = ligne * decalage_px + colonne * (tuile_largeur + ecart) + tuile_largeur / 2
+        y = ligne * (tuile_hauteur + ecart) + tuile_hauteur / 2
+        return math.hypot(x - centre_x, y - centre_y)
+
+    cellules = [(ligne, colonne) for ligne in range(lignes) for colonne in range(colonnes)]
+    cellules.sort(key=lambda cellule: (_distance_au_centre(cellule), cellule[0], cellule[1]))
+    return cellules
+
+
 def construire_grille_inclinee(
     images: Sequence[Image.Image],
     largeur_canvas: int,
@@ -204,6 +235,18 @@ def construire_grille_inclinee(
     puis la fait pivoter légèrement avant de la centrer sur le canvas
     final -- même principe que le rendu de luckynumb3rs, en implémentation
     propre.
+
+    `images` DOIT être fourni dans l'ordre de pertinence (le premier
+    résultat du catalogue en premier, voir GenerateurBackdrops.
+    _telecharger_images_pour_mosaique) : les cellules sont remplies du
+    CENTRE vers les BORDS (voir `_ordre_cellules_centre_vers_bord`), donc
+    `images[0]` atterrit au centre du backdrop -- l'endroit le plus
+    regardé -- et les résultats suivants s'en éloignent progressivement.
+    Si `images` compte moins d'éléments que de cellules, elles sont
+    répétées en cycle (mêmes éléments qu'avant, seul l'ORDRE de
+    remplissage des cellules change) -- les répétitions, les moins
+    pertinentes, se retrouvent donc logiquement sur les bords plutôt que
+    dispersées au hasard.
     """
     if not images:
         raise ValueError("Aucune image fournie pour construire la grille.")
@@ -219,14 +262,14 @@ def construire_grille_inclinee(
     grille_hauteur = lignes * (tuile_hauteur + ecart)
     grille = Image.new("RGBA", (grille_largeur, grille_hauteur), (0, 0, 0, 0))
 
+    ordre_cellules = _ordre_cellules_centre_vers_bord(colonnes, lignes, tuile_largeur, tuile_hauteur, ecart, decalage_px)
     cycle_images = itertools.cycle(images)
-    for ligne in range(lignes):
-        for colonne in range(colonnes):
-            source = next(cycle_images)
-            tuile = preparer_tuile(source, tuile_largeur, tuile_hauteur)
-            x = ligne * decalage_px + colonne * (tuile_largeur + ecart)
-            y = ligne * (tuile_hauteur + ecart)
-            grille.alpha_composite(tuile, (x, y))
+    for ligne, colonne in ordre_cellules:
+        source = next(cycle_images)
+        tuile = preparer_tuile(source, tuile_largeur, tuile_hauteur)
+        x = ligne * decalage_px + colonne * (tuile_largeur + ecart)
+        y = ligne * (tuile_hauteur + ecart)
+        grille.alpha_composite(tuile, (x, y))
 
     pivotee = grille.rotate(INCLINAISON_DEG, expand=True, resample=Image.Resampling.BICUBIC)
 
@@ -453,7 +496,7 @@ def incruster_titre(
     return resultat.convert("RGB")
 
 
-def incruster_logo(image: Image.Image, logo: Image.Image, largeur: int, hauteur: int) -> Image.Image:
+def incruster_logo(image: Image.Image, logo: Image.Image | None, largeur: int, hauteur: int) -> Image.Image:
     """Recadre `image` (cover) sur (largeur, hauteur), puis colle `logo`
     (image avec transparence, ex: logo-titre officiel fourni par un
     catalogue comme FanKai) en bas à gauche, par-dessus un léger dégradé
@@ -461,8 +504,14 @@ def incruster_logo(image: Image.Image, logo: Image.Image, largeur: int, hauteur:
     est disponible plutôt qu'un simple texte : rendu plus fidèle à
     l'identité visuelle de l'oeuvre. `logo` est redimensionné (ratio
     conservé) pour tenir dans une zone raisonnable du canvas, jamais
-    agrandi au-delà de sa taille d'origine."""
+    agrandi au-delà de sa taille d'origine. `logo=None` retourne juste le
+    fond recadré -- défensif : l'appelant actuel filtre déjà ce cas avant
+    d'appeler cette fonction, mais une fonction de compositing publique du
+    module doit rester robuste à un appel direct avec logo manquant."""
     fond = recadrer_pour_tuile(image, largeur, hauteur).convert("RGBA")
+    if logo is None:
+        return fond.convert("RGB")
+
     marge = max(12, int(largeur * _MARGE_RATIO))
 
     logo = logo.convert("RGBA")

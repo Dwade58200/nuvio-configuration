@@ -166,6 +166,49 @@ def test_grille_avec_une_seule_image_repetee_ne_plante_pas():
     assert canvas.size == (800, 450)
 
 
+def test_ordre_cellules_centre_vers_bord_est_trie_par_distance_croissante():
+    """La cellule la plus proche du centre géométrique de la grille doit
+    arriver EN PREMIER, et chaque cellule suivante doit être au moins
+    aussi éloignée que la précédente (tri par distance croissante)."""
+    from mosaique import _ordre_cellules_centre_vers_bord
+
+    colonnes, lignes = 7, 5
+    ordre = _ordre_cellules_centre_vers_bord(
+        colonnes, lignes, tuile_largeur=372, tuile_hauteur=210, ecart=9, decalage_px=190
+    )
+    # toutes les cellules de la grille doivent être présentes, sans doublon
+    assert len(ordre) == colonnes * lignes
+    assert len(set(ordre)) == colonnes * lignes
+
+    def _distance(cellule):
+        ligne, colonne = cellule
+        largeur = colonnes * (372 + 9) + lignes * 190
+        hauteur = lignes * (210 + 9)
+        x = ligne * 190 + colonne * (372 + 9) + 372 / 2
+        y = ligne * (210 + 9) + 210 / 2
+        return ((x - largeur / 2) ** 2 + (y - hauteur / 2) ** 2) ** 0.5
+
+    distances = [_distance(c) for c in ordre]
+    assert distances == sorted(distances)
+
+
+def test_construire_grille_inclinee_place_le_premier_resultat_au_centre():
+    """Le coeur de la demande : `images[0]` (le PREMIER résultat du
+    catalogue) doit se retrouver exactement au pixel central du backdrop
+    final -- les résultats suivants doivent s'en éloigner."""
+    marqueur = (255, 0, 0)
+    autres = [(g, g, g) for g in (40, 55, 70, 85, 100, 115, 130, 145, 160, 175, 190)]
+    images = [_image_couleur(marqueur)] + [_image_couleur(c) for c in autres]
+
+    canvas = construire_grille_inclinee(images, 1920, 1080).convert("RGB")
+
+    assert canvas.getpixel((960, 540)) == marqueur
+    # ni les coins ni les bords ne doivent porter la couleur du premier
+    # résultat -- ils sont occupés par des répétitions plus tardives.
+    for point in [(20, 20), (1900, 20), (20, 1060), (1900, 1060)]:
+        assert canvas.getpixel(point) != marqueur
+
+
 # ---------------------------------------------------------------------------
 # Dégradé
 # ---------------------------------------------------------------------------
@@ -323,6 +366,16 @@ def test_incruster_logo_convertit_un_logo_sans_canal_alpha():
     logo = Image.new("RGB", (300, 100), (255, 255, 0))
     resultat = incruster_logo(fond, logo, 1280, 720)
     assert resultat.size == (1280, 720)
+
+
+def test_incruster_logo_avec_logo_none_retourne_juste_le_fond_recadre():
+    """Défensif : un appel direct avec logo=None (l'appelant actuel du
+    pipeline filtre déjà ce cas, mais la fonction reste publique) ne doit
+    jamais planter -- juste le fond recadré, sans dégradé ni collage."""
+    fond = _image_couleur((50, 60, 70), taille=(1280, 720))
+    resultat = incruster_logo(fond, None, 1280, 720)
+    assert resultat.size == (1280, 720)
+    assert resultat.mode == "RGB"
 
 
 if __name__ == "__main__":

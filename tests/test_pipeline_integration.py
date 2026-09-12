@@ -373,6 +373,165 @@ def test_fankai_champ_titre_retombe_sur_le_poster_si_tmdb_ne_trouve_rien(tmp_pat
     assert (tmp_path / resultat.chemin).exists()
 
 
+def _logo_factice_bytes() -> bytes:
+    """Un petit logo RGBA en mémoire (PNG, fond transparent), pour simuler
+    le téléchargement du logo-titre officiel d'un item FanKai."""
+    img = Image.new("RGBA", (300, 120), (0, 0, 0, 0))
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+def test_fankai_avec_champ_logo_et_filtre_anime_colle_le_logo_par_item(tmp_path):
+    """Bout en bout : "champLogo" + "genreObligatoire": "anime" doivent
+    coller le logo PROPRE À CHAQUE ITEM (pas un logo unique partagé) sur
+    son backdrop TMDB nu -- Frieren (logo=null dans la fixture réelle)
+    doit retomber sur le titre écrit en texte, les autres items sur leur
+    propre logo."""
+    from generer_backdrops import GROUPE_ANIMES
+
+    fixture = json.loads(
+        (Path(__file__).resolve().parent / "fixtures" / "fankai_catalog_sample.json").read_text(encoding="utf-8")
+    )
+    url_catalogue = "https://streamio.fankai.fr/x/catalog/anime/fankai_catalog.json"
+
+    def _repondre(url, timeout=None, params=None, **kwargs):
+        if url.rstrip("?") == url_catalogue or url.startswith(url_catalogue):
+            return FausseReponse(json_data=fixture)
+        if "/search/tv" in url or "/search/movie" in url:
+            return FausseReponse(
+                json_data={"results": [{"id": 999, "popularity": 42.0, "genre_ids": [16], "original_language": "ja"}]}
+            )
+        if "/images" in url:
+            return FausseReponse(json_data={"backdrops": [{"file_path": "/nu.jpg", "iso_639_1": None, "vote_average": 8.0}]})
+        if "/image/logo" in url:
+            return FausseReponse(content=_logo_factice_bytes())
+        # poster de repli, backdrop TMDB nu téléchargé, etc.
+        return FausseReponse(content=_image_factice_bytes())
+
+    session_mock = MagicMock()
+    session_mock.get.side_effect = _repondre
+
+    catalogues = {
+        "1d5e3b0.fankai_catalog": {
+            "kind": "custom_catalogue",
+            "media_type": "tv",
+            "url": url_catalogue,
+            "champ_image": "poster",
+            "champ_titre": "name",
+            "suffixes_titre_ignorer": ["Henshū", "Kaï", "Kai"],
+            "champ_logo": "logo",
+            "filtre_anime": True,
+        }
+    }
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle",
+        cle_fanart=None,
+        repertoire_sortie=tmp_path,
+        dry_run=False,
+        mosaique=True,
+        catalogues_aiometadata=catalogues,
+    )
+    generateur.session = session_mock
+    generateur.tmdb.session = session_mock
+    generateur.catalogue_custom.session = session_mock
+
+    dossier = {
+        "title": "FanKai",
+        "sources": [
+            {
+                "provider": "addon",
+                "addonId": "com.aiostreams.viren070.5a21f0f2-961",
+                "catalogId": "1d5e3b0.fankai_catalog",
+                "type": "anime",
+            }
+        ],
+    }
+
+    resultat = generateur.traiter_dossier(GROUPE_ANIMES, dossier)
+
+    assert resultat.statut == "genere"
+    assert (tmp_path / resultat.chemin).exists()
+    urls_appelees = [c.args[0] if c.args else c.kwargs.get("url") for c in session_mock.get.call_args_list]
+    urls_logo_appelees = {u for u in urls_appelees if u and "/image/logo" in u}
+    # 5 items ont un logo dans la fixture (Frieren = null, exclu) -> 5 URLs
+    # de logo DISTINCTES appelées, une par item -- pas un logo unique répété.
+    assert len(urls_logo_appelees) == 5
+    assert all("logo" in u for u in urls_logo_appelees)
+
+
+def test_fankai_champ_logo_absent_ou_en_echec_retombe_sur_le_titre_en_texte(tmp_path):
+    """Si un item n'a pas de logo (null, ex: Frieren) OU si son
+    téléchargement échoue, le pipeline doit quand même réussir en
+    retombant sur le titre écrit en texte -- jamais d'échec total pour un
+    logo manquant/indisponible."""
+    from generer_backdrops import GROUPE_ANIMES
+
+    fixture = json.loads(
+        (Path(__file__).resolve().parent / "fixtures" / "fankai_catalog_sample.json").read_text(encoding="utf-8")
+    )
+    url_catalogue = "https://streamio.fankai.fr/x/catalog/anime/fankai_catalog.json"
+
+    def _repondre(url, timeout=None, params=None, **kwargs):
+        if url.rstrip("?") == url_catalogue or url.startswith(url_catalogue):
+            return FausseReponse(json_data=fixture)
+        if "/search/tv" in url or "/search/movie" in url:
+            return FausseReponse(
+                json_data={"results": [{"id": 999, "popularity": 42.0, "genre_ids": [16], "original_language": "ja"}]}
+            )
+        if "/images" in url:
+            return FausseReponse(json_data={"backdrops": [{"file_path": "/nu.jpg", "iso_639_1": None, "vote_average": 8.0}]})
+        if "/image/logo" in url:
+            return FausseReponse(status_code=404)  # tous les téléchargements de logo échouent
+        return FausseReponse(content=_image_factice_bytes())
+
+    session_mock = MagicMock()
+    session_mock.get.side_effect = _repondre
+
+    catalogues = {
+        "1d5e3b0.fankai_catalog": {
+            "kind": "custom_catalogue",
+            "media_type": "tv",
+            "url": url_catalogue,
+            "champ_image": "poster",
+            "champ_titre": "name",
+            "suffixes_titre_ignorer": ["Henshū", "Kaï", "Kai"],
+            "champ_logo": "logo",
+            "filtre_anime": True,
+        }
+    }
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle",
+        cle_fanart=None,
+        repertoire_sortie=tmp_path,
+        dry_run=False,
+        mosaique=True,
+        catalogues_aiometadata=catalogues,
+    )
+    generateur.session = session_mock
+    generateur.tmdb.session = session_mock
+    generateur.catalogue_custom.session = session_mock
+
+    dossier = {
+        "title": "FanKai",
+        "sources": [
+            {
+                "provider": "addon",
+                "addonId": "com.aiostreams.viren070.5a21f0f2-961",
+                "catalogId": "1d5e3b0.fankai_catalog",
+                "type": "anime",
+            }
+        ],
+    }
+
+    resultat = generateur.traiter_dossier(GROUPE_ANIMES, dossier)
+
+    assert resultat.statut == "genere"
+    assert (tmp_path / resultat.chemin).exists()
+
+
 if __name__ == "__main__":
     import pytest
 
