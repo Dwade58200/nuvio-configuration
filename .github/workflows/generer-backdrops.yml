@@ -5,22 +5,25 @@ on:
     - cron: "0 4 1 * *"  # 1er du mois à 4h00 UTC
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: "Mode simulation (aucun appel TMDB, aucun commit)"
-        type: boolean
-        default: false
       groupe:
-        description: "Ne traiter qu'un seul groupe (ex: Genres) — laisser vide pour tous"
-        required: false
-        default: ""
+        description: "Ne traiter qu'un seul groupe — choisir '(tous)' pour tous les traiter"
+        type: choice
+        options:
+          - "(tous)"
+          - "Découvrir"
+          - "Services de Streaming"
+          - "Genres"
+          - "Thématiques"
+          - "Vibe"
+          - "Animés"
+          - "Années"
+          - "Franchises"
+          - "Sports"
+        default: "(tous)"
       limite:
         description: "Limiter le nombre de dossiers traités (tests rapides) — laisser vide pour tous"
         required: false
         default: ""
-      desactiver_mosaique:
-        description: "Débug : forcer l'ancien mode 1 seul backdrop par dossier"
-        type: boolean
-        default: false
       mettre_a_jour_urls:
         description: "Mettre à jour heroBackdropUrl dans le JSON (à activer seulement quand de nouveaux dossiers viennent d'être résolus, pas à chaque run)"
         type: boolean
@@ -59,7 +62,6 @@ jobs:
           python -m pip install pillow requests
 
       - name: Nettoyer l'ancienne arborescence (collections/ -> Collections/)
-        if: ${{ inputs.dry_run != true }}
         run: |
           if [ -d "collections" ]; then
             git rm -r --quiet collections/ 2>/dev/null || rm -rf collections/
@@ -87,18 +89,14 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           FANART_API_KEY: ${{ secrets.FANART_API_KEY }}
           MDBLIST_API_KEY: ${{ secrets.MDBLIST_API_KEY }}
-          DRY_RUN: ${{ inputs.dry_run }}
           GROUPE: ${{ inputs.groupe }}
           LIMITE: ${{ inputs.limite }}
-          DESACTIVER_MOSAIQUE: ${{ inputs.desactiver_mosaique }}
           VERBOSE: ${{ inputs.verbose }}
         run: |
           set -o pipefail
-          ARGS=(--collections Templates/Nuvio-Collections-Dwade58200.json --sortie Collections --profil compresse --parallelisme 3)
-          if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run); fi
-          if [ -n "$GROUPE" ]; then ARGS+=(--groupe "$GROUPE"); fi
+          ARGS=(--collections Templates/Nuvio-Collections-Dwade58200.json --sortie Collections --profil compresse --parallelisme 3 --mosaique)
+          if [ -n "$GROUPE" ] && [ "$GROUPE" != "(tous)" ]; then ARGS+=(--groupe "$GROUPE"); fi
           if [ -n "$LIMITE" ]; then ARGS+=(--limite "$LIMITE"); fi
-          if [ "$DESACTIVER_MOSAIQUE" != "true" ]; then ARGS+=(--mosaique); fi
           if [ "$VERBOSE" = "true" ]; then ARGS+=(--verbose); fi
           if [ -f "Templates/aiometadata-setup.json" ]; then ARGS+=(--aiometadata "Templates/aiometadata-setup.json"); fi
           python3 -B scripts/generer_backdrops.py "${ARGS[@]}" 2>&1 | tee generer_backdrops.log
@@ -113,7 +111,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Mettre à jour heroBackdropUrl vers les images générées
-        if: ${{ inputs.dry_run != true && inputs.mettre_a_jour_urls == true }}
+        if: ${{ inputs.mettre_a_jour_urls == true }}
         run: |
           python3 -B scripts/mettre_a_jour_urls.py \
             --collections Templates/Nuvio-Collections-Dwade58200.json \
@@ -127,7 +125,7 @@ jobs:
 
       - name: Commiter et pousser les changements
         id: publication
-        if: ${{ inputs.dry_run != true && inputs.commiter != false }}
+        if: ${{ inputs.commiter != false }}
         run: |
           git add Collections/ Templates/
           if git diff --cached --quiet; then
