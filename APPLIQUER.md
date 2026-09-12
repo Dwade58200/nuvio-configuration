@@ -1,9 +1,34 @@
 # Session du 12 septembre 2026 — mosaïque : ordre centre → bord, consolidation logo FanKai
 # + session suivante (même jour) — optimisation preparer_tuile, nettoyage code mort
+# + session suivante (même jour) — simplification du déclenchement manuel du workflow
 # + session du 11 septembre 2026 — backdrop TMDB nu + titre incrusté (FanKai), tri MDBList respecté
 # + session suivante (même jour) — logo FanKai + filtre genre anime (bug "Monster" corrigé)
 # + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
+
+## 🖱️ Déclenchement manuel du workflow simplifié
+
+Trois changements dans `.github/workflows/generer-backdrops.yml`, sur le
+déclenchement manuel (`workflow_dispatch`) uniquement -- rien touché côté
+script Python (`--dry-run` et le mode single-backdrop automatique restent
+pleinement fonctionnels, notamment pour les tests) :
+
+1. **`groupe` devient une liste déroulante** (`type: choice`) avec les 9
+   groupes réels + une option `"(tous)"` (défaut, équivalent à l'ancien
+   champ texte vide) -- au lieu d'un champ texte libre où il fallait taper
+   le nom exact du groupe.
+2. **`dry_run` entièrement retiré** du workflow (input, variable d'env
+   `DRY_RUN`, et les trois conditions `if: ${{ inputs.dry_run != true }}`
+   qui en dépendaient, simplifiées en conséquence) -- plus d'utilité en
+   pratique pour un déclenchement manuel.
+3. **`desactiver_mosaique` entièrement retiré** du workflow (input,
+   variable d'env, et la condition sur `--mosaique`) -- `--mosaique` est
+   maintenant toujours passé, sans condition.
+
+`BACKDROPS_SETUP.md` mis à jour (section "Depuis GitHub Actions" +
+mention de `desactiver_mosaique` dans la section mosaïque) pour refléter
+ces retraits. YAML validé (`yaml.safe_load`). Tests inchangés (222,
+aucun ne couvre le YAML du workflow) : ruff + mypy toujours propres.
 
 ## ⚡ Optimisation : preparer_tuile ne travaille plus qu'une fois par image distincte
 

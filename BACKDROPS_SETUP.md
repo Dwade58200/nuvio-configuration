@@ -98,9 +98,10 @@ disponibles que de cases (catalogue restreint), les images sont répétées
 (cycle) en dernier recours pour compléter la grille -- mais uniquement
 dans ce cas.
 
-Pour forcer l'ancien comportement (debug, comparaison) : lance sans
-`--mosaique`, ou coche **desactiver_mosaique** au déclenchement manuel
-depuis GitHub Actions.
+Pour forcer l'ancien comportement (debug, comparaison) : lance en local
+sans `--mosaique` (l'option de déclenchement manuel équivalente,
+**desactiver_mosaique**, a été retirée du workflow -- plus d'utilité une
+fois la mosaïque définitivement adoptée en production).
 
 ### D'où vient le titre visible sur chaque tuile ?
 
@@ -288,10 +289,12 @@ Options utiles de `generer_backdrops.py` :
 ### Depuis GitHub Actions
 
 1. Onglet **Actions** → workflow **Générer les Backdrops** → **Run workflow**.
-2. Le déclenchement manuel permet aussi de cocher **dry_run**, ou de préciser
-   un `groupe`/une `limite` pour un test rapide sans tout régénérer.
-3. La mosaïque est **active par défaut** (aussi sur le cron mensuel) ; coche
-   **desactiver_mosaique** uniquement pour du débug/comparaison.
+2. Le déclenchement manuel permet de choisir un `groupe` dans la liste
+   déroulante (ou "(tous)" pour tous les traiter) et de préciser une
+   `limite` pour un test rapide sans tout régénérer.
+3. La mosaïque est **active par défaut** (aussi sur le cron mensuel) --
+   plus d'option pour revenir à l'ancien mode 1 seul backdrop depuis le
+   déclenchement manuel (uniquement en local, voir plus haut).
 4. La case **mettre_a_jour_urls** est décochée par défaut (voir
    « Mise à jour des URLs ») : coche-la
    uniquement la première fois, ou après une phase qui débloque de
