@@ -209,6 +209,38 @@ def test_construire_grille_inclinee_place_le_premier_resultat_au_centre():
         assert canvas.getpixel(point) != marqueur
 
 
+def test_construire_grille_inclinee_ne_prepare_chaque_image_qu_une_seule_fois():
+    """Optimisation : quand la grille a plus de cases que d'images
+    distinctes (cas courant -- voir TUILES_CIBLE/completer_jusqua), la
+    même image PIL revient plusieurs fois dans `images` (cycle). Le
+    recadrage/redimensionnement/arrondi (`preparer_tuile`, coûteux : LANCZOS
+    + masque) ne doit être fait qu'UNE SEULE fois par image source, pas une
+    fois par case -- le résultat final doit rester rigoureusement identique
+    (mêmes pixels) qu'avec un appel par case."""
+    import mosaique as module_mosaique
+
+    images = [_image_couleur((i * 20, 100, 200)) for i in range(6)]
+
+    compteur = {"appels": 0}
+    original = module_mosaique.preparer_tuile
+
+    def preparer_tuile_instrumente(*args, **kwargs):
+        compteur["appels"] += 1
+        return original(*args, **kwargs)
+
+    module_mosaique.preparer_tuile = preparer_tuile_instrumente
+    try:
+        canvas = construire_grille_inclinee(images, 1920, 1080)
+        colonnes, lignes = module_mosaique.dimensions_grille(1920, 1080)
+        nb_cases = colonnes * lignes
+    finally:
+        module_mosaique.preparer_tuile = original
+
+    assert nb_cases > len(images)  # sinon le test ne prouve rien
+    assert compteur["appels"] == len(images)  # une fois par image DISTINCTE, pas par case
+    assert canvas.size == (1920, 1080)
+
+
 # ---------------------------------------------------------------------------
 # Dégradé
 # ---------------------------------------------------------------------------

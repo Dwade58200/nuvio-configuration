@@ -60,12 +60,6 @@ def completer_jusqua(images: Sequence[Image.Image], minimum: int = TUILES_CIBLE)
     return resultat
 
 
-# Compatibilité : gardé pour ne pas casser d'éventuels appels existants qui
-# testent juste "a-t-on assez d'images ?" (retourne un couple factice).
-def choisir_grille(nombre_images: int) -> tuple[int, int] | None:
-    return (1, 1) if assez_d_images(nombre_images) else None
-
-
 # ---------------------------------------------------------------------------
 # Couleur d'accent
 # ---------------------------------------------------------------------------
@@ -105,38 +99,13 @@ def aplatir_transparence(image: Image.Image, couleur_fond: tuple[int, int, int] 
     """Compose proprement une image avec canal alpha (ex: artworks
     'clearart' de Fanart, souvent détourés sur fond transparent) sur un
     fond uni sombre, plutôt que de simplement jeter le canal alpha (ce qui
-    peut révéler des pixels noirs/blancs parasites sous la découpe).
-    Filet de sécurité si aucun vrai fond n'a pu être composé en amont
-    (voir `composer_sur_fond` pour le cas nominal avec un fond réel)."""
+    peut révéler des pixels noirs/blancs parasites sous la découpe)."""
     if image.mode in ("RGBA", "LA") or (image.mode == "P" and "transparency" in image.info):
         image = image.convert("RGBA")
         fond = Image.new("RGB", image.size, couleur_fond)
         fond.paste(image, mask=image.split()[-1])
         return fond
     return image.convert("RGB")
-
-
-def composer_sur_fond(image_transparente: Image.Image, image_fond: Image.Image, proportion_max: float = 0.8) -> Image.Image:
-    """Compose un artwork détouré (ex: 'clearart' Fanart) sur une VRAIE
-    image de fond, plutôt que sur une couleur plate -- l'artwork est
-    redimensionné pour tenir dans `proportion_max` du fond (en conservant
-    son ratio) et centré."""
-    image_fond = image_fond.convert("RGBA")
-    image_transparente = image_transparente.convert("RGBA")
-
-    ratio = min(
-        (image_fond.width * proportion_max) / max(1, image_transparente.width),
-        (image_fond.height * proportion_max) / max(1, image_transparente.height),
-        1.0,  # ne jamais agrandir l'artwork au-delà de sa taille d'origine
-    )
-    nouvelle_taille = (max(1, int(image_transparente.width * ratio)), max(1, int(image_transparente.height * ratio)))
-    artwork_redim = image_transparente.resize(nouvelle_taille, Image.Resampling.LANCZOS)
-
-    x = (image_fond.width - artwork_redim.width) // 2
-    y = (image_fond.height - artwork_redim.height) // 2
-    resultat = image_fond.copy()
-    resultat.alpha_composite(artwork_redim, (x, y))
-    return resultat.convert("RGB")
 
 
 def recadrer_pour_tuile(image: Image.Image, largeur: int, hauteur: int) -> Image.Image:
@@ -264,9 +233,22 @@ def construire_grille_inclinee(
 
     ordre_cellules = _ordre_cellules_centre_vers_bord(colonnes, lignes, tuile_largeur, tuile_hauteur, ecart, decalage_px)
     cycle_images = itertools.cycle(images)
+    # `images` contient très souvent la même image PIL répétée plusieurs
+    # fois (dès que la grille a plus de cases que de titres distincts --
+    # le cas courant, voir completer_jusqua) : mise en cache par
+    # IDENTITÉ d'objet (`id(source)`, PIL.Image n'étant pas hashable) pour
+    # ne recadrer/redimensionner (LANCZOS)/arrondir les coins qu'UNE
+    # SEULE fois par image source, au lieu de refaire ce travail à chaque
+    # case où elle réapparaît -- résultat strictement identique
+    # (`preparer_tuile` est pure : même image + mêmes dimensions de tuile
+    # -> même résultat), juste sans le calculer plusieurs fois.
+    tuiles_par_image: dict[int, Image.Image] = {}
     for ligne, colonne in ordre_cellules:
         source = next(cycle_images)
-        tuile = preparer_tuile(source, tuile_largeur, tuile_hauteur)
+        tuile = tuiles_par_image.get(id(source))
+        if tuile is None:
+            tuile = preparer_tuile(source, tuile_largeur, tuile_hauteur)
+            tuiles_par_image[id(source)] = tuile
         x = ligne * decalage_px + colonne * (tuile_largeur + ecart)
         y = ligne * (tuile_hauteur + ecart)
         grille.alpha_composite(tuile, (x, y))

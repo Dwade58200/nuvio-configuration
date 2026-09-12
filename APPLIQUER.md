@@ -1,9 +1,102 @@
-# Session du 11 septembre 2026 — backdrop TMDB nu + titre incrusté (FanKai), tri MDBList respecté
+# Session du 12 septembre 2026 — mosaïque : ordre centre → bord, consolidation logo FanKai
+# + session suivante (même jour) — optimisation preparer_tuile, nettoyage code mort
+# + session du 11 septembre 2026 — backdrop TMDB nu + titre incrusté (FanKai), tri MDBList respecté
 # + session suivante (même jour) — logo FanKai + filtre genre anime (bug "Monster" corrigé)
 # + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
 
-## 🎴 FanKai : logo officiel + filtre genre anime (correctifs suite au premier déploiement)
+## ⚡ Optimisation : preparer_tuile ne travaille plus qu'une fois par image distincte
+
+Demande explicite : optimiser sans changer le comportement ni les
+commentaires existants, et vérifier l'absence d'éléments inutiles.
+
+**Optimisation retenue** -- `construire_grille_inclinee` (mosaique.py)
+appelait `preparer_tuile()` (recadrage + redimensionnement LANCZOS +
+arrondi des coins, l'étape la plus coûteuse de la génération après la
+rotation) une fois PAR CASE de la grille. Or dès que la grille a plus de
+cases que d'images distinctes (le cas normal : ~9x8=72 cases pour
+souvent 8 à 15 titres, voir TUILES_CIBLE/completer_jusqua), la même
+image PIL revient plusieurs fois dans la liste cyclée -- et se faisait
+retraiter à l'identique à chaque case. Corrigé par une mise en cache
+locale à l'appel, par IDENTITÉ d'objet (`id(source)`, `PIL.Image` n'étant
+pas hashable -- vérifié). Mesuré au profiler (`cProfile`, le chronomètre
+seul étant trop bruité dans cet environnement) sur un cas réaliste (10
+images, grille 9x8) : **~45% de temps CPU en moins** par mosaïque générée
+(72 appels à `preparer_tuile` ramenés à 10). Résultat pixel-perfect
+identique à avant (vérifié). Nouveau test qui instrumente
+`preparer_tuile` pour verrouiller ce comportement (compte les appels
+réels, pas juste la sortie).
+
+**Code mort supprimé** (confirmé par recherche exhaustive + `vulture`,
+aucun appelant nulle part dans le dépôt) :
+- `mosaique.choisir_grille()` -- vestige explicitement marqué
+  "compatibilité", jamais appelé.
+- `mosaique.composer_sur_fond()` -- jamais appelé, seule
+  `aplatir_transparence()` le mentionnait en cross-référence dans son
+  docstring (retirée avec la fonction).
+
+**Signalé mais PAS supprimé** (jugement à faire, pas un cas évident) :
+`ClientMDBList.rechercher_listes()` (generer_backdrops.py) n'est appelée
+par aucun script de la pipeline -- seuls 2 tests l'exercisent. Elle
+duplique une logique quasi identique déjà présente, en autonome, dans
+`scripts/mdblist_recherche.py` (le vrai outil CLI utilisé en pratique
+pour chercher une liste MDBList). Possiblement une méthode utilitaire
+gardée pour un usage interactif futur (REPL) plutôt qu'un oubli -- laissée
+en l'état, à trancher par toi.
+
+Tests : 221 -> 222 (nouveau test de non-régression sur le nombre d'appels
+à `preparer_tuile`). ruff + mypy toujours propres.
+
+## 🎯 Mosaïque : les tuiles se remplissent du centre vers les bords
+
+Jusqu'ici, la grille se remplissait ligne par ligne (haut-gauche vers
+bas-droite) sans lien avec le classement du catalogue. Demande : que le
+PREMIER résultat (celui affiché en tête côté app) soit visuellement le
+plus mis en avant. Nouvelle fonction `mosaique._ordre_cellules_centre_vers_bord` :
+trie toutes les cases de la grille par distance croissante à son centre
+géométrique (en pixels, avant rotation) ; `construire_grille_inclinee`
+remplit désormais les cases dans cet ordre plutôt que ligne par ligne.
+`images[0]` atterrit exactement au pixel central du backdrop final ; les
+résultats suivants s'en éloignent progressivement. Une rotation étant un
+déplacement rigide autour du centre de l'image, la distance au centre
+(donc l'ordre calculé avant rotation) reste valable après rotation ET
+recentrage sur le canvas -- vérifié par un test qui lit le pixel exact
+(960, 540) sur un canvas 1920x1080. Comme les répétitions (cycle, quand
+il y a moins de titres que de cases) suivent le même ordre, elles se
+retrouvent logiquement sur les cases les plus excentrées plutôt que
+dispersées au hasard. Conséquence pratique : un mauvais tri côté
+catalogue (voir section "Tri MDBList" plus bas) se voit maintenant aussi
+dans le POSITIONNEMENT, pas seulement dans quels titres apparaissent --
+`BACKDROPS_SETUP.md` mis à jour en conséquence.
+
+## 🎴 FanKai : consolidation de la session précédente (logo par item)
+
+Une variante alternative de la fonctionnalité "logo FanKai" (session
+précédente) proposait un logo **par item** du catalogue (`champLogo`
+pointant vers un champ `logo` propre à chaque titre, ex:
+`https://metadata.fankai.fr/series/{id}/image/logo`) plutôt qu'un logo de
+marque unique partagé par tous les items -- retenue car plus fidèle à ce
+que fournit réellement le catalogue FanKai (chaque anime a son propre
+logo-titre officiel, pas juste le badge générique "FANKAI") et cohérente
+avec le principe déjà en place pour `champImage`/`champTitre` (un champ
+par item). Deux points consolidés dessus :
+- `mosaique.incruster_logo(logo=None, ...)` ne plante plus (retourne
+  juste le fond recadré) -- défensif, l'appelant du pipeline filtrait
+  déjà ce cas mais une fonction de compositing publique du module doit
+  rester robuste à un appel direct sans logo.
+- 2 tests d'intégration bout-en-bout ajoutés sur `traiter_dossier()`
+  (absents de la variante retenue, qui n'avait que des tests unitaires
+  par couche) : un qui vérifie que plusieurs items d'une même fixture
+  récupèrent chacun leur PROPRE URL de logo (pas une seule répétée), et
+  un qui vérifie qu'un échec de téléchargement (404) retombe proprement
+  sur le titre en texte sans faire échouer tout le dossier.
+
+Tests : la consolidation logo (ci-dessus) est passée de 216 à 219 (2
+tests d'intégration bout-en-bout + 1 test unitaire sur
+`incruster_logo(None)`) ; l'ordre centre → bord ajoute 2 tests
+supplémentaires, 219 -> 221. ruff + mypy toujours propres.
+
+
 
 Le premier déploiement de la fonctionnalité "backdrop TMDB nu + titre
 incrusté" (voir plus bas) tournait, mais deux soucis remontés après coup :
