@@ -6,6 +6,54 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
+## ✅ Fait (session du 13 septembre 2026, suite -- outil de design enrichi + tests manquants + nettoyage CI)
+
+- [x] **Outil `outils/reglage-style-mosaique.html`, saisie numérique** :
+      chaque curseur (largeur/hauteur de tuile, écart, arrondi, décalage,
+      inclinaison, ombre, flou) a maintenant un champ numérique jumeau --
+      taper une valeur exacte met à jour le curseur (et inversement),
+      avec les mêmes bornes min/max. Idée de l'utilisateur.
+- [x] **Outil, choix du ratio des tuiles** : la case "Conserver le ratio
+      16:9" (session précédente) est remplacée par un menu déroulant
+      **16:9 / 4:3 / 3:2 / 1:1 / Libre**, qui resynchronise largeur/hauteur
+      dès qu'on change de ratio (comme avant pour 16:9, généralisé à
+      d'autres formats). Idée de l'utilisateur.
+- [x] **Outil, génération d'un backdrop réel depuis un dossier d'images**
+      -- nouvelle section en bas de page : sélection d'un dossier/plusieurs
+      images locales (100% côté navigateur, aucun envoi réseau), choix
+      d'une résolution de sortie (1280×720/1920×1080/780×439, alignées sur
+      les profils `PROFILS_QUALITE` du script), puis génération réelle
+      (même moteur de rendu que l'aperçu, factorisé dans `composerBackdrop`)
+      et téléchargement du fichier -- sans passer par
+      `generer_backdrops.py`/TMDB. Utile pour un lot d'images sans
+      référence TMDB (fan-arts, scans, captures perso). Idée de
+      l'utilisateur.
+      Logique validée en exécutant le vrai script dans un DOM/canvas
+      factice (Node + stubs, pas de dépendance ajoutée) : verrouillage de
+      ratio, synchronisation curseur↔numérique, clamp aux bornes, reset,
+      et le flux complet sélection de fichiers -> génération ->
+      téléchargement.
+- [x] **Tests ajoutés pour `mdblist_recherche.py`** (11 tests, aucune
+      couverture avant) : tri des résultats, transmission clé/requête,
+      clé invalide (`sys.exit(1)`), erreur serveur (`HTTPError`), réponse
+      inattendue (non-liste), formatage de l'affichage (snippet JSON,
+      liste privée, valeurs par défaut), câblage CLI de `main()`
+      (variable d'environnement vs `--cle-api`, absence des deux).
+- [x] **Tests ajoutés pour `purger_cache.py`** (+3, s'ajoutent aux 7 déjà
+      existants -- la liste "reste à faire" était obsolète sur ce point) :
+      comptage des échecs HTTP (statut != 200) sans interrompre le run,
+      `requests.RequestException` rattrapée sans planter, câblage CLI de
+      `main()` (arguments non-défaut jusqu'à `purger_cdn`).
+- [x] **Étape de migration `collections/` -> `Collections/` retirée** de
+      `generer-backdrops.yml` -- vérifié directement sur le dépôt GitHub
+      réel (`Dwade58200/nuvio-configuration`) : plus aucun dossier
+      `collections/` en minuscule à la racine, uniquement `Collections/`.
+      Migration ponctuelle d'une ancienne session, désormais du code mort.
+- [x] Suite complète revérifiée : **245 tests** (231 + 14), `ruff`/`mypy`
+      propres, YAML du workflow revalidé après suppression de l'étape.
+
+---
+
 ## ✅ Fait (session du 13 septembre 2026 -- suffixes FanKai manquants + récap de fin de run + outil de style)
 
 - [x] **Bug signalé par l'utilisateur : Bleach/Naruto Shippuden/Inazuma
@@ -128,18 +176,11 @@ précis :
 
 - [x] ~~`🎌 Animés / FanKai` n'a aucune source résoluble en image~~ --
       résolu, voir la session du 8 septembre 2026 ci-dessus.
-- [ ] **`mdblist_recherche.py` et `purger_cache.py` n'ont aucun test**,
-      contrairement à tous les autres scripts. Les deux contiennent de la
-      logique pure testable sans réseau (construction d'URL de recherche/
-      de purge, découpage `chemin_depot`/`chemin_encode`) qui pourrait être
-      extraite et couverte avec des appels réseau mockés, sur le modèle des
-      tests existants.
-- [ ] **Nettoyage mineur** : l'étape "Nettoyer l'ancienne arborescence
-      (`collections/` -> `Collections/`)" dans `generer-backdrops.yml` est
-      une migration ponctuelle d'une ancienne session, presque certainement
-      obsolète aujourd'hui (le dossier en minuscule ne devrait plus jamais
-      exister) -- candidate à suppression après confirmation qu'elle ne se
-      déclenche plus jamais depuis quelques runs.
+- [x] ~~`mdblist_recherche.py` et `purger_cache.py` n'ont aucun test~~ --
+      résolu, voir la session du 13 septembre 2026 (suite) ci-dessus.
+- [x] ~~Nettoyage mineur : étape "Nettoyer l'ancienne arborescence" dans
+      `generer-backdrops.yml`~~ -- retirée, voir la session du 13
+      septembre 2026 (suite) ci-dessus.
 
 ---
 
@@ -416,17 +457,10 @@ précis :
 
 ## 🔵 Reste à faire
 
-- [ ] Couvrir `mdblist_recherche.py` et `purger_cache.py` par des tests
-      (seuls scripts du dossier sans aucun test actuellement).
-- [ ] Vérifier si l'étape de migration `collections/` -> `Collections/`
-      dans `generer-backdrops.yml` est encore nécessaire, et la retirer
-      si elle ne s'est plus déclenchée depuis plusieurs runs.
-- [x] ~~Une fois le secret `FANKAI_CATALOG_URL` configuré côté GitHub :
-      vérifier sur un vrai run (pas juste `--dry-run`) que FanKai génère
-      effectivement sa mosaïque en conditions réelles~~ -- confirmé par un
-      vrai log de run fourni par l'utilisateur (session du 13 septembre
-      2026 ci-dessus) : le catalogue est bien récupéré et des mosaïques
-      sont bien générées pour FanKai.
+Rien pour l'instant -- tout le backlog connu a été traité (voir
+l'historique ci-dessus). Prochaines pistes à explorer si tu en as :
+la liste "Idées plus lointaines" juste en dessous, ou tes propres idées
+à ajouter au fil de l'eau.
 
 ---
 

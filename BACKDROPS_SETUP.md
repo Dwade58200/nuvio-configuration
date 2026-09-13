@@ -167,13 +167,17 @@ de réponse `429`).
 dépendance, ouvrable directement dans un navigateur) qui prévisualise en
 direct la grille de tuiles + la vignette du mode mosaïque : taille des
 tuiles, écart, arrondi des coins, décalage cascade, inclinaison, intensité
-de l'ombre, flou et couleur de la lueur d'accent.
+de l'ombre, flou et couleur de la lueur d'accent. Chaque curseur a un
+champ numérique jumeau juste à côté -- pour taper une valeur exacte au
+lieu de tâtonner à la souris, les deux restent synchronisés dans les deux
+sens.
 
-La case **"Conserver le ratio 16:9"** (cochée par défaut, comme le canvas
+Le menu déroulant **"Ratio des tuiles"** (16:9 par défaut, comme le canvas
 final -- voir `_dimensions_canvas`) recalcule automatiquement l'autre
 curseur (largeur ↔ hauteur) dès que l'un des deux bouge, pour ne pas
-sortir par erreur du format attendu par le reste du pipeline. Décoche-la
-si tu veux volontairement expérimenter un ratio de tuile différent.
+sortir par erreur du format choisi. Les préréglages 4:3/3:2/1:1 sont là
+pour expérimenter d'autres formats de tuile ; choisis "Libre" pour piloter
+largeur et hauteur indépendamment, sans contrainte.
 
 **Déployé automatiquement sur GitHub Pages** (`.github/workflows/deployer-outils.yml`,
 déclenché à chaque modification de `outils/`) : accessible à
@@ -194,6 +198,21 @@ python3 scripts/appliquer_style_mosaique.py --json-inline '<coller le JSON copi�
 python3 scripts/appliquer_style_mosaique.py --json fichier.json          # ou depuis un fichier
 python3 scripts/appliquer_style_mosaique.py --json-inline '...' --dry-run  # aperçu sans écrire
 ```
+
+### Générer un vrai backdrop depuis un dossier d'images
+
+Tout en bas de la même page, une section indépendante permet de générer un
+**vrai fichier téléchargeable** à partir de tes propres images (posters,
+scans, captures perso...) plutôt que des placeholders : sélectionne un
+dossier ou plusieurs fichiers image, choisis une résolution de sortie
+(1280×720 / 1920×1080 / 780×439, alignées sur les profils
+`PROFILS_QUALITE` du script), clique sur **🖼️ Générer le backdrop**, puis
+télécharge le résultat. Le style appliqué est exactement celui réglé
+au-dessus (tuiles, ombre, lueur...). 100% local : les images ne quittent
+jamais le navigateur, aucun appel réseau. Pratique pour un lot d'images
+sans référence TMDB (donc hors du champ d'action de
+`generer_backdrops.py`) -- pas destiné à remplacer le pipeline normal pour
+les catalogues déjà résolubles via TMDB/Fanart.tv/MDBList.
 
 Seules les clés présentes dans le JSON sont modifiées (`tuile_largeur`,
 `tuile_hauteur`, `ecart`, `rayon_coin`, `decalage_ligne`,

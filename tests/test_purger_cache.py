@@ -110,3 +110,76 @@ def test_purger_cdn_ignore_un_fichier_hors_du_repertoire_de_sortie(arborescence,
 
     session_mock.assert_not_called()
     assert "ignoré" in capsys.readouterr().err.lower()
+
+
+def test_purger_cdn_compte_les_echecs_http_sans_planter(arborescence, monkeypatch, capsys):
+    """Un statut HTTP != 200 (ex: 404/500 côté jsDelivr) sur un des deux
+    fichiers ne doit ni interrompre la purge des autres, ni faire planter
+    le run -- juste être compté comme un échec dans le résumé final."""
+    reponses = [FausseReponse(200), FausseReponse(500)]
+    session_mock = MagicMock(side_effect=reponses)
+    monkeypatch.setattr("purger_cache.requests.get", session_mock)
+    monkeypatch.setattr("purger_cache.time.sleep", lambda _: None)
+
+    purger_cdn("owner/repo", "main", arborescence, fichiers=None)
+
+    assert session_mock.call_count == 2
+    sortie = capsys.readouterr().out
+    assert "1 réussi" in sortie
+    assert "1 échoué" in sortie
+
+
+def test_purger_cdn_gere_une_exception_reseau_sans_planter(arborescence, monkeypatch, capsys):
+    """Une requests.RequestException (timeout, DNS, etc.) sur un fichier
+    est rattrapée -- comptée comme un échec, la purge continue pour les
+    fichiers suivants au lieu d'arrêter tout le run."""
+    import requests
+
+    def get_qui_echoue(*_args, **_kwargs):
+        raise requests.RequestException("boom")
+
+    monkeypatch.setattr("purger_cache.requests.get", get_qui_echoue)
+    monkeypatch.setattr("purger_cache.time.sleep", lambda _: None)
+
+    purger_cdn("owner/repo", "main", arborescence, fichiers=None)
+
+    sortie_erreur = capsys.readouterr().err
+    assert "erreur réseau" in sortie_erreur.lower()
+
+
+def test_main_construit_bien_les_arguments_pour_purger_cdn(monkeypatch, tmp_path):
+    """Vérifie le câblage CLI (main -> charger_fichiers_modifies +
+    purger_cdn) avec des arguments non-défaut, sans dépendre du réseau."""
+    import purger_cache
+
+    fichier_modifies = tmp_path / "fichiers_modifies.txt"
+    fichier_modifies.write_text("Sortie/Groupe/Backdrops/X.jpg\n", encoding="utf-8")
+
+    appels = {}
+
+    def fausse_purge(depot, branche, repertoire_sortie, delai, fichiers):
+        appels["depot"] = depot
+        appels["branche"] = branche
+        appels["repertoire_sortie"] = repertoire_sortie
+        appels["delai"] = delai
+        appels["fichiers"] = fichiers
+
+    monkeypatch.setattr(purger_cache, "purger_cdn", fausse_purge)
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "purger_cache.py",
+            "--depot", "autre/depot",
+            "--branche", "develop",
+            "--sortie", "Sortie",
+            "--delai", "0",
+            "--fichiers-modifies", str(fichier_modifies),
+        ],
+    )
+
+    assert purger_cache.main() == 0
+    assert appels["depot"] == "autre/depot"
+    assert appels["branche"] == "develop"
+    assert appels["repertoire_sortie"] == Path("Sortie")
+    assert appels["delai"] == 0
+    assert appels["fichiers"] == [Path("Sortie/Groupe/Backdrops/X.jpg")]

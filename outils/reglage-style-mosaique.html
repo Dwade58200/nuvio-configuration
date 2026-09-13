@@ -32,9 +32,9 @@
     background: #0a0a0c;
     margin-bottom: 20px;
   }
-  canvas { display: block; width: 100%; height: auto; }
+  canvas, .panneau-preview img { display: block; width: 100%; height: auto; }
   .actions { display: flex; gap: 10px; margin-bottom: 24px; }
-  button {
+  button, .bouton-lien {
     flex: 1;
     background: var(--surface-2);
     color: var(--text);
@@ -43,16 +43,27 @@
     padding: 10px 14px;
     font-size: 14px;
     cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
   }
-  button:hover { background: #2a2a2e; }
-  button:active { transform: scale(0.98); }
+  button:hover, .bouton-lien:hover { background: #2a2a2e; }
+  button:active, .bouton-lien:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button:disabled:hover { background: var(--surface-2); }
+  .bouton-lien.accent {
+    background: var(--accent);
+    color: #101014;
+    font-weight: 600;
+    border-color: var(--accent);
+  }
   .grille-controles {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
   }
-  .ligne { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .ligne { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
   .ligne:last-child { margin-bottom: 0; }
   .ligne label {
     min-width: 150px;
@@ -64,12 +75,24 @@
     flex: 1;
     accent-color: var(--accent);
   }
-  .ligne .valeur {
-    min-width: 46px;
+  .ligne input[type=number].valeur-num {
+    width: 66px;
+    flex-shrink: 0;
     text-align: right;
     font-size: 14px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 6px 8px;
+  }
+  .ligne .unite {
+    font-size: 13px;
+    color: var(--text-secondary);
+    min-width: 14px;
+    flex-shrink: 0;
   }
   .ligne input[type=color] {
     width: 48px;
@@ -78,6 +101,15 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     background: none;
+  }
+  .ligne select {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 14px;
+    flex: 1;
   }
   .case-a-cocher { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-secondary); }
   .separateur { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
@@ -100,6 +132,11 @@
     line-height: 1.6;
     margin-top: 14px;
   }
+  input[type=file] {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
 </style>
 </head>
 <body>
@@ -107,10 +144,11 @@
   <h1>Réglage du style mosaïque</h1>
   <p class="sous-titre">
     Aperçu approximatif (canvas HTML) de la grille de tuiles + vignette
-    utilisée par <code>scripts/mosaique.py</code>. Ajuste les curseurs,
-    copie le bloc de valeurs en bas dans le script une fois satisfait.
-    Ceci est un outil de préréglage visuel, pas le vrai moteur de rendu
-    PIL -- à confirmer sur un run réel avant adoption définitive.
+    utilisée par <code>scripts/mosaique.py</code>. Ajuste les curseurs (ou
+    tape une valeur directement), copie le bloc de valeurs en bas dans le
+    script une fois satisfait. Ceci est un outil de préréglage visuel, pas
+    le vrai moteur de rendu PIL -- à confirmer sur un run réel avant
+    adoption définitive.
   </p>
 
   <div class="panneau-preview">
@@ -127,38 +165,44 @@
     <div class="ligne">
       <label for="tuileLargeur">Largeur tuile</label>
       <input type="range" id="tuileLargeur" min="150" max="500" step="2" value="372">
-      <span class="valeur" id="tuileLargeurOut">372</span>
+      <input type="number" class="valeur-num" id="tuileLargeurNum" min="150" max="500" step="2" value="372">
     </div>
     <div class="ligne">
       <label for="tuileHauteur">Hauteur tuile</label>
       <input type="range" id="tuileHauteur" min="80" max="280" step="2" value="210">
-      <span class="valeur" id="tuileHauteurOut">210</span>
+      <input type="number" class="valeur-num" id="tuileHauteurNum" min="80" max="280" step="2" value="210">
     </div>
     <div class="ligne">
-      <label for="verrouRatio">Conserver le ratio 16:9</label>
-      <span class="case-a-cocher">
-        <input type="checkbox" id="verrouRatio" checked>
-      </span>
+      <label for="ratioTuile">Ratio des tuiles</label>
+      <select id="ratioTuile">
+        <option value="16/9" selected>16:9 (défaut)</option>
+        <option value="4/3">4:3</option>
+        <option value="3/2">3:2</option>
+        <option value="1/1">1:1 (carré)</option>
+        <option value="libre">Libre (pas de contrainte)</option>
+      </select>
     </div>
     <div class="ligne">
       <label for="ecart">Écart entre tuiles</label>
       <input type="range" id="ecart" min="0" max="30" step="1" value="9">
-      <span class="valeur" id="ecartOut">9</span>
+      <input type="number" class="valeur-num" id="ecartNum" min="0" max="30" step="1" value="9">
     </div>
     <div class="ligne">
       <label for="rayon">Arrondi des coins</label>
       <input type="range" id="rayon" min="0" max="40" step="1" value="9">
-      <span class="valeur" id="rayonOut">9</span>
+      <input type="number" class="valeur-num" id="rayonNum" min="0" max="40" step="1" value="9">
     </div>
     <div class="ligne">
       <label for="decalage">Décalage cascade</label>
       <input type="range" id="decalage" min="0" max="100" step="5" value="50">
-      <span class="valeur" id="decalageOut">50%</span>
+      <input type="number" class="valeur-num" id="decalageNum" min="0" max="100" step="5" value="50">
+      <span class="unite">%</span>
     </div>
     <div class="ligne">
       <label for="inclinaison">Inclinaison</label>
       <input type="range" id="inclinaison" min="-25" max="25" step="1" value="10">
-      <span class="valeur" id="inclinaisonOut">10°</span>
+      <input type="number" class="valeur-num" id="inclinaisonNum" min="-25" max="25" step="1" value="10">
+      <span class="unite">°</span>
     </div>
 
     <hr class="separateur">
@@ -166,12 +210,13 @@
     <div class="ligne">
       <label for="ombre">Intensité ombre</label>
       <input type="range" id="ombre" min="0" max="200" step="5" value="100">
-      <span class="valeur" id="ombreOut">100%</span>
+      <input type="number" class="valeur-num" id="ombreNum" min="0" max="200" step="5" value="100">
+      <span class="unite">%</span>
     </div>
     <div class="ligne">
       <label for="flou">Flou de la lueur</label>
       <input type="range" id="flou" min="0" max="80" step="2" value="24">
-      <span class="valeur" id="flouOut">24</span>
+      <input type="number" class="valeur-num" id="flouNum" min="0" max="80" step="2" value="24">
     </div>
     <div class="ligne">
       <label for="accentColor">Couleur d'accent</label>
@@ -195,6 +240,40 @@
     constantes modifiables dans <code>mosaique.py</code>
     (<code>INTENSITE_OMBRE</code>, <code>RAYON_FLOU_LUEUR_MIN</code>).
   </p>
+
+  <hr class="separateur">
+  <h2 style="margin-top:0">Générer un backdrop réel à partir d'un dossier d'images</h2>
+  <p class="note">
+    100% local : les images sélectionnées ne quittent jamais ton
+    navigateur (aucun envoi réseau). Utile pour un lot d'images sans
+    référence TMDB (fan-arts, scans, captures perso...) -- applique le
+    style réglé au-dessus à de VRAIES images et produit un fichier
+    téléchargeable, sans passer par <code>generer_backdrops.py</code>.
+  </p>
+  <div class="grille-controles">
+    <div class="ligne">
+      <label for="dossierImages">Dossier ou images</label>
+      <input type="file" id="dossierImages" webkitdirectory multiple accept="image/*">
+    </div>
+    <div class="ligne">
+      <label for="resolutionSortie">Résolution de sortie</label>
+      <select id="resolutionSortie">
+        <option value="1280x720">1280×720 (profil standard)</option>
+        <option value="1920x1080">1920×1080 (profil haute)</option>
+        <option value="780x439">780×439 (profil compressé)</option>
+      </select>
+    </div>
+  </div>
+  <p class="note" id="statutDossier">Aucune image sélectionnée.</p>
+  <div class="actions" style="margin-bottom: 14px;">
+    <button id="genererReel" disabled>🖼️ Générer le backdrop</button>
+  </div>
+  <div class="panneau-preview" id="panneauApercuReel" style="display:none;">
+    <img id="apercuReel" alt="Backdrop généré">
+  </div>
+  <div class="actions" id="zoneTelechargement" style="display:none;">
+    <a id="telechargerReel" class="bouton-lien accent" download="backdrop-mosaique.jpg">💾 Télécharger le backdrop généré</a>
+  </div>
 </div>
 
 <script>
@@ -203,15 +282,18 @@
   var ctx = canvas.getContext('2d');
   var W = canvas.width, H = canvas.height;
 
-  var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:10, ombre:100, flou:24, accentColor:'#7f77dd', glowToggle:true, verrouRatio:true};
+  var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:10, ombre:100, flou:24, accentColor:'#7f77dd', glowToggle:true, ratioTuile:'16/9'};
 
   var ids = ['tuileLargeur','tuileHauteur','ecart','rayon','decalage','inclinaison','ombre','flou'];
   var els = {};
-  ids.forEach(function(id){ els[id] = document.getElementById(id); });
+  var elsNum = {};
+  ids.forEach(function(id){
+    els[id] = document.getElementById(id);
+    elsNum[id] = document.getElementById(id + 'Num');
+  });
   var accentColor = document.getElementById('accentColor');
   var glowToggle = document.getElementById('glowToggle');
-  var verrouRatio = document.getElementById('verrouRatio');
-  var RATIO_16_9 = 16 / 9;
+  var ratioTuile = document.getElementById('ratioTuile');
   var sortie = document.getElementById('sortie');
   var derniereValeurJson = {};
 
@@ -261,55 +343,19 @@
     gctx.restore();
   }
 
-  function appliquerOmbre(intensite){
-    var g = ctx.createLinearGradient(0, 0, W * 0.6, 0);
-    g.addColorStop(0, 'rgba(6,6,8,' + (0.75 * intensite) + ')');
-    g.addColorStop(1, 'rgba(6,6,8,0)');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-
-    g = ctx.createLinearGradient(0, H * 0.45, 0, H);
-    g.addColorStop(0, 'rgba(6,6,8,0)');
-    g.addColorStop(1, 'rgba(6,6,8,' + (0.78 * intensite) + ')');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-
-    g = ctx.createRadialGradient(0, H, 0, 0, H, Math.hypot(W, H) * 0.6);
-    g.addColorStop(0, 'rgba(6,6,8,' + (0.86 * intensite) + ')');
-    g.addColorStop(1, 'rgba(6,6,8,0)');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  }
-
-  function appliquerLueur(hex, flouPx){
-    ctx.save();
-    ctx.filter = 'blur(' + flouPx + 'px)';
-    var g = ctx.createRadialGradient(W, 0, 0, W, 0, Math.hypot(W, H) * 0.55);
-    g.addColorStop(0, hexToRgba(hex, 0.55));
-    g.addColorStop(1, hexToRgba(hex, 0));
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
-  }
-
-  function render(){
-    var v = {};
-    ids.forEach(function(id){ v[id] = parseInt(els[id].value, 10); });
-
-    document.getElementById('tuileLargeurOut').textContent = v.tuileLargeur;
-    document.getElementById('tuileHauteurOut').textContent = v.tuileHauteur;
-    document.getElementById('ecartOut').textContent = v.ecart;
-    document.getElementById('rayonOut').textContent = v.rayon;
-    document.getElementById('decalageOut').textContent = v.decalage + '%';
-    document.getElementById('inclinaisonOut').textContent = v.inclinaison + '\u00b0';
-    document.getElementById('ombreOut').textContent = v.ombre + '%';
-    document.getElementById('flouOut').textContent = v.flou;
-
-    var echelle = W / 1920;
+  // Construit la grille de tuiles inclinée sur `targetCtx` (W x H) et
+  // renvoie l'échelle utilisée -- factorisé pour servir aussi bien à
+  // l'aperçu (800x450, affiches placeholder) qu'à l'export réel (pleine
+  // résolution, vraies images -- voir génération depuis un dossier).
+  function dessinerFondEtGrille(targetCtx, largeur, hauteur, v, listePosters){
+    var echelle = largeur / 1920;
     var tl = Math.max(1, Math.round(v.tuileLargeur * echelle));
     var th = Math.max(1, Math.round(v.tuileHauteur * echelle));
     var ec = Math.max(1, Math.round(v.ecart * echelle));
     var ry = Math.max(2, Math.round(v.rayon * echelle));
     var marge = 3;
-    var colonnes = Math.ceil(W / (tl + ec)) + marge;
-    var lignes = Math.ceil(H / (th + ec)) + marge;
+    var colonnes = Math.ceil(largeur / (tl + ec)) + marge;
+    var lignes = Math.ceil(hauteur / (th + ec)) + marge;
     var decalagePx = Math.round((v.decalage / 100) * (tl + ec));
 
     var gridW = colonnes * (tl + ec) + lignes * decalagePx;
@@ -323,27 +369,75 @@
     var idx = 0;
     for (var ligne = 0; ligne < lignes; ligne++){
       for (var colonne = 0; colonne < colonnes; colonne++){
-        var poster = posters[idx % posters.length]; idx++;
+        var poster = listePosters[idx % listePosters.length]; idx++;
         var x = ligne * decalagePx + colonne * (tl + ec);
         var y = ligne * (th + ec);
         dessinerTuile(gctx, poster, x, y, tl, th, ry);
       }
     }
 
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#0a0a0c';
-    ctx.fillRect(0, 0, W, H);
+    targetCtx.clearRect(0, 0, largeur, hauteur);
+    targetCtx.fillStyle = '#0a0a0c';
+    targetCtx.fillRect(0, 0, largeur, hauteur);
 
-    ctx.save();
-    ctx.translate(W / 2, H / 2);
-    ctx.rotate(v.inclinaison * Math.PI / 180);
-    ctx.drawImage(gridCanvas, -gridW / 2, -gridH / 2);
-    ctx.restore();
+    targetCtx.save();
+    targetCtx.translate(largeur / 2, hauteur / 2);
+    targetCtx.rotate(v.inclinaison * Math.PI / 180);
+    targetCtx.drawImage(gridCanvas, -gridW / 2, -gridH / 2);
+    targetCtx.restore();
 
-    appliquerOmbre(v.ombre / 100);
+    return echelle;
+  }
+
+  function appliquerOmbre(targetCtx, largeur, hauteur, intensite){
+    var g = targetCtx.createLinearGradient(0, 0, largeur * 0.6, 0);
+    g.addColorStop(0, 'rgba(6,6,8,' + (0.75 * intensite) + ')');
+    g.addColorStop(1, 'rgba(6,6,8,0)');
+    targetCtx.fillStyle = g; targetCtx.fillRect(0, 0, largeur, hauteur);
+
+    g = targetCtx.createLinearGradient(0, hauteur * 0.45, 0, hauteur);
+    g.addColorStop(0, 'rgba(6,6,8,0)');
+    g.addColorStop(1, 'rgba(6,6,8,' + (0.78 * intensite) + ')');
+    targetCtx.fillStyle = g; targetCtx.fillRect(0, 0, largeur, hauteur);
+
+    g = targetCtx.createRadialGradient(0, hauteur, 0, 0, hauteur, Math.hypot(largeur, hauteur) * 0.6);
+    g.addColorStop(0, 'rgba(6,6,8,' + (0.86 * intensite) + ')');
+    g.addColorStop(1, 'rgba(6,6,8,0)');
+    targetCtx.fillStyle = g; targetCtx.fillRect(0, 0, largeur, hauteur);
+  }
+
+  function appliquerLueur(targetCtx, largeur, hauteur, hex, flouPx){
+    targetCtx.save();
+    targetCtx.filter = 'blur(' + flouPx + 'px)';
+    var g = targetCtx.createRadialGradient(largeur, 0, 0, largeur, 0, Math.hypot(largeur, hauteur) * 0.55);
+    g.addColorStop(0, hexToRgba(hex, 0.55));
+    g.addColorStop(1, hexToRgba(hex, 0));
+    targetCtx.fillStyle = g;
+    targetCtx.fillRect(0, 0, largeur, hauteur);
+    targetCtx.restore();
+  }
+
+  // Rendu complet (grille + ombre + lueur) sur n'importe quel canvas cible
+  // -- utilisé pour l'aperçu ET pour l'export réel plein format.
+  function composerBackdrop(targetCtx, largeur, hauteur, v, listePosters){
+    var echelle = dessinerFondEtGrille(targetCtx, largeur, hauteur, v, listePosters);
+    appliquerOmbre(targetCtx, largeur, hauteur, v.ombre / 100);
     if (glowToggle.checked){
-      appliquerLueur(accentColor.value, v.flou * echelle);
+      appliquerLueur(targetCtx, largeur, hauteur, accentColor.value, v.flou * echelle);
     }
+  }
+
+  function lireValeurs(){
+    var v = {};
+    ids.forEach(function(id){ v[id] = parseInt(els[id].value, 10); });
+    return v;
+  }
+
+  function render(){
+    var v = lireValeurs();
+    ids.forEach(function(id){ elsNum[id].value = v[id]; });
+
+    composerBackdrop(ctx, W, H, v, posters);
 
     sortie.textContent =
       '# Valeurs choisies -- à reporter dans scripts/mosaique.py\n' +
@@ -376,28 +470,52 @@
   accentColor.addEventListener('input', render);
   glowToggle.addEventListener('change', render);
 
+  // Saisie numérique : répercute vers le curseur correspondant puis
+  // redéclenche son propre événement 'input' (au lieu d'appeler render()
+  // directement) pour que la synchronisation de ratio de tuile
+  // (tuileLargeur/tuileHauteur) s'applique aussi bien quand on tape un
+  // nombre que quand on bouge le curseur.
+  ids.forEach(function(id){
+    elsNum[id].addEventListener('input', function(){
+      var brut = parseInt(elsNum[id].value, 10);
+      if (isNaN(brut)) return;
+      var min = parseInt(els[id].min, 10), max = parseInt(els[id].max, 10);
+      els[id].value = Math.min(max, Math.max(min, brut));
+      els[id].dispatchEvent(new Event('input'));
+    });
+  });
+
+  function ratioActuel(){
+    if (ratioTuile.value === 'libre') return null;
+    var parts = ratioTuile.value.split('/');
+    return parseInt(parts[0], 10) / parseInt(parts[1], 10);
+  }
   function synchroniserHauteurDepuisLargeur(){
-    var cible = Math.round(parseInt(els.tuileLargeur.value, 10) / RATIO_16_9);
+    var ratio = ratioActuel();
+    if (!ratio) return;
+    var cible = Math.round(parseInt(els.tuileLargeur.value, 10) / ratio);
     els.tuileHauteur.value = Math.min(280, Math.max(80, cible));
   }
   function synchroniserLargeurDepuisHauteur(){
-    var cible = Math.round(parseInt(els.tuileHauteur.value, 10) * RATIO_16_9);
+    var ratio = ratioActuel();
+    if (!ratio) return;
+    var cible = Math.round(parseInt(els.tuileHauteur.value, 10) * ratio);
     els.tuileLargeur.value = Math.min(500, Math.max(150, cible));
   }
 
   els.tuileLargeur.addEventListener('input', function(){
-    if (verrouRatio.checked) synchroniserHauteurDepuisLargeur();
+    synchroniserHauteurDepuisLargeur();
     render();
   });
   els.tuileHauteur.addEventListener('input', function(){
-    if (verrouRatio.checked) synchroniserLargeurDepuisHauteur();
+    synchroniserLargeurDepuisHauteur();
     render();
   });
-  verrouRatio.addEventListener('change', function(){
-    // Réaligne immédiatement sur le ratio dès l'activation, à partir de
-    // la largeur actuelle (référence la plus naturelle : c'est le
-    // premier des deux curseurs dans le panneau).
-    if (verrouRatio.checked) synchroniserHauteurDepuisLargeur();
+  ratioTuile.addEventListener('change', function(){
+    // Réaligne immédiatement sur le nouveau ratio choisi, à partir de la
+    // largeur actuelle (référence la plus naturelle : c'est le premier
+    // des deux curseurs dans le panneau). Rien ne bouge si "Libre".
+    synchroniserHauteurDepuisLargeur();
     render();
   });
 
@@ -409,7 +527,7 @@
     ids.forEach(function(id){ els[id].value = defaults[id]; });
     accentColor.value = defaults.accentColor;
     glowToggle.checked = defaults.glowToggle;
-    verrouRatio.checked = defaults.verrouRatio;
+    ratioTuile.value = defaults.ratioTuile;
     render();
   });
   document.getElementById('copierJson').addEventListener('click', function(){
@@ -427,6 +545,69 @@
     } else {
       window.prompt('Copie manuelle (Ctrl/Cmd+C) :', texte);
     }
+  });
+
+  // --- Génération réelle depuis un dossier d'images (100% local) ---
+  var imagesReelles = [];
+  var dossierImages = document.getElementById('dossierImages');
+  var resolutionSortie = document.getElementById('resolutionSortie');
+  var statutDossier = document.getElementById('statutDossier');
+  var boutonGenererReel = document.getElementById('genererReel');
+  var panneauApercuReel = document.getElementById('panneauApercuReel');
+  var apercuReel = document.getElementById('apercuReel');
+  var zoneTelechargement = document.getElementById('zoneTelechargement');
+  var telechargerReel = document.getElementById('telechargerReel');
+
+  dossierImages.addEventListener('change', function(e){
+    var fichiers = Array.prototype.filter.call(e.target.files, function(f){
+      return f.type.indexOf('image/') === 0;
+    });
+    if (fichiers.length === 0){
+      statutDossier.textContent = 'Aucune image trouvée dans la sélection.';
+      boutonGenererReel.disabled = true;
+      imagesReelles = [];
+      return;
+    }
+    statutDossier.textContent = 'Chargement de ' + fichiers.length + ' image(s)...';
+    boutonGenererReel.disabled = true;
+    var chargements = fichiers.map(function(fichier){
+      return new Promise(function(resolve){
+        var img = new Image();
+        img.onload = function(){ resolve(img); };
+        img.onerror = function(){ resolve(null); };
+        img.src = URL.createObjectURL(fichier);
+      });
+    });
+    Promise.all(chargements).then(function(images){
+      imagesReelles = images.filter(Boolean);
+      if (imagesReelles.length === 0){
+        statutDossier.textContent = 'Aucune image exploitable (fichiers corrompus ou format non supporté).';
+        boutonGenererReel.disabled = true;
+        return;
+      }
+      statutDossier.textContent = imagesReelles.length + ' image(s) chargée(s), prête(s) pour la génération.';
+      boutonGenererReel.disabled = false;
+    });
+  });
+
+  boutonGenererReel.addEventListener('click', function(){
+    if (imagesReelles.length === 0) return;
+    var v = lireValeurs();
+    var dims = resolutionSortie.value.split('x').map(Number);
+    var canvasSortie = document.createElement('canvas');
+    canvasSortie.width = dims[0];
+    canvasSortie.height = dims[1];
+    var ctxSortie = canvasSortie.getContext('2d');
+    composerBackdrop(ctxSortie, dims[0], dims[1], v, imagesReelles);
+
+    apercuReel.src = canvasSortie.toDataURL('image/jpeg', 0.92);
+    panneauApercuReel.style.display = 'block';
+    canvasSortie.toBlob(function(blob){
+      if (!blob) return;
+      var url = URL.createObjectURL(blob);
+      telechargerReel.href = url;
+      zoneTelechargement.style.display = 'flex';
+    }, 'image/jpeg', 0.92);
   });
 
   genererAffiches();
