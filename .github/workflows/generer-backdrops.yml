@@ -133,6 +133,11 @@ jobs:
             echo "modifie=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          # Capturé AVANT le commit (le seul moment où "--cached" liste encore
+          # ces changements) : sert à ne purger sur le CDN que les backdrops
+          # réellement modifiés, pas les ~200+ fichiers inchangés à chaque
+          # run -- voir purger_cache.py.
+          git -c core.quotepath=false diff --cached --name-only --diff-filter=ACMR -- 'Collections/*/Backdrops/*.jpg' > fichiers_modifies.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "chore: actualiser les backdrops et les heroBackdropUrl"
@@ -141,4 +146,4 @@ jobs:
 
       - name: Vider le cache CDN jsDelivr
         if: steps.publication.outputs.modifie == 'true'
-        run: python3 -B scripts/purger_cache.py --depot "${{ github.repository }}" --branche "${{ github.ref_name }}" --sortie Collections
+        run: python3 -B scripts/purger_cache.py --depot "${{ github.repository }}" --branche "${{ github.ref_name }}" --sortie Collections --fichiers-modifies fichiers_modifies.txt
