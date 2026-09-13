@@ -832,14 +832,30 @@ def test_nettoyer_titre_pour_recherche_retire_les_suffixes_de_branding():
     officiel TMDB -- ils doivent disparaître pour la recherche, mais un mot
     qui fait partie du vrai titre (ex: "Saga" dans "Vinland Saga") doit
     rester si ce n'est pas lui-même listé comme suffixe à ignorer."""
-    suffixes = ["Henshū", "Kaï", "Kai"]
+    suffixes = ["Henshū", "Kaï", "Kai", "Yabai", "Fan-Cut"]
     assert nettoyer_titre_pour_recherche("Black Lagoon Henshū", suffixes) == "Black Lagoon"
     assert nettoyer_titre_pour_recherche("Boruto Kaï", suffixes) == "Boruto"
     assert nettoyer_titre_pour_recherche("Vinland Saga Henshū", suffixes) == "Vinland Saga"
+    # Suffixes ajoutés après le bug signalé (Bleach/Naruto/Inazuma Eleven
+    # non reconnus -- absents de la liste avant correction).
+    assert nettoyer_titre_pour_recherche("Bleach Yabai", suffixes) == "Bleach"
+    assert nettoyer_titre_pour_recherche("Naruto Shippuden Yabai", suffixes) == "Naruto Shippuden"
+    assert nettoyer_titre_pour_recherche("Inazuma Eleven Fan-Cut", suffixes) == "Inazuma Eleven"
     # Aucun suffixe présent -> titre inchangé.
     assert nettoyer_titre_pour_recherche("One Piece", suffixes) == "One Piece"
     # Titre vide -> ne casse rien, retourne tel quel.
     assert nettoyer_titre_pour_recherche("", suffixes) == ""
+
+
+def test_nettoyer_titre_pour_recherche_retire_annee_avant_le_suffixe():
+    """Bug FanKai : "Hunter x Hunter Kaï (2011)" ne matchait pas le suffixe
+    "Kaï" car l'année suivait le suffixe en fin de chaîne -- l'année doit
+    être retirée D'ABORD pour que le suffixe redevienne en fin de titre."""
+    suffixes = ["Kaï", "Kai"]
+    assert nettoyer_titre_pour_recherche("Hunter x Hunter Kaï (2011)", suffixes) == "Hunter x Hunter"
+    assert nettoyer_titre_pour_recherche("Hunter x Hunter Kaï (1999)", suffixes) == "Hunter x Hunter"
+    # Une année seule, sans suffixe, est aussi retirée.
+    assert nettoyer_titre_pour_recherche("Dragon Ball (1986)", suffixes) == "Dragon Ball"
 
 
 def test_addon_tiers_sans_entree_custom_connue_reste_ignore():

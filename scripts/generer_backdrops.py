@@ -228,9 +228,16 @@ def nettoyer_titre_pour_recherche(titre: str, suffixes_a_ignorer: Sequence[str])
     le titre utilisé pour la recherche -- le titre AFFICHÉ sur le backdrop
     reste toujours l'original, inchangé. Retire les suffixes un par un
     (dans n'importe quel ordre, répété jusqu'à stabilité) pour couvrir le
-    cas où plusieurs seraient empilés."""
+    cas où plusieurs seraient empilés.
+
+    Retire aussi, AVANT les suffixes, une précision d'année en fin de
+    titre entre parenthèses (ex: FanKai "Hunter x Hunter Kaï (2011)" vs
+    "... Kaï (1999)", pour distinguer deux montages de la même série) :
+    sinon le suffixe ("Kaï") ne se trouve plus en toute fin de chaîne une
+    fois l'année collée derrière, et n'est donc jamais retiré."""
     resultat = (titre or "").strip()
     original = resultat
+    resultat = re.sub(r"\s*\(\d{4}\)\s*$", "", resultat).strip() or resultat
     changement = True
     while changement:
         changement = False

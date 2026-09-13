@@ -530,8 +530,19 @@ d'échec total pour un seul titre raté.
 Le champ optionnel `suffixesTitreIgnorer` retire des suffixes de branding
 du catalogue **avant la recherche TMDB uniquement** (le titre AFFICHÉ sur
 le backdrop reste toujours l'original, inchangé) -- pour FanKai, par
-exemple, `["Henshū", "Kaï", "Kai"]` transforme "Boruto Kaï" en "Boruto"
-pour la recherche, sans jamais toucher au "Boruto Kaï" écrit sur l'image.
+exemple, `["Henshū", "Kaï", "Kai", "Yabai", "Fan-Cut"]` transforme
+"Boruto Kaï" en "Boruto" pour la recherche, sans jamais toucher au
+"Boruto Kaï" écrit sur l'image. Cette liste doit couvrir TOUS les
+suffixes de montage utilisés par le catalogue -- un suffixe absent de la
+liste (ex: "Yabai", "Fan-Cut" avant l'ajout ci-dessus) fait échouer la
+recherche TMDB et retombe sur le poster brut du catalogue, non reconnu
+comme le bon titre.
+
+Une précision d'année entre parenthèses en toute fin de titre (ex:
+"Hunter x Hunter Kaï (2011)" vs "... Kaï (1999)", utilisée par FanKai
+pour distinguer deux montages de la même série) est retirée
+automatiquement avant la recherche, qu'elle suive ou non un suffixe
+listé ci-dessus -- pas besoin de la lister séparément.
 
 Deux champs optionnels supplémentaires affinent cette variante :
 
@@ -565,7 +576,7 @@ il passe par un fichier séparé, `Templates/catalogues-personnalises.json`
       "sourceUrl": "https://streamio.fankai.fr/<ta-config-encodée>/catalog/anime/fankai_catalog.json",
       "champImage": "poster",
       "champTitre": "name",
-      "suffixesTitreIgnorer": ["Henshū", "Kaï", "Kai"],
+      "suffixesTitreIgnorer": ["Henshū", "Kaï", "Kai", "Yabai", "Fan-Cut"],
       "champLogo": "logo",
       "genreObligatoire": "anime"
     }
