@@ -135,6 +135,12 @@
       <span class="valeur" id="tuileHauteurOut">210</span>
     </div>
     <div class="ligne">
+      <label for="verrouRatio">Conserver le ratio 16:9</label>
+      <span class="case-a-cocher">
+        <input type="checkbox" id="verrouRatio" checked>
+      </span>
+    </div>
+    <div class="ligne">
       <label for="ecart">Écart entre tuiles</label>
       <input type="range" id="ecart" min="0" max="30" step="1" value="9">
       <span class="valeur" id="ecartOut">9</span>
@@ -197,13 +203,15 @@
   var ctx = canvas.getContext('2d');
   var W = canvas.width, H = canvas.height;
 
-  var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:10, ombre:100, flou:24, accentColor:'#7f77dd', glowToggle:true};
+  var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:10, ombre:100, flou:24, accentColor:'#7f77dd', glowToggle:true, verrouRatio:true};
 
   var ids = ['tuileLargeur','tuileHauteur','ecart','rayon','decalage','inclinaison','ombre','flou'];
   var els = {};
   ids.forEach(function(id){ els[id] = document.getElementById(id); });
   var accentColor = document.getElementById('accentColor');
   var glowToggle = document.getElementById('glowToggle');
+  var verrouRatio = document.getElementById('verrouRatio');
+  var RATIO_16_9 = 16 / 9;
   var sortie = document.getElementById('sortie');
   var derniereValeurJson = {};
 
@@ -363,9 +371,35 @@
     };
   }
 
-  ids.forEach(function(id){ els[id].addEventListener('input', render); });
+  var idsSansRatio = ids.filter(function(id){ return id !== 'tuileLargeur' && id !== 'tuileHauteur'; });
+  idsSansRatio.forEach(function(id){ els[id].addEventListener('input', render); });
   accentColor.addEventListener('input', render);
   glowToggle.addEventListener('change', render);
+
+  function synchroniserHauteurDepuisLargeur(){
+    var cible = Math.round(parseInt(els.tuileLargeur.value, 10) / RATIO_16_9);
+    els.tuileHauteur.value = Math.min(280, Math.max(80, cible));
+  }
+  function synchroniserLargeurDepuisHauteur(){
+    var cible = Math.round(parseInt(els.tuileHauteur.value, 10) * RATIO_16_9);
+    els.tuileLargeur.value = Math.min(500, Math.max(150, cible));
+  }
+
+  els.tuileLargeur.addEventListener('input', function(){
+    if (verrouRatio.checked) synchroniserHauteurDepuisLargeur();
+    render();
+  });
+  els.tuileHauteur.addEventListener('input', function(){
+    if (verrouRatio.checked) synchroniserLargeurDepuisHauteur();
+    render();
+  });
+  verrouRatio.addEventListener('change', function(){
+    // Réaligne immédiatement sur le ratio dès l'activation, à partir de
+    // la largeur actuelle (référence la plus naturelle : c'est le
+    // premier des deux curseurs dans le panneau).
+    if (verrouRatio.checked) synchroniserHauteurDepuisLargeur();
+    render();
+  });
 
   document.getElementById('shuffle').addEventListener('click', function(){
     genererAffiches();
@@ -375,6 +409,7 @@
     ids.forEach(function(id){ els[id].value = defaults[id]; });
     accentColor.value = defaults.accentColor;
     glowToggle.checked = defaults.glowToggle;
+    verrouRatio.checked = defaults.verrouRatio;
     render();
   });
   document.getElementById('copierJson').addEventListener('click', function(){

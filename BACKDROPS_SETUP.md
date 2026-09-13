@@ -169,6 +169,12 @@ direct la grille de tuiles + la vignette du mode mosaïque : taille des
 tuiles, écart, arrondi des coins, décalage cascade, inclinaison, intensité
 de l'ombre, flou et couleur de la lueur d'accent.
 
+La case **"Conserver le ratio 16:9"** (cochée par défaut, comme le canvas
+final -- voir `_dimensions_canvas`) recalcule automatiquement l'autre
+curseur (largeur ↔ hauteur) dès que l'un des deux bouge, pour ne pas
+sortir par erreur du format attendu par le reste du pipeline. Décoche-la
+si tu veux volontairement expérimenter un ratio de tuile différent.
+
 **Déployé automatiquement sur GitHub Pages** (`.github/workflows/deployer-outils.yml`,
 déclenché à chaque modification de `outils/`) : accessible à
 `https://<utilisateur>.github.io/<nom-du-repo>/`. **Première utilisation
@@ -615,6 +621,29 @@ son propre catalogue (souvent différents du `catalogId` préfixé vu côté
 Nuvio, ex: `1d5e3b0.fankai_catalog` vs `fankai_catalog`), ouvre l'URL de
 son manifeste Stremio (`.../manifest.json`) et regarde le tableau
 `"catalogs"`.
+
+### Repérer un suffixe manquant dans `suffixesTitreIgnorer`
+
+En fin de run, si au moins un titre `champTitre` n'a trouvé AUCUNE
+correspondance sur TMDB (recherche infructueuse -> repli sur le poster
+brut du catalogue), un récapitulatif dédié s'affiche automatiquement
+(sans besoin de `--verbose`) :
+
+```
+⚠️  3 titre(s) "champ_titre" non reconnu(s) par TMDB (repli sur l'image brute du catalogue) :
+  - Bleach Yabai
+  - Dragon Ball Yabai
+  - Inazuma Eleven Fan-Cut
+  -> vérifier si un suffixe de montage (ex: "Yabai", "Fan-Cut", "Kaï") manque dans
+     `suffixesTitreIgnorer` (BACKDROPS_SETUP.md, section "Catalogues sans id IMDb").
+```
+
+Un titre revenant plusieurs fois (présent dans plusieurs groupes) affiche
+son nombre d'occurrences (`(x2)`). Ce récap ne remplace pas forcément un
+suffixe manquant : un titre peut aussi échouer parce que TMDB ne référence
+tout simplement pas ce montage précis (rare) -- mais dans l'immense
+majorité des cas observés (Bleach/Naruto/Inazuma Eleven notamment), la
+cause est un suffixe de branding catalogue absent de la liste.
 
 ## 🖼️ Images manuelles (sans passer par la génération)
 

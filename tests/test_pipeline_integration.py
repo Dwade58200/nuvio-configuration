@@ -371,6 +371,10 @@ def test_fankai_champ_titre_retombe_sur_le_poster_si_tmdb_ne_trouve_rien(tmp_pat
 
     assert resultat.statut == "genere"
     assert (tmp_path / resultat.chemin).exists()
+    # Chaque titre du catalogue (TMDB ne trouve jamais rien ici) doit être
+    # remonté dans le récap de fin de run -- voir
+    # afficher_titres_champ_titre_non_resolus.
+    assert set(generateur.titres_champ_titre_non_resolus) == {item["name"] for item in fixture["metas"]}
 
 
 def _logo_factice_bytes() -> bytes:

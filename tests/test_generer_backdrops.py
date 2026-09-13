@@ -30,6 +30,7 @@ from generer_backdrops import (  # noqa: E402
     _extraire_slug_thematique,
     _mapper_filtres_discover,
     _resoudre_genre_depuis_texte,
+    afficher_titres_champ_titre_non_resolus,
     analyser_url_mdblist,
     charger_catalogues_aiometadata,
     charger_collections,
@@ -856,6 +857,22 @@ def test_nettoyer_titre_pour_recherche_retire_annee_avant_le_suffixe():
     assert nettoyer_titre_pour_recherche("Hunter x Hunter Kaï (1999)", suffixes) == "Hunter x Hunter"
     # Une année seule, sans suffixe, est aussi retirée.
     assert nettoyer_titre_pour_recherche("Dragon Ball (1986)", suffixes) == "Dragon Ball"
+
+
+def test_afficher_titres_champ_titre_non_resolus_liste_les_titres_avec_leur_compte(capsys):
+    """Récap de fin de run (voir GenerateurBackdrops.titres_champ_titre_non_resolus) :
+    doit lister chaque titre distinct, avec son nombre d'occurrences si
+    répété (ex: présent dans plusieurs groupes), et rester silencieux
+    quand tout a été résolu."""
+    afficher_titres_champ_titre_non_resolus(["Bleach Yabai", "Naruto Yabai", "Bleach Yabai"])
+    sortie = capsys.readouterr().out
+    assert "2 titre" in sortie
+    assert "Bleach Yabai" in sortie and "(x2)" in sortie
+    assert "Naruto Yabai" in sortie
+    assert "suffixesTitreIgnorer" in sortie
+
+    afficher_titres_champ_titre_non_resolus([])
+    assert capsys.readouterr().out == ""
 
 
 def test_addon_tiers_sans_entree_custom_connue_reste_ignore():

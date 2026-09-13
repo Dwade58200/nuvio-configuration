@@ -58,6 +58,7 @@ import sys
 import threading
 import time
 import unicodedata
+from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date as _date
@@ -1514,6 +1515,13 @@ class GenerateurBackdrops:
         self.catalogues_aiometadata = catalogues_aiometadata or {}
         self.images_manuelles = images_manuelles or {}
         self.chemin_police_titre = chemin_police_titre or CHEMIN_POLICE_TITRE_DEFAUT
+        # Titres des catalogues "champ_titre" (ex: FanKai) qui n'ont trouvé
+        # AUCUNE correspondance sur TMDB (voir étape 0 de
+        # _resoudre_image_tuile) -- collectés pour le récap de fin de run
+        # (afficher_titres_champ_titre_non_resolus), append protégé par
+        # verrou car alimenté depuis plusieurs threads en parallèle.
+        self.titres_champ_titre_non_resolus: list[str] = []
+        self._verrou_titres_non_resolus = threading.Lock()
 
     def _dimensions_canvas(self) -> tuple[int, int]:
         largeur = PROFILS_QUALITE.get(self.profil, PROFILS_QUALITE["standard"])["largeur"]
@@ -1588,6 +1596,8 @@ class GenerateurBackdrops:
                 "[TUILE] titre=%r : échec recherche/backdrop nu -> repli sur l'image brute du catalogue",
                 titre_a_incruster.titre_affiche,
             )
+            with self._verrou_titres_non_resolus:
+                self.titres_champ_titre_non_resolus.append(titre_a_incruster.titre_affiche)
             return self._telecharger_une_image(self._url_image_depuis_chemin(backdrop_path)) if backdrop_path else None
 
         if not tmdb_id:
@@ -2064,6 +2074,27 @@ def afficher_resume(resultats: list[ResultatDossier]) -> None:
             print(f"  - {n:>3}x  {raison}")
 
 
+def afficher_titres_champ_titre_non_resolus(titres: list[str]) -> None:
+    """Récapitule, en fin de run, les titres des catalogues "champ_titre"
+    (ex: FanKai) qui n'ont trouvé AUCUNE correspondance sur TMDB et sont
+    donc retombés sur l'image brute du catalogue -- sans ce résumé,
+    repérer un suffixe de branding manquant dans `suffixesTitreIgnorer`
+    (voir BACKDROPS_SETUP.md, section *Catalogues sans id IMDb*) demande de
+    fouiller tout le log à la main (cas vécu : "Yabai"/"Fan-Cut" absents de
+    la liste FanKai, invisibles sans grep dédié)."""
+    if not titres:
+        return
+    compte = Counter(titres)
+    print(f"\n⚠️  {len(compte)} titre(s) \"champ_titre\" non reconnu(s) par TMDB (repli sur l'image brute du catalogue) :")
+    for titre, n in sorted(compte.items(), key=lambda item: (-item[1], item[0])):
+        suffixe_occurrences = f"  (x{n})" if n > 1 else ""
+        print(f"  - {titre}{suffixe_occurrences}")
+    print(
+        "  -> vérifier si un suffixe de montage (ex: \"Yabai\", \"Fan-Cut\", \"Kaï\") manque dans "
+        "`suffixesTitreIgnorer` (BACKDROPS_SETUP.md, section \"Catalogues sans id IMDb\")."
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Génère les backdrops des collections Nuvio.")
     parser.add_argument("--cle-tmdb", default=None, help="Clé API TMDB (ou variable TMDB_API_KEY)")
@@ -2121,6 +2152,7 @@ def main() -> int:
         collections, parallelisme=args.parallelisme, filtre_groupe=args.groupe, limite=args.limite
     )
     afficher_resume(resultats)
+    afficher_titres_champ_titre_non_resolus(generateur.titres_champ_titre_non_resolus)
 
     if args.signaler_orphelins:
         orphelins = detecter_backdrops_orphelins(collections, Path(args.sortie))

@@ -6,6 +6,46 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
+## ✅ Fait (session du 13 septembre 2026 -- suffixes FanKai manquants + récap de fin de run + outil de style)
+
+- [x] **Bug signalé par l'utilisateur : Bleach/Naruto Shippuden/Inazuma
+      Eleven non reconnus** -- diagnostiqué depuis un vrai log de run
+      fourni : `suffixesTitreIgnorer` ne contenait que `["Henshū", "Kaï",
+      "Kai"]`, sans les suffixes `"Yabai"` et `"Fan-Cut"` également
+      utilisés par FanKai. Ajoutés dans `.github/workflows/generer-backdrops.yml`
+      (source réelle de `catalogues-personnalises.json` en CI) et dans
+      l'exemple `BACKDROPS_SETUP.md`.
+- [x] **Bug connexe trouvé dans le même log** : `nettoyer_titre_pour_recherche`
+      ne retirait un suffixe que s'il était en toute fin de chaîne --
+      `"Hunter x Hunter Kaï (2011)"`/`"... Kaï (1999)"` (précision d'année
+      FanKai pour distinguer deux montages) ne matchaient donc jamais.
+      Corrigé : l'année entre parenthèses est désormais retirée AVANT le
+      test des suffixes.
+- [x] **Nouveau récap de fin de run** (`afficher_titres_champ_titre_non_resolus`) :
+      liste, sans besoin de `--verbose`, tous les titres `champTitre` (ex:
+      FanKai) retombés sur le poster brut faute de correspondance TMDB,
+      avec leur nombre d'occurrences -- évite de devoir grepper tout le
+      log à la main pour repérer un suffixe manquant (exactement le
+      diagnostic qui a précédé cette session). `GenerateurBackdrops`
+      collecte ces titres (`titres_champ_titre_non_resolus`, alimenté
+      thread-safe) pendant `_resoudre_image_tuile`.
+- [x] **Outil `outils/reglage-style-mosaique.html`** : case "Conserver le
+      ratio 16:9" (cochée par défaut) qui synchronise automatiquement
+      largeur/hauteur de tuile l'une par rapport à l'autre -- évite de
+      dériver du ratio attendu par le reste du pipeline en réglant les
+      deux curseurs indépendamment.
+- [x] 3 tests ajoutés/étendus (231 au total) : 2 nouveaux cas pour
+      `nettoyer_titre_pour_recherche` (Yabai/Fan-Cut + année avant
+      suffixe), 1 nouveau test pour `afficher_titres_champ_titre_non_resolus`,
+      assertion ajoutée au test d'intégration FanKai existant
+      (`titres_champ_titre_non_resolus` bien peuplé). Tous verts,
+      `ruff`/`mypy` propres.
+- [x] Documentation à jour (`BACKDROPS_SETUP.md` : nouvelle sous-section
+      *Repérer un suffixe manquant*, section *Régler le style
+      visuellement* complétée).
+
+---
+
 ## ✅ Fait (session du 8 septembre 2026 -- backdrop pour FanKai, comme Bingecat)
 
 - [x] **FanKai résolu comme un catalogue "custom" (comme Bingecat)** :
@@ -381,9 +421,12 @@ précis :
 - [ ] Vérifier si l'étape de migration `collections/` -> `Collections/`
       dans `generer-backdrops.yml` est encore nécessaire, et la retirer
       si elle ne s'est plus déclenchée depuis plusieurs runs.
-- [ ] Une fois le secret `FANKAI_CATALOG_URL` configuré côté
-      GitHub : vérifier sur un vrai run (pas juste `--dry-run`) que
-      FanKai génère effectivement sa mosaïque en conditions réelles.
+- [x] ~~Une fois le secret `FANKAI_CATALOG_URL` configuré côté GitHub :
+      vérifier sur un vrai run (pas juste `--dry-run`) que FanKai génère
+      effectivement sa mosaïque en conditions réelles~~ -- confirmé par un
+      vrai log de run fourni par l'utilisateur (session du 13 septembre
+      2026 ci-dessus) : le catalogue est bien récupéré et des mosaïques
+      sont bien générées pour FanKai.
 
 ---
 
