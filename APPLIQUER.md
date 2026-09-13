@@ -1,10 +1,52 @@
 # Session du 12 septembre 2026 — mosaïque : ordre centre → bord, consolidation logo FanKai
 # + session suivante (même jour) — optimisation preparer_tuile, nettoyage code mort
 # + session suivante (même jour) — simplification du déclenchement manuel du workflow
+# + session suivante (même jour) — purge CDN sélective (fini de tout repurger à chaque run)
 # + session du 11 septembre 2026 — backdrop TMDB nu + titre incrusté (FanKai), tri MDBList respecté
 # + session suivante (même jour) — logo FanKai + filtre genre anime (bug "Monster" corrigé)
 # + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
+
+## ⚡ Purge CDN sélective (purger_cache.py)
+
+Suite logique de l'audit d'optimisation précédent : `purger_cache.py`
+purgeait TOUS les `.jpg` sous `Collections/` à chaque run (potentiellement
+200+ fichiers, 0.3s de délai entre chaque requête -- 1 à 3+ minutes), même
+quand un run mensuel normal ne modifie qu'une poignée de dossiers. C'est
+un changement de PÉRIMÈTRE (quels fichiers sont purgés), donc fait
+seulement après validation explicite.
+
+**`purger_cache.py`** : nouvel argument `--fichiers-modifies <fichier.txt>`
+(un chemin par ligne, relatif à la racine du dépôt). Si fourni, ne purge
+QUE ces fichiers-là ; sinon, comportement historique inchangé (tout
+purger -- toujours le défaut pour un usage manuel/standalone). Distinction
+importante : fichier ABSENT (argument omis) -> `None` -> repli sur "tout
+purger" ; fichier PRÉSENT mais VIDE (aucun backdrop modifié, seul un JSON
+a changé) -> liste vide -> "rien à purger", pas de fallback accidentel.
+
+**Workflow (`generer-backdrops.yml`)** : dans l'étape "Commiter et pousser
+les changements", AVANT le commit (le seul moment où `--cached` liste
+encore ces changements), capture `git diff --cached --name-only
+--diff-filter=ACMR -- 'Collections/*/Backdrops/*.jpg'` dans
+`fichiers_modifies.txt`, transmis à l'étape suivante via
+`--fichiers-modifies`.
+
+**Piège trouvé et corrigé en cours de route** : par défaut
+(`core.quotepath=true`), `git diff --name-only` échappe tout caractère
+non-ASCII en octal et entoure le chemin de guillemets (ex:
+`"Collections/Th\303\251matiques/..."` au lieu de
+`Collections/Thématiques/...`) -- aurait cassé la purge pour TOUS les
+groupes/dossiers accentués (Thématiques, Années, Animés, Noël...). Corrigé
+avec `git -c core.quotepath=false diff ...` (l'option globale `-c` doit
+précéder `diff`, pas le suivre -- vérifié en pratique, `git diff -c ...`
+échoue avec `fatal: bad revision`). Vérifié bout en bout avec un vrai
+dépôt Git de test (espaces ET accents dans les chemins).
+
+Nouveau fichier de tests `tests/test_purger_cache.py` (7 tests, dont la
+distinction `None` vs `[]`, le filtrage des chemins hors de `--sortie`, et
+la non-régression du comportement "tout purger" par défaut) --
+`BACKDROPS_SETUP.md` mis à jour. Tests : 222 -> 229. ruff + mypy toujours
+propres.
 
 ## 🖱️ Déclenchement manuel du workflow simplifié
 

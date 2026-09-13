@@ -819,7 +819,11 @@ cas connus.
 
 **Les images ne se mettent pas à jour sur Nuvio** → jsDelivr cache les
 fichiers ~7 jours ; le workflow purge automatiquement le cache après chaque
-commit, mais tu peux aussi lancer `python3 scripts/purger_cache.py` toi-même.
+commit -- uniquement pour les backdrops réellement modifiés dans ce run
+(voir `--fichiers-modifies` de `purger_cache.py`), pas tout le contenu de
+`Collections/`. Pour forcer une purge complète (ex: après un changement de
+dépôt/branche), lance `python3 scripts/purger_cache.py` toi-même sans cet
+argument.
 
 **"🆕 Nouveau groupe détecté dans le JSON"** → un groupe a été ajouté dans
 Nuvio, ou renommé au-delà d'un simple emoji/espace/accent. Ce n'est PAS un
