@@ -100,9 +100,13 @@ python3 scripts/generer_backdrops.py --dry-run
 ```
 
 Pour une exécution réelle, deux secrets GitHub sont nécessaires
-(`Settings → Secrets and variables → Actions`) : `TMDB_API_KEY` et
-`FANART_API_KEY` (`MDBLIST_API_KEY` est optionnel). Détails dans
+(`Settings → Secrets and variables → Actions`) : `TMDB_API_KEY` (requis) et
+`FANART_API_KEY` (recommandé). `MDBLIST_API_KEY` est optionnel. Détails dans
 `BACKDROPS_SETUP.md`, section *Configuration requise*.
+
+**Configuration locale** : copiez `.env.example` en `.env` et remplissez vos
+clés API. Le script valide automatiquement la présence des variables requises
+au démarrage.
 
 ## Qualité & CI
 

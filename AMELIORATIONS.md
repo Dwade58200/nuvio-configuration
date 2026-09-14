@@ -503,6 +503,37 @@ précis :
 
 ---
 
+## ✅ Fait (session du 14 septembre 2026 -- dépendances pinnées, validation des variables d'environnement, retry API, stubs mypy)
+
+- [x] **Dépendances pinnées dans `requirements.txt` et `requirements-dev.txt`** :
+      versions fixes (`requests==2.32.3`, `Pillow==11.0.0`, `pytest==8.3.3`,
+      `ruff==0.7.0`, `mypy==1.13.0`, `jsonschema==4.23.0`) au lieu de versions
+      flottantes (`>=`) -- évite les ruptures futures dues aux breaking changes
+      lors des mises à jour automatiques en CI.
+- [x] **Validation des variables d'environnement au démarrage**
+      (`generer_backdrops.py`, fonction `valider_variables_environnement()`) :
+      vérifie la présence de `TMDB_API_KEY` (requis) et avertit pour les clés
+      optionnelles manquantes (`FANART_API_KEY`, `MDBLIST_API_KEY`). Message
+      d'erreur clair et arrêt propre (`sys.exit(1)`) si variable requise absente,
+      plutôt qu'une erreur tardive pendant le traitement.
+- [x] **Retry/backoff pour les appels API HTTP** (`generer_backdrops.py`) :
+      configuration de `urllib3.util.retry.Retry` avec 3 tentatives maximum,
+      délai croissant (0.5s, 1s, 2s), gestion des codes 429, 500, 502, 503, 504.
+      Réessaye automatiquement en cas d'erreur temporaire réseau ou serveur,
+      évite l'échec d'un run mensuel complet pour une panne passagère.
+- [x] **Fichier `.env.example` créé** : modèle avec toutes les variables
+      d'environnement nécessaires, commentaires expliquant où obtenir chaque
+      clé API (liens vers TMDB/Fanart/MDBList). Facilite la configuration
+      locale pour les nouveaux contributeurs ou tests manuels.
+- [x] **Stubs de typage `types-requests` ajoutés** (`requirements-dev.txt`) :
+      corrige l'erreur mypy `Library stubs not installed for "requests"` qui
+      faisait échouer la CI. MyPy trouve maintenant les annotations de type
+      pour la bibliothèque `requests`.
+- [x] Suite complète revérifiée : **256 tests**, `ruff`/`mypy` propres,
+      workflows YAML revalidés.
+
+---
+
 ## 🔵 Reste à faire
 
 Rien pour l'instant -- tout le backlog connu a été traité (voir

@@ -1,4 +1,5 @@
-# Session du 12 septembre 2026 — mosaïque : ordre centre → bord, consolidation logo FanKai
+# Session du 14 septembre 2026 — dépendances pinnées, validation des variables d'environnement, retry API, stubs mypy
+# + session du 12 septembre 2026 — mosaïque : ordre centre → bord, consolidation logo FanKai
 # + session suivante (même jour) — optimisation preparer_tuile, nettoyage code mort
 # + session suivante (même jour) — simplification du déclenchement manuel du workflow
 # + session suivante (même jour) — purge CDN sélective (fini de tout repurger à chaque run)
@@ -6,6 +7,43 @@
 # + session suivante (même jour) — logo FanKai + filtre genre anime (bug "Monster" corrigé)
 # + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
+
+## ✅ Dépendances pinnées, validation des variables d'environnement, retry API, stubs mypy
+
+Session du 14 septembre 2026 : corrections haute priorité suite à l'audit
+de qualité professionnelle.
+
+- **Dépendances pinnées** (`requirements.txt` et `requirements-dev.txt`) :
+  versions fixes (`requests==2.32.3`, `Pillow==11.0.0`, `pytest==8.3.3`,
+  `ruff==0.7.0`, `mypy==1.13.0`, `jsonschema==4.23.0`, `types-requests==2.32.0.20241016`)
+  au lieu de versions flottantes (`>=`) -- évite les ruptures futures dues
+  aux breaking changes lors des mises à jour automatiques en CI.
+
+- **Validation des variables d'environnement** (`generer_backdrops.py`,
+  fonction `valider_variables_environnement()`) : vérifie la présence de
+  `TMDB_API_KEY` (requis) et avertit pour les clés optionnelles manquantes
+  (`FANART_API_KEY`, `MDBLIST_API_KEY`). Message d'erreur clair et arrêt
+  propre (`sys.exit(1)`) si variable requise absente, plutôt qu'une erreur
+  tardive pendant le traitement.
+
+- **Retry/backoff pour les appels API HTTP** (`generer_backdrops.py`) :
+  configuration de `urllib3.util.retry.Retry` avec 3 tentatives maximum,
+  délai croissant (0.5s, 1s, 2s), gestion des codes 429, 500, 502, 503, 504.
+  Réessaye automatiquement en cas d'erreur temporaire réseau ou serveur,
+  évite l'échec d'un run mensuel complet pour une panne passagère.
+
+- **Fichier `.env.example` créé** : modèle avec toutes les variables
+  d'environnement nécessaires, commentaires expliquant où obtenir chaque
+  clé API (liens vers TMDB/Fanart/MDBList). Facilite la configuration
+  locale pour les nouveaux contributeurs ou tests manuels.
+
+- **Stubs de typage `types-requests` ajoutés** (`requirements-dev.txt`) :
+  corrige l'erreur mypy `Library stubs not installed for "requests"` qui
+  faisait échouer la CI. MyPy trouve maintenant les annotations de type
+  pour la bibliothèque `requests`.
+
+Suite complète revérifiée : **256 tests**, `ruff`/`mypy` propres,
+workflows YAML revalidés.
 
 ## ⚡ Purge CDN sélective (purger_cache.py)
 
