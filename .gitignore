@@ -1,5 +1,5 @@
 ```
-# Dependencies
+# Python
 __pycache__/
 *.pyc
 *.pyo
@@ -7,37 +7,20 @@ __pycache__/
 .Python
 env/
 venv/
-ENV/
 .venv/
-.env
-.env.local
-.env.*
-.envrc
-.venv.bak/
-pip-log.txt
-pip-selfcheck.json
-requirements-dev.txt.bak
+.ENV
+.ENV.*
+.python-version
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage/
+htmlcov/
 
 # Build artifacts
 build/
 dist/
 *.egg-info/
-.eggs/
-.installed.cfg
-.tox/
-.coverage
-htmlcov/
-.coverage.*
-
-# Logs
-*.log
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+.sass-cache/
+.well-known/
 ```
