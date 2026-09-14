@@ -177,7 +177,22 @@ final -- voir `_dimensions_canvas`) recalcule automatiquement l'autre
 curseur (largeur ↔ hauteur) dès que l'un des deux bouge, pour ne pas
 sortir par erreur du format choisi. Les préréglages 4:3/3:2/1:1 sont là
 pour expérimenter d'autres formats de tuile ; choisis "Libre" pour piloter
-largeur et hauteur indépendamment, sans contrainte.
+largeur et hauteur indépendamment, sans contrainte. Ceci ne change QUE la
+forme des tuiles à l'intérieur -- pour changer la forme du backdrop entier,
+voir `--ratio-canvas` plus haut.
+
+**Les valeurs par défaut affichées à l'ouverture restent alignées sur les
+vraies constantes de `scripts/mosaique.py`** : `scripts/generer_defaults_outil.py`
+les régénère automatiquement à chaque déploiement (voir
+`deployer-outils.yml`, qui se déclenche aussi bien sur une modification de
+`outils/` que de `scripts/mosaique.py`) -- pas besoin d'y penser
+manuellement après un `appliquer_style_mosaique.py` lancé ailleurs.
+
+**Presets nommés** : une section dédiée permet de sauvegarder plusieurs
+réglages sous un nom, pour comparer différents styles avant de choisir --
+"Charger"/"🗑️" pour les relire/supprimer. Stockés uniquement dans le
+`localStorage` du navigateur (propre à cet appareil, rien n'est envoyé où
+que ce soit) -- à refaire si tu changes de navigateur/machine.
 
 **Déployé automatiquement sur GitHub Pages** (`.github/workflows/deployer-outils.yml`,
 déclenché à chaque modification de `outils/`) : accessible à
@@ -307,6 +322,7 @@ Options utiles de `generer_backdrops.py` :
 | `--groupe "Genres"` | Limite le traitement à un seul groupe (pratique pour tester) |
 | `--limite 5` | Limite le nombre de dossiers traités |
 | `--profil {standard,haute,compresse}` | Taille/qualité de sortie |
+| `--ratio-canvas "16:9"` | Ratio du canvas final (le backdrop entier, pas le ratio des tuiles individuelles -- voir *Régler le style visuellement*), ex: `"4:3"`, `"21:9"`. Défaut `"16:9"`, celui attendu par Nuvio -- ne change ça que si tu sais que le format cible est différent |
 | `--images-manuelles chemin.json` | Surcharges manuelles titre→image, court-circuitent la résolution (défaut : `Templates/images-manuelles.json`, ignoré si absent) |
 | `--signaler-orphelins` | Liste en fin d'exécution les backdrops sur disque sans dossier actif correspondant (rapport seul) |
 | `-v` | Logs détaillés |

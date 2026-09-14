@@ -137,6 +137,15 @@
     font-size: 13px;
     color: var(--text-secondary);
   }
+  .ligne input[type=text] {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 7px 10px;
+    font-size: 14px;
+  }
 </style>
 </head>
 <body>
@@ -158,6 +167,28 @@
   <div class="actions">
     <button id="shuffle">↻ Régénérer les affiches</button>
     <button id="reset">Réinitialiser les valeurs</button>
+  </div>
+
+  <div class="grille-controles" style="margin-bottom: 20px;">
+    <h2 style="margin-top:0">Presets (sauvegardés dans ce navigateur)</h2>
+    <div class="ligne">
+      <label for="presetNom">Nom du preset</label>
+      <input type="text" id="presetNom" placeholder="ex: Style FanKai">
+      <button id="presetSauvegarder" style="flex: 0 0 auto;">💾 Sauvegarder</button>
+    </div>
+    <div class="ligne">
+      <label for="presetListe">Presets enregistrés</label>
+      <select id="presetListe">
+        <option value="">-- Aucun preset --</option>
+      </select>
+      <button id="presetCharger" style="flex: 0 0 auto;">Charger</button>
+      <button id="presetSupprimer" style="flex: 0 0 auto;">🗑️</button>
+    </div>
+    <p class="note" style="margin-top: 10px;">
+      Enregistre plusieurs réglages pour comparer différents styles avant
+      de choisir -- stocké uniquement dans ce navigateur (rien n'est
+      envoyé où que ce soit), donc propre à cet appareil.
+    </p>
   </div>
 
   <div class="grille-controles">
@@ -609,6 +640,83 @@
       zoneTelechargement.style.display = 'flex';
     }, 'image/jpeg', 0.92);
   });
+
+  // --- Presets nommés (localStorage -- propres à ce navigateur/appareil) ---
+  var CLE_PRESETS = 'nuvio-mosaique-presets-v1';
+  var presetNom = document.getElementById('presetNom');
+  var presetListe = document.getElementById('presetListe');
+  var presetSauvegarder = document.getElementById('presetSauvegarder');
+  var presetCharger = document.getElementById('presetCharger');
+  var presetSupprimer = document.getElementById('presetSupprimer');
+
+  function chargerPresets(){
+    try {
+      var brut = localStorage.getItem(CLE_PRESETS);
+      return brut ? JSON.parse(brut) : {};
+    } catch (e) {
+      // localStorage indisponible (navigation privée stricte, quota...) --
+      // les presets deviennent simplement indisponibles pour cette session,
+      // pas une erreur bloquante pour le reste de l'outil.
+      return {};
+    }
+  }
+  function sauvegarderPresets(presets){
+    try { localStorage.setItem(CLE_PRESETS, JSON.stringify(presets)); } catch (e) { /* voir chargerPresets */ }
+  }
+  function rafraichirListePresets(nomASelectionner){
+    var presets = chargerPresets();
+    var noms = Object.keys(presets).sort();
+    presetListe.innerHTML = '<option value="">-- Aucun preset --</option>';
+    noms.forEach(function(nom){
+      var option = document.createElement('option');
+      option.value = nom;
+      option.textContent = nom;
+      presetListe.appendChild(option);
+    });
+    if (nomASelectionner && noms.indexOf(nomASelectionner) !== -1){
+      presetListe.value = nomASelectionner;
+    }
+  }
+
+  presetSauvegarder.addEventListener('click', function(){
+    var nom = (presetNom.value || '').trim();
+    if (!nom) { presetNom.focus(); return; }
+    var presets = chargerPresets();
+    presets[nom] = {
+      valeurs: lireValeurs(),
+      ratioTuile: ratioTuile.value,
+      accentColor: accentColor.value,
+      glowToggle: glowToggle.checked
+    };
+    sauvegarderPresets(presets);
+    rafraichirListePresets(nom);
+    presetNom.value = '';
+  });
+
+  presetCharger.addEventListener('click', function(){
+    var nom = presetListe.value;
+    if (!nom) return;
+    var preset = chargerPresets()[nom];
+    if (!preset) return;
+    ids.forEach(function(id){
+      if (preset.valeurs[id] !== undefined) els[id].value = preset.valeurs[id];
+    });
+    ratioTuile.value = preset.ratioTuile || '16/9';
+    accentColor.value = preset.accentColor || defaults.accentColor;
+    glowToggle.checked = preset.glowToggle !== undefined ? preset.glowToggle : true;
+    render();
+  });
+
+  presetSupprimer.addEventListener('click', function(){
+    var nom = presetListe.value;
+    if (!nom) return;
+    var presets = chargerPresets();
+    delete presets[nom];
+    sauvegarderPresets(presets);
+    rafraichirListePresets();
+  });
+
+  rafraichirListePresets();
 
   genererAffiches();
   render();

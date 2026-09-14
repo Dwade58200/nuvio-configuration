@@ -13,6 +13,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from generer_backdrops import (  # noqa: E402
@@ -873,6 +875,52 @@ def test_afficher_titres_champ_titre_non_resolus_liste_les_titres_avec_leur_comp
 
     afficher_titres_champ_titre_non_resolus([])
     assert capsys.readouterr().out == ""
+
+
+def test_analyser_ratio_canvas_accepte_les_formats_courants():
+    from generer_backdrops import _analyser_ratio_canvas
+
+    assert _analyser_ratio_canvas("16:9") == pytest.approx(16 / 9)
+    assert _analyser_ratio_canvas("4:3") == pytest.approx(4 / 3)
+    assert _analyser_ratio_canvas("1:1") == 1.0
+
+
+def test_analyser_ratio_canvas_rejette_les_formats_invalides():
+    """--ratio-canvas doit échouer avec un message clair (argparse
+    l'affiche et quitte) plutôt qu'un ValueError/ZeroDivisionError brut --
+    format manquant, non numérique, ou valeur nulle/négative."""
+    from argparse import ArgumentTypeError
+
+    from generer_backdrops import _analyser_ratio_canvas
+
+    for valeur_invalide in ["16-9", "16:9:1", "abc:9", "16:0", "0:9", "-16:9"]:
+        with pytest.raises(ArgumentTypeError):
+            _analyser_ratio_canvas(valeur_invalide)
+
+
+def test_dimensions_canvas_utilise_le_ratio_par_defaut_16_9():
+    from generer_backdrops import GenerateurBackdrops
+
+    generateur = GenerateurBackdrops(cle_tmdb="x", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"))
+    largeur, hauteur = generateur._dimensions_canvas()  # noqa: SLF001
+    assert largeur == 1280
+    assert hauteur == 720  # 1280 * 9/16, tel qu'avant l'ajout de --ratio-canvas
+
+
+def test_dimensions_canvas_respecte_un_ratio_personnalise():
+    """--ratio-canvas "4:3" doit changer la HAUTEUR du canvas final, sans
+    toucher à la largeur (pilotée par --profil, indépendant du ratio)."""
+    from generer_backdrops import GenerateurBackdrops, _analyser_ratio_canvas
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="x",
+        cle_fanart=None,
+        repertoire_sortie=Path("/tmp/inutilise"),
+        ratio_canvas=_analyser_ratio_canvas("4:3"),
+    )
+    largeur, hauteur = generateur._dimensions_canvas()  # noqa: SLF001
+    assert largeur == 1280
+    assert hauteur == 960  # 1280 * 3/4
 
 
 def test_addon_tiers_sans_entree_custom_connue_reste_ignore():

@@ -6,6 +6,54 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
+## ✅ Fait (session du 13 septembre 2026, suite 2 -- ratio du canvas, anti-dérive de l'outil, presets)
+
+Propositions faites par Claude lui-même après la session précédente
+(voir "Ce que tu n'as probablement pas encore vu"), demandées explicitement
+à la suite par l'utilisateur ("le reste des améliorations que tu
+souhaitais faire") :
+
+- [x] **`--ratio-canvas` (ex: `"16:9"`, `"4:3"`, `"21:9"`)** : le ratio du
+      canvas final (le backdrop entier, PAS le ratio des tuiles à
+      l'intérieur -- ça, c'est le menu de l'outil de la session
+      précédente) était câblé en dur dans `_dimensions_canvas()`
+      (`hauteur = largeur * 9/16`, sans override possible). Un flag CLI
+      accepte maintenant n'importe quel ratio "largeur:hauteur", avec un
+      message d'erreur clair sur une entrée malformée (`_analyser_ratio_canvas`,
+      utilisé par argparse). 4 tests ajoutés.
+- [x] **Anti-dérive de l'outil de style** (`scripts/generer_defaults_outil.py`,
+      nouveau) : les valeurs par défaut affichées à l'ouverture de
+      `outils/reglage-style-mosaique.html` (curseurs, champs numériques,
+      objet JS `defaults`) étaient un instantané figé dans le HTML, sans
+      lien avec les VRAIES constantes de `scripts/mosaique.py` -- si
+      celles-ci changeaient ailleurs que via l'outil (édition manuelle,
+      `appliquer_style_mosaique.py` lancé depuis une autre session), l'outil
+      repartait silencieusement d'un point de départ obsolète à la
+      prochaine ouverture. Ce script régénère ces valeurs par défaut
+      directement depuis `mosaique.py`, et tourne automatiquement à chaque
+      déploiement (`deployer-outils.yml`, désormais aussi déclenché par un
+      changement de `scripts/mosaique.py`, avec commit automatique de la
+      resynchronisation si nécessaire). 7 tests ajoutés ; vérifié
+      manuellement avec un vrai changement de constantes (largeur, décalage,
+      inclinaison) propagé correctement aux 3 endroits concernés.
+- [x] **Presets nommés dans l'outil** : au lieu du seul "Réinitialiser aux
+      valeurs par défaut", une nouvelle section permet de sauvegarder
+      plusieurs styles nommés (curseurs + ratio de tuile + couleur d'accent
+      + lueur), pour comparer avant de choisir. Stockage `localStorage`,
+      propre à ce navigateur/appareil (légitime ici : vraie page web
+      déployée par l'utilisateur, pas un artefact Claude soumis à la
+      restriction habituelle sur le stockage navigateur) -- protégé par un
+      `try/catch` si indisponible (navigation privée stricte, quota).
+- [x] Toute la logique JS de cette session (ratio, numérique, dossier
+      d'images, presets) validée en exécutant le VRAI script dans un
+      DOM/canvas simulé (Node + stubs, aucune dépendance ajoutée au repo) --
+      pas seulement relue.
+- [x] Suite complète revérifiée : **256 tests** (245 + 11), `ruff`/`mypy`
+      propres sur les 3 scripts touchés, YAML des deux workflows revalidé,
+      dry-run réel avec `--ratio-canvas 21:9`.
+
+---
+
 ## ✅ Fait (session du 13 septembre 2026, suite -- outil de design enrichi + tests manquants + nettoyage CI)
 
 - [x] **Outil `outils/reglage-style-mosaique.html`, saisie numérique** :

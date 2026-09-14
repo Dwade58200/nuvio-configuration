@@ -1477,6 +1477,24 @@ class ResultatDossier:
     chemin: str | None = None
 
 
+def _analyser_ratio_canvas(valeur: str) -> float:
+    """Parse un ratio "largeur:hauteur" (ex: "16:9", "4:3", "21:9") en
+    flottant largeur/hauteur, pour --ratio-canvas. Lève une erreur CLI
+    claire (argparse l'affiche proprement et quitte) plutôt qu'un
+    ValueError/ZeroDivisionError brut sur une entrée malformée."""
+    parties = valeur.split(":")
+    message_format = f'ratio invalide {valeur!r} -- format attendu "largeur:hauteur" (ex: "16:9")'
+    if len(parties) != 2:
+        raise argparse.ArgumentTypeError(message_format)
+    try:
+        largeur, hauteur = float(parties[0]), float(parties[1])
+    except ValueError:
+        raise argparse.ArgumentTypeError(message_format) from None
+    if largeur <= 0 or hauteur <= 0:
+        raise argparse.ArgumentTypeError(f"ratio invalide {valeur!r} -- largeur et hauteur doivent être positives")
+    return largeur / hauteur
+
+
 class GenerateurBackdrops:
     def __init__(
         self,
@@ -1491,6 +1509,7 @@ class GenerateurBackdrops:
         catalogues_aiometadata: dict[str, dict[str, Any]] | None = None,
         images_manuelles: dict[str, str] | None = None,
         chemin_police_titre: Path | str | None = None,
+        ratio_canvas: float = 16 / 9,
     ):
         self.session = requests.Session()
         # Le profil `mosaique` télécharge jusqu'à 12 tuiles en parallèle par
@@ -1515,6 +1534,7 @@ class GenerateurBackdrops:
         self.catalogues_aiometadata = catalogues_aiometadata or {}
         self.images_manuelles = images_manuelles or {}
         self.chemin_police_titre = chemin_police_titre or CHEMIN_POLICE_TITRE_DEFAUT
+        self.ratio_canvas = ratio_canvas
         # Titres des catalogues "champ_titre" (ex: FanKai) qui n'ont trouvé
         # AUCUNE correspondance sur TMDB (voir étape 0 de
         # _resoudre_image_tuile) -- collectés pour le récap de fin de run
@@ -1527,7 +1547,7 @@ class GenerateurBackdrops:
         largeur = PROFILS_QUALITE.get(self.profil, PROFILS_QUALITE["standard"])["largeur"]
         # on vise un canvas plus grand pour la mosaïque (plus de détail par tuile)
         largeur = max(largeur, 1280)
-        hauteur = round(largeur * 9 / 16)
+        hauteur = round(largeur / self.ratio_canvas)
         return largeur, hauteur
 
     def _telecharger_une_image(self, url: str) -> Image.Image | None:
@@ -2105,6 +2125,14 @@ def main() -> int:
     parser.add_argument("--collections", default="Templates/Nuvio-Collections-Dwade58200.json")
     parser.add_argument("--sortie", default=NOM_DOSSIER_RACINE)
     parser.add_argument("--profil", choices=list(PROFILS_QUALITE), default="standard")
+    parser.add_argument(
+        "--ratio-canvas",
+        type=_analyser_ratio_canvas,
+        default=16 / 9,
+        metavar="LARGEUR:HAUTEUR",
+        help='Ratio du canvas final, ex: "16:9" (défaut, attendu par Nuvio), "4:3", "21:9" -- '
+        "n'affecte QUE la forme du backdrop généré, pas le ratio des tuiles à l'intérieur",
+    )
     parser.add_argument("--parallelisme", type=int, default=4)
     parser.add_argument("--groupe", default=None, help="Ne traiter qu'un seul groupe (ex: Genres)")
     parser.add_argument("--limite", type=int, default=None, help="Limiter le nombre de dossiers (tests)")
@@ -2146,6 +2174,7 @@ def main() -> int:
         },
         images_manuelles=charger_images_manuelles(Path(args.images_manuelles) if args.images_manuelles else None),
         chemin_police_titre=Path(args.police_titre) if args.police_titre else None,
+        ratio_canvas=args.ratio_canvas,
     )
 
     resultats = generateur.generer_tout(
