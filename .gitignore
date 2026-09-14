@@ -1,27 +1,34 @@
+```
 # Python
 __pycache__/
-*.py[cod]
-*.egg-info/
-.mypy_cache/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.coverage
+coverage/
+htmlcov/
 .pytest_cache/
-.ruff_cache/
+.mypy_cache/
 
-# Environnements virtuels
-.venv/
+# Environment
+.env
+.env.local
+.env.*
+
+# Dependencies
 venv/
+.venv/
+.envrc
+.venv.bak/
+pip-log.txt
+pip-selfcheck.json
 
-# Éditeurs / OS
-.vscode/
-.idea/
-.DS_Store
-
-# Fichiers locaux de test/débug
-*.log
-/tmp/
-
-# Contient une URL avec un identifiant/clé perso encodé dedans (ex:
-# FanKai) -- ne jamais committer. Ce fichier n'est censé exister QUE
-# temporairement en CI (généré à la volée depuis le secret GitHub
-# FANKAI_CATALOG_URL, voir .github/workflows/generer-backdrops.yml) --
-# si tu le crées en local pour tester, il reste ignoré par Git.
-/Templates/catalogues-personnalises.json
+# Build artifacts
+build/
+dist/
+*.egg
+*.egg-info/
+.tox/
+```
