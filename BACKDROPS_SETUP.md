@@ -285,9 +285,24 @@ fin d'exécution.
 ### 2. Secrets GitHub
 
 Dans **Settings → Secrets and variables → Actions** du dépôt, créez :
-- `TMDB_API_KEY`
+- `TMDB_API_KEY` (requis)
 - `FANART_API_KEY` (recommandé -- sans lui, les mosaïques n'ont pas de titre visible)
 - `MDBLIST_API_KEY` (optionnel)
+
+### 3. Configuration locale (fichier `.env`)
+
+Pour tester en local, copiez `.env.example` à la racine du dépôt en `.env`
+et remplissez vos clés :
+
+```bash
+cp .env.example .env
+# Éditez .env avec vos clés API
+```
+
+Le script valide automatiquement la présence de `TMDB_API_KEY` au démarrage
+et affiche une erreur claire si cette variable requise est absente.
+Les clés optionnelles manquantes génèrent un avertissement mais n'arrêtent
+pas l'exécution.
 
 ## 📝 Utilisation
 
