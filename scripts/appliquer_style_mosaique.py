@@ -31,11 +31,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import re
-import sys
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 # clé JSON -> (nom de constante Python dans mosaique.py, formatteur de valeur)
 CONSTANTES: dict[str, tuple[str, Callable[[Any], str]]] = {
@@ -109,16 +111,16 @@ def main() -> int:
         valeurs = json.loads(Path(args.json).read_text(encoding="utf-8"))
 
     if not isinstance(valeurs, dict):
-        print("Erreur : le JSON doit être un objet {clé: valeur}.", file=sys.stderr)
+        logger.error("Le JSON doit être un objet {clé: valeur}.")
         return 1
 
     cles_inconnues = set(valeurs) - set(CONSTANTES) - CLES_INFORMATIVES
     for cle in sorted(cles_inconnues):
-        print(f"⚠️  Clé {cle!r} non reconnue -- ignorée.", file=sys.stderr)
+        logger.warning("Clé %r non reconnue -- ignorée.", cle)
 
     remplacements = construire_remplacements(valeurs)
     if not remplacements:
-        print("Aucune clé applicable dans le JSON fourni -- rien à changer.")
+        logger.info("Aucune clé applicable dans le JSON fourni -- rien à changer.")
         return 0
 
     chemin_mosaique = Path(args.mosaique)
@@ -126,29 +128,28 @@ def main() -> int:
     nouveau_contenu, modifiees, introuvables = appliquer(contenu, remplacements)
 
     for nom in introuvables:
-        print(
-            f"⚠️  Constante {nom!r} introuvable dans {chemin_mosaique} -- ignorée.",
-            file=sys.stderr,
+        logger.warning(
+            "Constante %r introuvable dans %s -- ignorée.", nom, chemin_mosaique
         )
 
     if not modifiees:
-        print("Rien à changer (valeurs déjà identiques, ou aucune constante applicable).")
+        logger.info("Rien à changer (valeurs déjà identiques, ou aucune constante applicable).")
         return 0
 
     prefixe = "[dry-run] " if args.dry_run else ""
-    print(f"{prefixe}Constantes modifiées dans {chemin_mosaique} :")
+    logger.info("%sConstantes modifiées dans %s :", prefixe, chemin_mosaique)
     for nom in modifiees:
-        print(f"  - {nom} = {remplacements[nom]}")
+        logger.info("  - %s = %s", nom, remplacements[nom])
 
     if args.dry_run:
-        print("\n(dry-run : rien n'a été écrit sur disque)")
+        logger.info("(dry-run : rien n'a été écrit sur disque)")
         return 0
 
     chemin_mosaique.write_text(nouveau_contenu, encoding="utf-8")
-    print(
-        f"\n✅ {chemin_mosaique} mis à jour. "
-        "Lance `pytest tests/test_mosaique.py tests/test_mosaique_integration.py` "
-        "puis un run réel (`generer_backdrops.py --dry-run`) pour confirmer le rendu."
+    logger.info(
+        "%s mis à jour. Lance `pytest tests/test_mosaique.py tests/test_mosaique_integration.py` "
+        "puis un run réel (`generer_backdrops.py --dry-run`) pour confirmer le rendu.",
+        chemin_mosaique,
     )
     return 0
 

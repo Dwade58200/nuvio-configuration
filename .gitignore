@@ -4,23 +4,34 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
-env/
+
+# Dependencies
 venv/
 .venv/
-.ENV
-.ENV.*
-.python-version
-.pytest_cache/
-.mypy_cache/
+.env
+.env.local
+*.env.*
+
+# Logs
+*.log
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Coverage
 .coverage
 coverage/
 htmlcov/
 
-# Build artifacts
-build/
-dist/
-*.egg-info/
-.sass-cache/
-.well-known/
+# Pre-commit
+.pre-commit-config.yaml
 ```

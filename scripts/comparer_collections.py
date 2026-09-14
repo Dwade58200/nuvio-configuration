@@ -30,10 +30,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -142,15 +145,19 @@ def main() -> int:
         try:
             ancien = charger_depuis_git(Path(args.collections), args.ref)
         except subprocess.CalledProcessError as exc:
-            print(
-                f"Erreur : impossible de lire {args.collections!r} depuis Git à la référence {args.ref!r}.",
-                file=sys.stderr,
+            logger.error(
+                "Impossible de lire %r depuis Git à la référence %r.",
+                args.collections,
+                args.ref,
             )
-            print(f"  ({exc.stderr.strip() if exc.stderr else exc})", file=sys.stderr)
-            print("Utilise --ancien fichier.json pour comparer deux fichiers explicites sans Git.", file=sys.stderr)
+            if exc.stderr:
+                logger.debug("Détail de l'erreur : %s", exc.stderr.strip())
+            logger.info(
+                "Utilise --ancien fichier.json pour comparer deux fichiers explicites sans Git."
+            )
             return 1
 
-    print(comparer(ancien, nouveau))
+    logger.info("%s", comparer(ancien, nouveau))
     return 0
 
 

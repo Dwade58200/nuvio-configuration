@@ -35,9 +35,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sys
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -96,12 +99,15 @@ def main() -> int:
 
     if args.retirer:
         if args.dossier not in donnees:
-            print(f"Aucune surcharge manuelle trouvée pour {args.dossier!r} -- rien à faire.")
+            logger.info("Aucune surcharge manuelle trouvée pour %r -- rien à faire.", args.dossier)
             return 0
         del donnees[args.dossier]
         sauver_images_manuelles(chemin_images_manuelles, donnees)
-        print(f"✅ Surcharge manuelle retirée pour {args.dossier!r}.")
-        print("(le fichier backdrop déjà généré reste sur disque -- relance generer_backdrops.py pour le régénérer via TMDB si besoin)")
+        logger.info("Surcharge manuelle retirée pour %r.", args.dossier)
+        logger.info(
+            "(le fichier backdrop déjà généré reste sur disque -- relance generer_backdrops.py "
+            "pour le régénérer via TMDB si besoin)"
+        )
         return 0
 
     if not args.image:
@@ -109,20 +115,21 @@ def main() -> int:
 
     donnees[args.dossier] = args.image
     sauver_images_manuelles(chemin_images_manuelles, donnees)
-    print(f"✅ Surcharge enregistrée : {args.dossier!r} -> {args.image!r} (dans {chemin_images_manuelles})")
+    logger.info("Surcharge enregistrée : %r -> %r (dans %s)", args.dossier, args.image, chemin_images_manuelles)
 
     if args.sans_generer:
-        print("(génération différée au prochain run de generer_backdrops.py)")
+        logger.info("(génération différée au prochain run de generer_backdrops.py)")
         return 0
 
     collections = charger_collections(Path(args.collections))
     groupe_titre = trouver_groupe_du_dossier(collections, args.dossier)
     if groupe_titre is None:
-        print(
-            f"⚠️  Dossier {args.dossier!r} introuvable dans {args.collections} -- "
+        logger.warning(
+            "Dossier %r introuvable dans %s -- "
             "surcharge enregistrée quand même, elle sera prise en compte dès que "
             "ce dossier existera dans le JSON (ou au prochain run complet).",
-            file=sys.stderr,
+            args.dossier,
+            args.collections,
         )
         return 0
 
@@ -136,12 +143,16 @@ def main() -> int:
         else:
             traiter_image_locale(Path(args.image), chemin_sortie, args.profil)
     except Exception as exc:  # noqa: BLE001
-        print(f"❌ Échec de la génération immédiate : {exc}", file=sys.stderr)
-        print("La surcharge reste enregistrée -- elle sera retentée au prochain run complet.", file=sys.stderr)
+        logger.error("Échec de la génération immédiate : %s", exc)
+        logger.info(
+            "La surcharge reste enregistrée -- elle sera retentée au prochain run complet."
+        )
         return 1
 
-    print(f"✅ Image générée : {chemin_relatif}")
-    print("Pense à lancer mettre_a_jour_urls.py pour répercuter le changement dans heroBackdropUrl.")
+    logger.info("Image générée : %s", chemin_relatif)
+    logger.info(
+        "Pense à lancer mettre_a_jour_urls.py pour répercuter le changement dans heroBackdropUrl."
+    )
     return 0
 
 
