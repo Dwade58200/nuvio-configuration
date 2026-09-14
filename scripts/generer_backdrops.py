@@ -67,6 +67,8 @@ from typing import Any
 
 try:
     import requests
+    from requests.adapters import HTTPAdapter
+    from urllib3.util.retry import Retry
 except ImportError:  # pragma: no cover
     print("Le paquet 'requests' est requis : pip install requests", file=sys.stderr)
     raise
@@ -1511,6 +1513,15 @@ class GenerateurBackdrops:
         chemin_police_titre: Path | str | None = None,
         ratio_canvas: float = 16 / 9,
     ):
+        # Configuration du retry/backoff pour les appels API
+        # En cas d'erreur temporaire (429, 500, 502, 503, 504), on réessaie automatiquement
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=0.5,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET", "POST"],
+        )
+
         self.session = requests.Session()
         # Le profil `mosaique` télécharge jusqu'à 12 tuiles en parallèle par
         # dossier, potentiellement pour plusieurs dossiers en même temps
@@ -1519,7 +1530,11 @@ class GenerateurBackdrops:
         # fait fermer/rouvrir des connexions en boucle ("Connection pool is
         # full, discarding connection") sans que ce soit une erreur, juste
         # un gâchis de connexions TCP. On agrandit le pool en conséquence.
-        adaptateur = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=64)
+        adaptateur = HTTPAdapter(
+            pool_connections=20,
+            pool_maxsize=64,
+            max_retries=retry_strategy,
+        )
         self.session.mount("https://", adaptateur)
         self.session.mount("http://", adaptateur)
         self.tmdb = ClientTMDB(cle_tmdb, session=self.session)
@@ -2147,6 +2162,29 @@ def main() -> int:
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO, format="%(message)s")
+
+    # Validation explicite des variables d'environnement requises
+    def valider_variables_environnement() -> list[str]:
+        """Valide que les variables d'environnement requises sont présentes."""
+        requis = {"TMDB_API_KEY"}
+        optionnels = {"FANART_API_KEY", "MDBLIST_API_KEY"}
+
+        # Vérifie les variables d'environnement
+        vars_env = {var: os.environ.get(var) for var in requis | optionnels}
+        manquants_requis = [var for var in requis if not vars_env[var] and not args.cle_tmdb]
+
+        # Affiche un warning pour les optionnels manquants
+        manquants_optionnels = [var for var in optionnels if not vars_env[var] and not getattr(args, f"cle_{var.lower().replace('_api_key', '')}", None)]
+        if manquants_optionnels and not args.dry_run:
+            logging.warning("Variables optionnelles non définies : %s. Certaines fonctionnalités seront limitées.", ", ".join(manquants_optionnels))
+
+        return manquants_requis
+
+    manquants = valider_variables_environnement()
+    if manquants and not args.dry_run:
+        print(f"Erreur : Variables d'environnement requises manquantes : {manquants}", file=sys.stderr)
+        print("Définissez TMDB_API_KEY ou utilisez --cle-tmdb", file=sys.stderr)
+        return 1
 
     cle_tmdb = args.cle_tmdb or os.environ.get("TMDB_API_KEY")
     if not cle_tmdb and not args.dry_run:

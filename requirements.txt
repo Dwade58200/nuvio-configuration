@@ -1,2 +1,4 @@
-requests>=2.31
-Pillow>=10.0
+# Dépendances principales (versions testées et stables)
+# Mettre à jour après tests : pip install -r requirements.txt && pytest
+requests==2.32.3
+Pillow==11.0.0
