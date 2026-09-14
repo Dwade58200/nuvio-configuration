@@ -5,11 +5,13 @@ on:
     branches: ["main"]
     paths:
       - "outils/**"
+      - "scripts/mosaique.py"
+      - "scripts/generer_defaults_outil.py"
       - ".github/workflows/deployer-outils.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -29,6 +31,30 @@ jobs:
       - name: Récupérer le repository
         uses: actions/checkout@v4
 
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: "Synchroniser les valeurs par défaut avec scripts/mosaique.py"
+        # Évite que l'outil affiche un point de départ obsolète si
+        # mosaique.py a changé ailleurs que via l'outil lui-même (édition
+        # manuelle, appliquer_style_mosaique.py lancé en local...). Voir
+        # scripts/generer_defaults_outil.py.
+        run: python3 -B scripts/generer_defaults_outil.py
+
+      - name: Commiter la synchronisation si nécessaire
+        run: |
+          git add outils/reglage-style-mosaique.html
+          if git diff --cached --quiet; then
+            echo "Déjà synchronisé, rien à commiter."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: synchroniser les valeurs par défaut de l'outil de style avec mosaique.py"
+          git push
+
       - name: Configurer GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -40,3 +66,4 @@ jobs:
       - name: Déployer sur GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
