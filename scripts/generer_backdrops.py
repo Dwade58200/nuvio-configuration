@@ -79,6 +79,14 @@ except ImportError:  # pragma: no cover
     print("Le paquet 'Pillow' est requis : pip install Pillow", file=sys.stderr)
     raise
 
+# Configuration du logging structuré
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S%z",
+)
+logger = logging.getLogger(__name__)
+
 import config_collections  # noqa: E402  (accès direct pour appliquer_config_externe)
 import mosaique as mosaique_module  # module compagnon, scripts/mosaique.py
 
@@ -1988,12 +1996,14 @@ class GenerateurBackdrops:
             groupes_vus.add(cle_normalisee)
 
             if cle_normalisee not in groupes_connus:
-                print(
-                    f"🆕 Nouveau groupe détecté dans le JSON : {titre_groupe!r} (normalisé: {cle_normalisee!r}) "
+                logger.info(
+                    "🆕 Nouveau groupe détecté dans le JSON : %r (normalisé: %r) "
                     "-- absent de CRITERES_GROUPES, donc traité automatiquement avec les réglages par défaut "
                     "(actif, sans filtre de dossiers, nom de sortie généré depuis son titre). "
                     "Ajoute une entrée dans CRITERES_GROUPES/GROUPE_SLUGS seulement si tu veux l'exclure, "
-                    "filtrer certains de ses dossiers, ou lui donner un nom de dossier de sortie précis."
+                    "filtrer certains de ses dossiers, ou lui donner un nom de dossier de sortie précis.",
+                    titre_groupe,
+                    cle_normalisee,
                 )
 
             if filtre_groupe and normaliser(filtre_groupe) not in cle_normalisee:
@@ -2003,9 +2013,10 @@ class GenerateurBackdrops:
 
         groupes_manquants = groupes_connus - groupes_vus
         if groupes_manquants and not filtre_groupe:
-            print(
-                f"⚠️  Groupe(s) attendu(s) mais absent(s) du JSON : {sorted(groupes_manquants)} "
-                "-- a peut-être été renommé au-delà d'un simple emoji/espace."
+            logger.warning(
+                "⚠️  Groupe(s) attendu(s) mais absent(s) du JSON : %s "
+                "-- a peut-être été renommé au-delà d'un simple emoji/espace.",
+                sorted(groupes_manquants),
             )
 
         if limite:
@@ -2089,24 +2100,24 @@ def afficher_resume(resultats: list[ResultatDossier]) -> None:
     ignores = [r for r in resultats if r.statut == "ignore"]
     erreurs = [r for r in resultats if r.statut == "erreur"]
 
-    print("\n" + "=" * 60)
-    print(f"✅ Générés : {len(generes)}")
-    print(f"⏭️  Ignorés : {len(ignores)}")
-    print(f"❌ Erreurs : {len(erreurs)}")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("✅ Générés : %d", len(generes))
+    logger.info("⏭️  Ignorés : %d", len(ignores))
+    logger.info("❌ Erreurs : %d", len(erreurs))
+    logger.info("=" * 60)
 
     if erreurs:
-        print("\nDétail des erreurs :")
+        logger.warning("Détail des erreurs :")
         for r in erreurs:
-            print(f"  - [{r.groupe}] {r.dossier} : {r.detail}")
+            logger.warning("  - [%s] %s : %s", r.groupe, r.dossier, r.detail)
 
     par_raison: dict[str, int] = {}
     for r in ignores:
         par_raison[r.detail] = par_raison.get(r.detail, 0) + 1
     if par_raison:
-        print("\nDossiers ignorés, par raison :")
+        logger.info("Dossiers ignorés, par raison :")
         for raison, n in sorted(par_raison.items(), key=lambda x: -x[1]):
-            print(f"  - {n:>3}x  {raison}")
+            logger.info("  - %3dx  %s", n, raison)
 
 
 def afficher_titres_champ_titre_non_resolus(titres: list[str]) -> None:
@@ -2120,11 +2131,14 @@ def afficher_titres_champ_titre_non_resolus(titres: list[str]) -> None:
     if not titres:
         return
     compte = Counter(titres)
-    print(f"\n⚠️  {len(compte)} titre(s) \"champ_titre\" non reconnu(s) par TMDB (repli sur l'image brute du catalogue) :")
+    logger.warning(
+        "⚠️  %d titre(s) \"champ_titre\" non reconnu(s) par TMDB (repli sur l'image brute du catalogue) :",
+        len(compte),
+    )
     for titre, n in sorted(compte.items(), key=lambda item: (-item[1], item[0])):
         suffixe_occurrences = f"  (x{n})" if n > 1 else ""
-        print(f"  - {titre}{suffixe_occurrences}")
-    print(
+        logger.warning("  - %s%s", titre, suffixe_occurrences)
+    logger.warning(
         "  -> vérifier si un suffixe de montage (ex: \"Yabai\", \"Fan-Cut\", \"Kaï\") manque dans "
         "`suffixesTitreIgnorer` (BACKDROPS_SETUP.md, section \"Catalogues sans id IMDb\")."
     )
@@ -2182,13 +2196,13 @@ def main() -> int:
 
     manquants = valider_variables_environnement()
     if manquants and not args.dry_run:
-        print(f"Erreur : Variables d'environnement requises manquantes : {manquants}", file=sys.stderr)
-        print("Définissez TMDB_API_KEY ou utilisez --cle-tmdb", file=sys.stderr)
+        logger.error("Variables d'environnement requises manquantes : %s", manquants)
+        logger.error("Définissez TMDB_API_KEY ou utilisez --cle-tmdb")
         return 1
 
     cle_tmdb = args.cle_tmdb or os.environ.get("TMDB_API_KEY")
     if not cle_tmdb and not args.dry_run:
-        print("Erreur : clé TMDB manquante (--cle-tmdb ou TMDB_API_KEY). Utilise --dry-run pour tester sans clé.", file=sys.stderr)
+        logger.error("Clé TMDB manquante (--cle-tmdb ou TMDB_API_KEY). Utilise --dry-run pour tester sans clé.")
         return 1
 
     config_collections.appliquer_config_externe(
@@ -2223,9 +2237,9 @@ def main() -> int:
 
     if args.signaler_orphelins:
         orphelins = detecter_backdrops_orphelins(collections, Path(args.sortie))
-        print(f"\n🗑️  Backdrops orphelins (plus aucun dossier actif correspondant) : {len(orphelins)}")
+        logger.info("🗑️  Backdrops orphelins (plus aucun dossier actif correspondant) : %d", len(orphelins))
         for chemin in orphelins:
-            print(f"  - {chemin}")
+            logger.info("  - %s", chemin)
 
     return 0
 

@@ -7,6 +7,7 @@ select = ["E", "F", "W", "I", "UP", "B"]
 ignore = [
     "E501", # longueur de ligne -- déjà couverte par line-length, mais certaines
             # chaînes (messages utilisateur, URLs) dépassent volontairement
+    "E402", # import en milieu de fichier -- requis pour config_collections/mosaique après logging
 ]
 
 [tool.mypy]

@@ -2,3 +2,5 @@
 # Mettre à jour après tests : pip install -r requirements.txt && pytest
 requests==2.32.3
 Pillow==11.0.0
+types-requests==2.32.0.20241016
+pytest-cov==6.0.0

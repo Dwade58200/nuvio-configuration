@@ -861,20 +861,24 @@ def test_nettoyer_titre_pour_recherche_retire_annee_avant_le_suffixe():
     assert nettoyer_titre_pour_recherche("Dragon Ball (1986)", suffixes) == "Dragon Ball"
 
 
-def test_afficher_titres_champ_titre_non_resolus_liste_les_titres_avec_leur_compte(capsys):
+def test_afficher_titres_champ_titre_non_resolus_liste_les_titres_avec_leur_compte(caplog):
     """Récap de fin de run (voir GenerateurBackdrops.titres_champ_titre_non_resolus) :
     doit lister chaque titre distinct, avec son nombre d'occurrences si
     répété (ex: présent dans plusieurs groupes), et rester silencieux
     quand tout a été résolu."""
-    afficher_titres_champ_titre_non_resolus(["Bleach Yabai", "Naruto Yabai", "Bleach Yabai"])
-    sortie = capsys.readouterr().out
-    assert "2 titre" in sortie
-    assert "Bleach Yabai" in sortie and "(x2)" in sortie
-    assert "Naruto Yabai" in sortie
-    assert "suffixesTitreIgnorer" in sortie
 
+    afficher_titres_champ_titre_non_resolus(["Bleach Yabai", "Naruto Yabai", "Bleach Yabai"])
+    # Vérifie que les messages ont été loggués via logger.warning
+    assert any("2 titre" in record.message for record in caplog.records)
+    assert any("Bleach Yabai" in record.message and "(x2)" in record.message for record in caplog.records)
+    assert any("Naruto Yabai" in record.message for record in caplog.records)
+    assert any("suffixesTitreIgnorer" in record.message for record in caplog.records)
+
+    # Capture le nombre de logs avant le deuxième appel
+    nb_logs_avant = len(caplog.records)
     afficher_titres_champ_titre_non_resolus([])
-    assert capsys.readouterr().out == ""
+    # Aucun log ne doit être émis pour une liste vide
+    assert len(caplog.records) == nb_logs_avant
 
 
 def test_analyser_ratio_canvas_accepte_les_formats_courants():

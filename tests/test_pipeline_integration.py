@@ -113,10 +113,15 @@ def test_pipeline_bascule_sur_fanart_si_pas_de_backdrop_tmdb():
     assert "requête" in resultat.detail
 
 
-def test_generer_tout_avertit_sur_groupe_du_json_non_reconnu(capsys):
+def test_generer_tout_avertit_sur_groupe_du_json_non_reconnu(caplog):
     """Reproduit le vrai bug rencontré : un groupe renommé dans le JSON
     (ex: emoji ajouté sur un nom totalement inconnu du script) doit
     déclencher un avertissement explicite, pas un échec silencieux."""
+    from generer_backdrops import GenerateurBackdrops
+
+    # Configure caplog pour capturer les logs INFO (pas seulement WARNING+)
+    caplog.set_level("INFO")
+
     collections = [
         {"title": "🔥 Groupe Jamais Vu", "folders": [{"title": "Test", "sources": []}]},
     ]
@@ -126,15 +131,19 @@ def test_generer_tout_avertit_sur_groupe_du_json_non_reconnu(capsys):
     )
     generateur.generer_tout(collections)
 
-    sortie = capsys.readouterr().out
-    assert "Nouveau groupe détecté" in sortie
-    assert "Groupe Jamais Vu" in sortie
+    # Vérifie que le message a été loggué via logger.info
+    assert any("Nouveau groupe détecté" in record.message for record in caplog.records)
+    assert any("Groupe Jamais Vu" in record.message for record in caplog.records)
+    # Le message contient aussi la clé normalisée (avec espaces, pas underscores)
+    assert any("groupe jamais vu" in record.message.lower() for record in caplog.records)
 
 
-def test_generer_tout_reconnait_un_groupe_avec_emoji_different(capsys):
+def test_generer_tout_reconnait_un_groupe_avec_emoji_different(caplog):
     """Le même groupe 'Genres', mais avec un emoji jamais vu explicitement
     dans le code, doit être reconnu (normalisation) et NE DOIT PAS déclencher
     l'avertissement 'non reconnu'."""
+    from generer_backdrops import GenerateurBackdrops
+
     collections = [
         {"title": "🆕 Genres", "folders": [{"title": "Action", "sources": []}]},
     ]
@@ -144,9 +153,8 @@ def test_generer_tout_reconnait_un_groupe_avec_emoji_different(capsys):
     )
     generateur.generer_tout(collections)
 
-    sortie = capsys.readouterr().out
-    assert "non reconnu" not in sortie
-    assert "Nouveau groupe détecté" not in sortie
+    # Vérifie qu'aucun warning 'non reconnu' n'a été émis
+    assert not any("non reconnu" in record.message for record in caplog.records)
 
 
 def test_image_manuelle_court_circuite_la_resolution_tmdb(tmp_path):
