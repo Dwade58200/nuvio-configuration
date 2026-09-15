@@ -642,6 +642,20 @@
     }, 'image/jpeg', 0.92);
   });
 
+  // --- Bouton Mélanger les images ---
+  var boutonMelanger = document.getElementById('melangerImages');
+  boutonMelanger.addEventListener('click', function(){
+    if (imagesReelles.length <= 1) return;
+    // Algorithme de Fisher-Yates pour mélanger aléatoirement le tableau
+    for (var i = imagesReelles.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = imagesReelles[i];
+      imagesReelles[i] = imagesReelles[j];
+      imagesReelles[j] = temp;
+    }
+    statutDossier.textContent = imagesReelles.length + ' image(s) mélangée(s). Cliquez sur "Générer le backdrop".';
+  });
+
   // --- Presets nommés (localStorage -- propres à ce navigateur/appareil) ---
   var CLE_PRESETS = 'nuvio-mosaique-presets-v1';
   var presetNom = document.getElementById('presetNom');

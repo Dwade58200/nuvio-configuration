@@ -1731,8 +1731,53 @@ class GenerateurBackdrops:
         if backdrop_path:
             logging.info("[TUILE] tmdb_id=%s -> retenu (6, dernier recours) : backdrop brut du candidat", tmdb_id)
             return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path}")
+
+        # 7) Tentative logo/titre TMDB pour les affiches sans titre (#13 - généralisé)
+        image_avec_logo = self._resoudre_tuile_sans_titre_avec_logo_tmdb(tmdb_id, media_type)
+        if image_avec_logo is not None:
+            return image_avec_logo
+
         logging.warning("[TUILE] tmdb_id=%s -> ÉCHEC TOTAL : aucune image trouvée", tmdb_id)
         return None
+
+    def _resoudre_tuile_sans_titre_avec_logo_tmdb(
+        self, tmdb_id: int, media_type: str
+    ) -> Image.Image | None:
+        """Pour les tuiles sans aucun backdrop avec texte (#13 - généralisé à
+        toutes les affiches sans titre) : cherche un logo/titre TMDB (priorité
+        fr-FR puis en-US), télécharge le backdrop nu le mieux noté, et incruste
+        le logo par-dessus. Retourne None si aucune des étapes ne fonctionne."""
+        # Recherche d'un logo/titre TMDB
+        logo_titre_tmdb = self.tmdb.recuperer_logo_titre(tmdb_id, media_type)
+        if not logo_titre_tmdb:
+            logging.debug("[TUILE] tmdb_id=%s : aucun logo/titre TMDB trouvé", tmdb_id)
+            return None
+
+        # Récupérer le backdrop nu le mieux noté
+        images_tmdb = self.tmdb.recuperer_images(tmdb_id, media_type)
+        backdrop_nu = meilleur_backdrop_tmdb_langue(images_tmdb, None)
+        if not backdrop_nu:
+            logging.debug("[TUILE] tmdb_id=%s : aucun backdrop nu disponible", tmdb_id)
+            return None
+
+        image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_nu}")
+        if image is None:
+            logging.debug("[TUILE] tmdb_id=%s : échec téléchargement backdrop nu", tmdb_id)
+            return None
+
+        # Télécharger et incruster le logo
+        logo = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w500{logo_titre_tmdb}")
+        if logo is None:
+            logging.debug("[TUILE] tmdb_id=%s : échec téléchargement logo", tmdb_id)
+            return None
+
+        try:
+            resultat = mosaique_module.incruster_logo(image, logo, image.width, image.height)
+            logging.info("[TUILE] tmdb_id=%s -> retenu (7) : backdrop TMDB nu + logo/titre TMDB", tmdb_id)
+            return resultat
+        except Exception:  # noqa: BLE001 -- un logo raté retombe sur le repli brut
+            logging.debug("[TUILE] tmdb_id=%s : échec incrustation logo", tmdb_id)
+            return None
 
     def _resoudre_tuile_titre_sur_backdrop_nu(
         self, info: InfoTitreCatalogue, media_type_hint: str | None

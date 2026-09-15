@@ -1,4 +1,11 @@
-```markdown
-# Documentation files
-*.md
+```
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Coverage reports
+.coverage
+
+# Logs
+*.log
 ```

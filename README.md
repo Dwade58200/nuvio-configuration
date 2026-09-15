@@ -126,6 +126,7 @@ au démarrage.
 | [`BACKDROPS_SETUP.md`](BACKDROPS_SETUP.md) | Référence technique complète du pipeline : fonctionnement détaillé, options CLI, configuration MDBList/AIOMetadata, dépannage |
 | [`AMELIORATIONS.md`](AMELIORATIONS.md) | Liste de travail : ce qui a été fait, ce qui reste, pistes non planifiées |
 | [`APPLIQUER.md`](APPLIQUER.md) | Journal des corrections de la dernière session en date, pour suivre ce qui a changé |
+| [**Générer un backdrop réel à partir d'un dossier d'images**](https://dwade58200.github.io/nuvio-configuration/outils/reglage-style-mosaique.html) | Outil en ligne pour créer une mosaïque personnalisée depuis vos propres images (sélection locale, aperçu en direct, téléchargement) |
 
 ## Licence
 
