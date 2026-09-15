@@ -393,19 +393,33 @@
     var gridW = colonnes * (tl + ec) + lignes * decalagePx;
     var gridH = lignes * (th + ec);
 
+    // Générer toutes les cellules de la grille avec leurs coordonnées
+    var cellules = [];
+    for (var ligne = 0; ligne < lignes; ligne++){
+      for (var colonne = 0; colonne < colonnes; colonne++){
+        var x = ligne * decalagePx + colonne * (tl + ec);
+        var y = ligne * (th + ec);
+        var centerX = x + tl / 2;
+        var centerY = y + th / 2;
+        // Distance au centre de la grille (pour placement en spirale du centre vers les bords)
+        var distance = Math.sqrt(Math.pow(centerX - gridW / 2, 2) + Math.pow(centerY - gridH / 2, 2));
+        cellules.push({ x: x, y: y, distance: distance });
+      }
+    }
+    
+    // Trier les cellules par distance croissante au centre (spirale)
+    cellules.sort(function(a, b){ return a.distance - b.distance; });
+
     var gridCanvas = document.createElement('canvas');
     gridCanvas.width = Math.max(1, gridW);
     gridCanvas.height = Math.max(1, gridH);
     var gctx = gridCanvas.getContext('2d');
 
-    var idx = 0;
-    for (var ligne = 0; ligne < lignes; ligne++){
-      for (var colonne = 0; colonne < colonnes; colonne++){
-        var poster = listePosters[idx % listePosters.length]; idx++;
-        var x = ligne * decalagePx + colonne * (tl + ec);
-        var y = ligne * (th + ec);
-        dessinerTuile(gctx, poster, x, y, tl, th, ry);
-      }
+    // Placer les images en suivant l'ordre trié (image[0] au centre, puis en s'éloignant)
+    for (var idx = 0; idx < cellules.length; idx++){
+      var cellule = cellules[idx];
+      var poster = listePosters[idx % listePosters.length];
+      dessinerTuile(gctx, poster, cellule.x, cellule.y, tl, th, ry);
     }
 
     targetCtx.clearRect(0, 0, largeur, hauteur);
