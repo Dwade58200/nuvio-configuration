@@ -611,11 +611,13 @@
     if (fichiers.length === 0){
       statutDossier.textContent = 'Aucune image trouvée dans la sélection.';
       boutonGenererReel.disabled = true;
+      boutonMelanger.disabled = true;
       imagesReelles = [];
       return;
     }
     statutDossier.textContent = 'Chargement de ' + fichiers.length + ' image(s)...';
     boutonGenererReel.disabled = true;
+    boutonMelanger.disabled = true;
     var chargements = fichiers.map(function(fichier){
       return new Promise(function(resolve){
         var img = new Image();
@@ -629,10 +631,12 @@
       if (imagesReelles.length === 0){
         statutDossier.textContent = 'Aucune image exploitable (fichiers corrompus ou format non supporté).';
         boutonGenererReel.disabled = true;
+        boutonMelanger.disabled = true;
         return;
       }
       statutDossier.textContent = imagesReelles.length + ' image(s) chargée(s), prête(s) pour la génération.';
       boutonGenererReel.disabled = false;
+      boutonMelanger.disabled = false;
     });
   });
 
