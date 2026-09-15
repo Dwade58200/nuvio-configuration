@@ -197,10 +197,16 @@ def test_construire_grille_inclinee_place_le_premier_resultat_au_centre():
     catalogue) doit se retrouver exactement au pixel central du backdrop
     final -- les résultats suivants doivent s'en éloigner."""
     marqueur = (255, 0, 0)
+    # Utiliser des couleurs UNIQUEMENT pour la première image
+    # Les autres images peuvent être grises, mais pas rouges
     autres = [(g, g, g) for g in (40, 55, 70, 85, 100, 115, 130, 145, 160, 175, 190)]
-    images = [_image_couleur(marqueur)] + [_image_couleur(c) for c in autres]
+    # Ajouter suffisamment d'images non-rouges pour remplir la grille sans repetition
+    # Une grille 1920x1080 a ~72 cellules (9x8), donc il faut au moins 72 images
+    toutes_images = [_image_couleur(marqueur)] + [_image_couleur(c) for c in autres]
+    while len(toutes_images) < 80:
+        toutes_images.append(_image_couleur((50, 100, 150)))  # Bleu-gris, pas rouge
 
-    canvas = construire_grille_inclinee(images, 1920, 1080).convert("RGB")
+    canvas = construire_grille_inclinee(toutes_images, 1920, 1080).convert("RGB")
 
     assert canvas.getpixel((960, 540)) == marqueur
     # ni les coins ni les bords ne doivent porter la couleur du premier

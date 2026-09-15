@@ -243,6 +243,7 @@ def construire_grille_inclinee(
     # (`preparer_tuile` est pure : même image + mêmes dimensions de tuile
     # -> même résultat), juste sans le calculer plusieurs fois.
     tuiles_par_image: dict[int, Image.Image] = {}
+    premiere_cellule = ordre_cellules[0]
     for ligne, colonne in ordre_cellules:
         source = next(cycle_images)
         tuile = tuiles_par_image.get(id(source))
@@ -253,11 +254,28 @@ def construire_grille_inclinee(
         y = ligne * (tuile_hauteur + ecart)
         grille.alpha_composite(tuile, (x, y))
 
-    pivotee = grille.rotate(INCLINAISON_DEG, expand=True, resample=Image.Resampling.BICUBIC)
+    # Rotation autour du centre de la grille pour préserver le centrage
+    centre_grille = (grille_largeur / 2, grille_hauteur / 2)
+    pivotee = grille.rotate(INCLINAISON_DEG, center=centre_grille, resample=Image.Resampling.BICUBIC)
 
+    # Calculer la position du centre de la première tuile APRÈS rotation
+    # pour l'aligner exactement au centre du canvas
+    lignep, columnep = premiere_cellule
+    xp = lignep * decalage_px + columnep * (tuile_largeur + ecart) + tuile_largeur / 2
+    yp = lignep * (tuile_hauteur + ecart) + tuile_hauteur / 2
+
+    # Appliquer la même rotation au centre de la première tuile
+    angle_rad = math.radians(INCLINAISON_DEG)
+    dxp = xp - centre_grille[0]
+    dyp = yp - centre_grille[1]
+    new_dxp = dxp * math.cos(angle_rad) - dyp * math.sin(angle_rad)
+    new_dyp = dxp * math.sin(angle_rad) + dyp * math.cos(angle_rad)
+    centre_premiere_tuile_apres_rotation = (centre_grille[0] + new_dxp, centre_grille[1] + new_dyp)
+
+    # Centrer le canvas pour que la première tuile soit exactement au centre
     canvas = Image.new("RGBA", (largeur_canvas, hauteur_canvas), (10, 10, 12, 255))
-    x_centre = (largeur_canvas - pivotee.width) // 2
-    y_centre = (hauteur_canvas - pivotee.height) // 2
+    x_centre = int(round(largeur_canvas / 2 - centre_premiere_tuile_apres_rotation[0]))
+    y_centre = int(round(hauteur_canvas / 2 - centre_premiere_tuile_apres_rotation[1]))
     canvas.alpha_composite(pivotee, (x_centre, y_centre))
 
     return canvas

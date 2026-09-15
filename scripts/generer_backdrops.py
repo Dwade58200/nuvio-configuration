@@ -859,9 +859,9 @@ class ClientTMDB:
         logos = data.get("logos") or []
         # Priorité fr-FR puis en-US
         for langue_cible in ["fr", "en"]:
-            candidats = [l for l in logos if l.get("iso_639_1") == langue_cible]
+            candidats = [logo for logo in logos if logo.get("iso_639_1") == langue_cible]
             if candidats:
-                meilleur = sorted(candidats, key=lambda l: -(l.get("vote_average") or 0))[0]
+                meilleur = sorted(candidats, key=lambda logo: -(logo.get("vote_average") or 0))[0]
                 return meilleur.get("file_path")
         return None
 
@@ -1752,7 +1752,7 @@ class GenerateurBackdrops:
         if not trouve:
             return None
         tmdb_id, media_type = trouve
-        
+
         # Recherche d'un logo/titre TMDB (priorité fr-FR puis en-US) pour
         # les affiches sans titre détecté (#13). Si trouvé, on l'utilise
         # à la place du logo du catalogue ou du texte généré.
@@ -1761,7 +1761,7 @@ class GenerateurBackdrops:
             logo_titre_tmdb = self.tmdb.recuperer_logo_titre(tmdb_id, media_type)
         except Exception:  # noqa: BLE001 -- un logo raté retombe sur les autres méthodes
             pass
-        
+
         backdrop_nu = self.tmdb.recuperer_backdrop_nu(tmdb_id, media_type)
         if not backdrop_nu:
             return None
@@ -1774,7 +1774,7 @@ class GenerateurBackdrops:
         # d'une tuile comme n'importe quelle autre image de mosaïque (voir
         # mosaique.preparer_tuile), logo/texte suivent donc le même
         # recadrage "cover" que le reste de l'image.
-        
+
         # Priorité 1: Logo du catalogue (ex: FanKai)
         if info.url_logo:
             logo = self._telecharger_une_image(info.url_logo)
@@ -1783,7 +1783,7 @@ class GenerateurBackdrops:
                     return mosaique_module.incruster_logo(image, logo, image.width, image.height)
                 except Exception:  # noqa: BLE001 -- un logo raté retombe sur le texte, jamais une exception
                     pass
-        
+
         # Priorité 2: Logo/titre TMDB (#13 - généralisé à toutes les affiches sans titre)
         if logo_titre_tmdb:
             logo = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w500{logo_titre_tmdb}")
