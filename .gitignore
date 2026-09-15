@@ -1,63 +1,20 @@
-```python
+```
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+*.pyc
+*.pyo
+*.pyd
+
+# Logs and temp files
+*.log
+*.tmp
 
 # Environment
-.venv/
-venv/
-env/
-ENV/
+.env
+.env.local
+*.env.*
 
-# IDE
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Coverage
-.coverage
-htmlcov/
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-
-# Temporary files
-*.tmp
-*.temp
-*~
-```
-
-Wait, let me reconsider this. The only modified file is `scripts/generer_backdrops.py` which is a Python source file. There are no build artifacts, dependencies, or temporary files in the changes. Following rule #6, since the changes contain only source files and no build artifacts, dependencies, or temp files, the output should be empty.
-
-```python
-
 ```
