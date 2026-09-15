@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "exportedAt": "2026-09-07T11:02:52.568Z",
+  "exportedAt": "2026-09-15T11:33:16.773Z",
   "catalogs": [
     {
       "id": "trakt.watchlist",
@@ -61,6 +61,7 @@
       "showInHome": true,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -68,11 +69,11 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "primary_release_date.desc",
-            "include_adult": true,
+            "include_adult": false,
             "watch_region": "FR",
             "vote_average.gte": 4.9,
-            "vote_count.gte": 10,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 10
           },
           "formState": {
             "catalogName": "🆕 Nouveautés",
@@ -88,9 +89,11 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
+            "includeAdult": false,
             "releasedOnly": false,
             "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
@@ -125,7 +128,7 @@
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=primary_release_date.desc&include_adult=true&watch_region=FR&vote_average.gte=4.9&vote_count.gte=10"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=primary_release_date.desc&include_adult=false&watch_region=FR&vote_average.gte=4.9&vote_average.lte=9.9&vote_count.gte=10"
       }
     },
     {
@@ -136,6 +139,7 @@
       "showInHome": true,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -143,11 +147,11 @@
           "mediaType": "tv",
           "params": {
             "sort_by": "first_air_date.desc",
-            "include_adult": true,
+            "include_adult": false,
             "watch_region": "FR",
             "vote_average.gte": 4.9,
-            "vote_count.gte": 10,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 10
           },
           "formState": {
             "catalogName": "🆕 Nouveautés",
@@ -163,9 +167,11 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
+            "includeAdult": false,
             "releasedOnly": false,
             "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
@@ -200,30 +206,8 @@
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=first_air_date.desc&include_adult=true&watch_region=FR&vote_average.gte=4.9&vote_count.gte=10"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=first_air_date.desc&include_adult=false&watch_region=FR&vote_average.gte=4.9&vote_average.lte=9.9&vote_count.gte=10"
       }
-    },
-    {
-      "id": "mdblist.recommended.recommended.movies",
-      "type": "movie",
-      "name": "🫵 Recommandation MDBList",
-      "enabled": true,
-      "showInHome": false,
-      "source": "mdblist",
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "displayType": "movie"
-    },
-    {
-      "id": "mdblist.recommended.recommended.series",
-      "type": "series",
-      "name": "🫵 Recommandation MDBList",
-      "enabled": true,
-      "showInHome": false,
-      "source": "mdblist",
-      "cacheTTL": 86400,
-      "enableRatingPosters": true,
-      "displayType": "series"
     },
     {
       "id": "custom.com_aicat_ace6ec91_449a_4f74_928a_3243ac4d3fc1_nuvio.movie.aicat_list_118229",
@@ -728,7 +712,7 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "without_genres": "16",
             "with_original_language": "fr",
             "watch_region": "FR",
@@ -755,7 +739,7 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
+            "includeAdult": false,
             "releasedOnly": false,
             "tmdbTvStatuses": [],
             "tmdbMovieReleaseTypes": [],
@@ -794,7 +778,7 @@
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=true&without_genres=16&with_original_language=fr&watch_region=FR&vote_average.gte=6&vote_count.gte=700&primary_release_date.gte=1960-01-01"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&without_genres=16&with_original_language=fr&watch_region=FR&vote_average.gte=6&vote_count.gte=700&primary_release_date.gte=1960-01-01"
       }
     },
     {
@@ -812,7 +796,7 @@
           "mediaType": "tv",
           "params": {
             "sort_by": "popularity.desc",
-            "include_adult": true,
+            "include_adult": false,
             "without_genres": "16",
             "with_original_language": "fr",
             "watch_region": "FR",
@@ -838,7 +822,7 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
+            "includeAdult": false,
             "releasedOnly": false,
             "tmdbTvStatuses": [],
             "tmdbMovieReleaseTypes": [],
@@ -877,7 +861,7 @@
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=popularity.desc&include_adult=true&without_genres=16&with_original_language=fr&watch_region=FR&vote_average.gte=3&vote_count.gte=20"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=popularity.desc&include_adult=false&without_genres=16&with_original_language=fr&watch_region=FR&vote_average.gte=3&vote_count.gte=20"
       }
     },
     {
@@ -1006,6 +990,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -1013,13 +998,13 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "popularity.desc",
-            "include_adult": true,
+            "include_adult": false,
             "watch_region": "FR",
             "with_watch_providers": "8",
             "with_watch_monetization_types": "flatrate|free|ads|rent|buy",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 100
           },
           "formState": {
             "catalogName": "🔴 Populaire",
@@ -1035,7 +1020,7 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
+            "includeAdult": false,
             "releasedOnly": false,
             "tmdbTvStatuses": [],
             "tmdbMovieReleaseTypes": [],
@@ -1079,9 +1064,8 @@
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=popularity.desc&include_adult=true&watch_region=FR&with_watch_providers=8&with_watch_monetization_types=flatrate%7Cfree%7Cads%7Crent%7Cbuy"
-      },
-      "displayType": "movie"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=popularity.desc&include_adult=false&watch_region=FR&with_watch_providers=8&with_watch_monetization_types=flatrate%7Cfree%7Cads%7Crent%7Cbuy&vote_average.gte=4&vote_average.lte=9.9&vote_count.gte=100"
+      }
     },
     {
       "id": "tmdb.discover.movie.global_copy.mt49lz6m",
@@ -1091,6 +1075,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -1098,13 +1083,13 @@
           "mediaType": "tv",
           "params": {
             "sort_by": "popularity.desc",
-            "include_adult": true,
+            "include_adult": false,
             "watch_region": "FR",
             "with_watch_providers": "8",
             "with_watch_monetization_types": "flatrate|free|ads|rent|buy",
             "vote_average.gte": 4,
-            "vote_count.gte": 100,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 100
           },
           "formState": {
             "catalogName": "🔴 Populaire",
@@ -1120,7 +1105,7 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
+            "includeAdult": false,
             "releasedOnly": false,
             "tmdbTvStatuses": [],
             "tmdbMovieReleaseTypes": [],
@@ -1164,9 +1149,8 @@
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=popularity.desc&include_adult=true&watch_region=FR&with_watch_providers=8&with_watch_monetization_types=flatrate%7Cfree%7Cads%7Crent%7Cbuy"
-      },
-      "displayType": "series"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=popularity.desc&include_adult=false&watch_region=FR&with_watch_providers=8&with_watch_monetization_types=flatrate%7Cfree%7Cads%7Crent%7Cbuy&vote_average.gte=4&vote_average.lte=9.9&vote_count.gte=100"
+      }
     },
     {
       "id": "flixpatrol.amazon-prime.fr.movie",
@@ -2720,11 +2704,12 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "28",
+            "without_keywords": "210024",
             "vote_average.gte": 7,
             "vote_average.lte": 9.9,
-            "vote_count.gte": 500
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "⚔️ Top Action",
@@ -2745,7 +2730,7 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
+            "includeAdult": false,
             "releasedOnly": false,
             "tmdbTvStatuses": [],
             "tmdbMovieReleaseTypes": [],
@@ -2757,7 +2742,12 @@
             "companyJoinMode": "or",
             "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -2766,7 +2756,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -2784,7 +2774,7 @@
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=true&with_genres=28&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=500"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=28&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -2906,11 +2896,12 @@
           "mediaType": "tv",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "10759",
+            "without_keywords": "210024",
             "vote_average.gte": 7,
             "vote_average.lte": 9.9,
-            "vote_count.gte": 500
+            "vote_count.gte": 2000
           },
           "formState": {
             "catalogName": "⚔️ Top Action & Aventure",
@@ -2931,7 +2922,7 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
+            "includeAdult": false,
             "releasedOnly": false,
             "tmdbTvStatuses": [],
             "tmdbMovieReleaseTypes": [],
@@ -2943,7 +2934,12 @@
             "companyJoinMode": "or",
             "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -2952,7 +2948,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 2000,
             "runtimeRange": [
               0,
               400
@@ -2970,7 +2966,7 @@
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=true&with_genres=10759&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=500"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=10759&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=2000"
       }
     },
     {
@@ -3094,9 +3090,10 @@
             "sort_by": "vote_average.desc",
             "include_adult": true,
             "with_genres": "12",
+            "without_keywords": "210024",
             "vote_average.gte": 7,
             "vote_average.lte": 9.9,
-            "vote_count.gte": 500
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "⚔️ Top Aventure",
@@ -3129,7 +3126,12 @@
             "companyJoinMode": "or",
             "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -3138,7 +3140,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -3156,7 +3158,7 @@
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=true&with_genres=12&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=500"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=true&with_genres=12&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -3326,6 +3328,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -3333,12 +3336,12 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "35",
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "region": "FR",
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "😄 Top Comédie",
@@ -3359,15 +3362,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -3376,7 +3388,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -3389,11 +3401,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=35&with_release_type=4%7C5%7C6&release_date.lte=2026-04-29"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=35&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -3500,6 +3513,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -3509,10 +3523,11 @@
             "sort_by": "vote_average.desc",
             "include_adult": true,
             "with_genres": "35",
+            "without_keywords": "210024",
             "with_status": "0|3|4|5",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 2000
           },
           "formState": {
             "catalogName": "😄 Top Comédie",
@@ -3535,13 +3550,22 @@
             "certificationMode": "exact",
             "includeAdult": true,
             "releasedOnly": true,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -3550,7 +3574,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 2000,
             "runtimeRange": [
               0,
               400
@@ -3563,11 +3587,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=35&with_status=0%7C3%7C4%7C5"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=true&with_genres=35&without_keywords=210024&with_status=0%7C3%7C4%7C5&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=2000"
       }
     },
     {
@@ -3674,6 +3699,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -3683,10 +3709,13 @@
             "sort_by": "vote_average.desc",
             "include_adult": true,
             "with_genres": "18",
-            "vote_average.gte": 7,
-            "vote_count.gte": 500,
+            "without_keywords": "210024",
             "region": "FR",
-            "vote_average.lte": 9.9
+            "with_release_type": "4|5|6",
+            "release_date.lte": "__tmdb_date__:today:to",
+            "vote_average.gte": 7,
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "🎭 Top Drame",
@@ -3709,13 +3738,22 @@
             "certificationMode": "exact",
             "includeAdult": true,
             "releasedOnly": true,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -3724,7 +3762,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -3737,11 +3775,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=18&with_release_type=4%7C5%7C6&release_date.lte=2026-04-29"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=true&with_genres=18&without_keywords=210024&region=FR&with_release_type=4%7C5%7C6&release_date.lte=2026-09-15&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -3848,6 +3887,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -3857,10 +3897,11 @@
             "sort_by": "vote_average.desc",
             "include_adult": true,
             "with_genres": "18",
+            "without_keywords": "210024",
             "with_status": "0|3|4|5",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 2000
           },
           "formState": {
             "catalogName": "🎭 Top Drame",
@@ -3883,13 +3924,22 @@
             "certificationMode": "exact",
             "includeAdult": true,
             "releasedOnly": true,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -3898,7 +3948,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 2000,
             "runtimeRange": [
               0,
               400
@@ -3911,11 +3961,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=18&with_status=0%7C3%7C4%7C5"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=true&with_genres=18&without_keywords=210024&with_status=0%7C3%7C4%7C5&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=2000"
       }
     },
     {
@@ -4042,6 +4093,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -4051,10 +4103,13 @@
             "sort_by": "vote_average.desc",
             "include_adult": true,
             "with_genres": "27",
-            "vote_average.gte": 7,
-            "vote_count.gte": 500,
+            "without_keywords": "210024",
             "region": "FR",
-            "vote_average.lte": 9.9
+            "with_release_type": "4|5|6",
+            "release_date.lte": "__tmdb_date__:today:to",
+            "vote_average.gte": 7,
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "👻 Top Horreur",
@@ -4077,13 +4132,22 @@
             "certificationMode": "exact",
             "includeAdult": true,
             "releasedOnly": true,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -4092,7 +4156,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -4105,13 +4169,13 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=27&with_release_type=4%7C5%7C6&release_date.lte=2026-04-30"
-      },
-      "displayType": "movie"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=true&with_genres=27&without_keywords=210024&region=FR&with_release_type=4%7C5%7C6&release_date.lte=2026-09-15&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
+      }
     },
     {
       "id": "mdblist.128045",
@@ -4220,6 +4284,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -4227,12 +4292,12 @@
           "mediaType": "tv",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_keywords": "315058",
-            "with_status": "0|3|4|5",
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 2000
           },
           "formState": {
             "catalogName": "👻 Top Horreur",
@@ -4248,20 +4313,29 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [
               {
                 "id": 315058,
                 "label": "horror"
               }
             ],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -4270,7 +4344,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 2000,
             "runtimeRange": [
               0,
               400
@@ -4283,11 +4357,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_keywords=315058&with_status=0%7C3%7C4%7C5"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_keywords=315058&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=2000"
       }
     },
     {
@@ -4414,6 +4489,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -4421,12 +4497,12 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "10749",
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "region": "FR",
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "💕 Top Romance",
@@ -4447,15 +4523,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -4464,7 +4549,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -4477,11 +4562,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=10749&with_release_type=4%7C5%7C6&release_date.lte=2026-04-30"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=10749&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -4501,26 +4587,6 @@
         "itemCount": 500,
         "url": "https://mdblist.com/lists/snoak/latest-romance-movies",
         "mediatype": "movie",
-        "author": "snoak"
-      }
-    },
-    {
-      "id": "mdblist.128264",
-      "type": "series",
-      "name": "💕 New Romance",
-      "enabled": true,
-      "showInHome": false,
-      "source": "mdblist",
-      "sort": "default",
-      "order": "asc",
-      "cacheTTL": 86400,
-      "genreSelection": "standard",
-      "enableRatingPosters": true,
-      "displayType": "Série",
-      "metadata": {
-        "itemCount": 200,
-        "url": "https://mdblist.com/lists/snoak/latest-romance-shows",
-        "mediatype": "show",
         "author": "snoak"
       }
     },
@@ -4610,6 +4676,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -4617,12 +4684,12 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "878",
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "region": "FR",
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "🌌 Top Sci-Fi",
@@ -4643,15 +4710,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -4660,7 +4736,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -4673,11 +4749,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=878&with_release_type=4%7C5%7C6&release_date.lte=2026-04-30"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=878&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -4751,6 +4828,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -4758,12 +4836,12 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "14",
-            "vote_count.gte": 500,
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "region": "FR",
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "🐉 Top Fantastique",
@@ -4784,15 +4862,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -4801,7 +4888,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -4814,11 +4901,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=14&with_release_type=4%7C5%7C6&release_date.lte=2026-04-30&vote_count.gte=50"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=14&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -4982,6 +5070,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -4991,10 +5080,11 @@
             "sort_by": "vote_average.desc",
             "include_adult": true,
             "with_genres": "10765",
+            "without_keywords": "210024",
             "with_status": "0|3|4|5",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 2000
           },
           "formState": {
             "catalogName": "🌌 Top Sci-Fi & Fantastique",
@@ -5017,13 +5107,22 @@
             "certificationMode": "exact",
             "includeAdult": true,
             "releasedOnly": true,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -5032,7 +5131,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 2000,
             "runtimeRange": [
               0,
               400
@@ -5045,11 +5144,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=10765&with_status=0%7C3%7C4%7C5"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=true&with_genres=10765&without_keywords=210024&with_status=0%7C3%7C4%7C5&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=2000"
       }
     },
     {
@@ -5156,6 +5256,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -5163,12 +5264,12 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "53",
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "region": "FR",
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "🔪 Top Thriller",
@@ -5189,15 +5290,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -5206,7 +5316,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -5219,11 +5329,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=53&with_release_type=4%7C5%7C6&release_date.lte=2026-04-30"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=53&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -5243,26 +5354,6 @@
         "itemCount": 500,
         "url": "https://mdblist.com/lists/snoak/latest-thriller-movies",
         "mediatype": "movie",
-        "author": "snoak"
-      }
-    },
-    {
-      "id": "mdblist.128050",
-      "type": "series",
-      "name": "🔪 New Thriller",
-      "enabled": true,
-      "showInHome": false,
-      "source": "mdblist",
-      "sort": "default",
-      "order": "asc",
-      "cacheTTL": 86400,
-      "genreSelection": "standard",
-      "enableRatingPosters": true,
-      "displayType": "Série",
-      "metadata": {
-        "itemCount": 500,
-        "url": "https://mdblist.com/lists/snoak/latest-thriller-shows",
-        "mediatype": "show",
         "author": "snoak"
       }
     },
@@ -5350,6 +5441,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -5359,10 +5451,13 @@
             "sort_by": "vote_average.desc",
             "include_adult": true,
             "with_genres": "16",
-            "vote_average.gte": 7,
-            "vote_count.gte": 500,
+            "without_keywords": "210024",
             "region": "FR",
-            "vote_average.lte": 9.9
+            "with_release_type": "4|5|6",
+            "release_date.lte": "__tmdb_date__:today:to",
+            "vote_average.gte": 7,
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "🎨 Top Animation",
@@ -5385,13 +5480,22 @@
             "certificationMode": "exact",
             "includeAdult": true,
             "releasedOnly": true,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -5400,7 +5504,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -5413,11 +5517,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=16&with_release_type=4%7C5%7C6&release_date.lte=2026-04-30"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=true&with_genres=16&without_keywords=210024&region=FR&with_release_type=4%7C5%7C6&release_date.lte=2026-09-15&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -5524,6 +5629,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -5531,12 +5637,12 @@
           "mediaType": "tv",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "16",
-            "with_status": "0|3|4|5",
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 2000
           },
           "formState": {
             "catalogName": "🎨 Top Animation",
@@ -5557,15 +5663,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -5574,7 +5689,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 2000,
             "runtimeRange": [
               0,
               400
@@ -5587,11 +5702,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=16&with_status=0%7C3%7C4%7C5"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=16&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=2000"
       }
     },
     {
@@ -5698,6 +5814,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -5705,12 +5822,11 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "99",
             "vote_average.gte": 7,
-            "vote_count.gte": 500,
-            "region": "FR",
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 400
           },
           "formState": {
             "catalogName": "📽️ Top Documentaire",
@@ -5731,13 +5847,17 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
             "withoutKeywords": [],
             "keywordJoinMode": "or",
@@ -5748,7 +5868,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 400,
             "runtimeRange": [
               0,
               400
@@ -5761,11 +5881,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=99&with_release_type=4%7C5%7C6&release_date.lte=2026-04-30"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=99&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=400"
       }
     },
     {
@@ -6125,7 +6246,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
-      "displayType": "movie",
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -6133,11 +6254,12 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "80",
-            "vote_count.gte": 500,
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "🚔 Top Policier",
@@ -6158,15 +6280,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
+            "includeAdult": false,
             "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -6175,7 +6306,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -6188,11 +6319,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=true&with_genres=80&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=500"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=80&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -6247,6 +6379,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -6256,10 +6389,11 @@
             "sort_by": "vote_average.desc",
             "include_adult": true,
             "with_genres": "80",
+            "without_keywords": "210024",
             "with_status": "0|3|4|5",
-            "vote_count.gte": 500,
             "vote_average.gte": 7,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 2000
           },
           "formState": {
             "catalogName": "🚔 Top Policier",
@@ -6282,13 +6416,22 @@
             "certificationMode": "exact",
             "includeAdult": true,
             "releasedOnly": true,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -6297,7 +6440,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 2000,
             "runtimeRange": [
               0,
               400
@@ -6310,11 +6453,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=80&with_status=0%7C3%7C4%7C5&vote_count.gte=25"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=true&with_genres=80&without_keywords=210024&with_status=0%7C3%7C4%7C5&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=2000"
       }
     },
     {
@@ -6446,6 +6590,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -6453,12 +6598,12 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "9648",
-            "vote_count.gte": 500,
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "region": "FR",
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "🧩 Top Mystère",
@@ -6479,15 +6624,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -6496,7 +6650,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -6509,11 +6663,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=9648&with_release_type=4%7C5%7C6&release_date.lte=2026-04-30&vote_count.gte=50"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=9648&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -6645,6 +6800,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -6652,12 +6808,12 @@
           "mediaType": "tv",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "9648",
-            "with_status": "0|3|4|5",
-            "vote_count.gte": 500,
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 2000
           },
           "formState": {
             "catalogName": "🧩 Top Mystère",
@@ -6678,15 +6834,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -6695,7 +6860,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 2000,
             "runtimeRange": [
               0,
               400
@@ -6708,11 +6873,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=9648&with_status=0%7C3%7C4%7C5&vote_count.gte=25"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=9648&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=2000"
       }
     },
     {
@@ -6844,6 +7010,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Film",
       "metadata": {
         "discover": {
           "version": 2,
@@ -6851,12 +7018,12 @@
           "mediaType": "movie",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "10752",
-            "vote_count.gte": 500,
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "region": "FR",
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 5000
           },
           "formState": {
             "catalogName": "🪖 Top Guerre",
@@ -6877,15 +7044,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -6894,7 +7070,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 5000,
             "runtimeRange": [
               0,
               400
@@ -6907,11 +7083,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (movie)",
-        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=10752&with_release_type=4%7C5%7C6&release_date.lte=2026-04-30&vote_count.gte=25"
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=vote_average.desc&include_adult=false&with_genres=10752&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=5000"
       }
     },
     {
@@ -7043,6 +7220,7 @@
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "Série",
       "metadata": {
         "discover": {
           "version": 2,
@@ -7050,12 +7228,12 @@
           "mediaType": "tv",
           "params": {
             "sort_by": "vote_average.desc",
-            "include_adult": true,
+            "include_adult": false,
             "with_genres": "10768",
-            "with_status": "0|3|4|5",
-            "vote_count.gte": 500,
+            "without_keywords": "210024",
             "vote_average.gte": 7,
-            "vote_average.lte": 9.9
+            "vote_average.lte": 9.9,
+            "vote_count.gte": 1000
           },
           "formState": {
             "catalogName": "🪖 Top Guerre & Politique",
@@ -7076,15 +7254,24 @@
             "certificationCountry": "",
             "certificationValue": "",
             "certificationMode": "exact",
-            "includeAdult": true,
-            "releasedOnly": true,
+            "includeAdult": false,
+            "releasedOnly": false,
+            "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
             "withoutCompanies": [],
             "companyJoinMode": "or",
+            "withNetworks": [],
             "withKeywords": [],
-            "withoutKeywords": [],
+            "withoutKeywords": [
+              {
+                "id": 210024,
+                "label": "anime"
+              }
+            ],
             "keywordJoinMode": "or",
             "watchRegion": "",
             "watchProviders": [],
@@ -7093,7 +7280,7 @@
               7,
               9.9
             ],
-            "voteCountMin": 500,
+            "voteCountMin": 1000,
             "runtimeRange": [
               0,
               400
@@ -7106,11 +7293,12 @@
             "seriesDatePreset": "clear",
             "airDateFrom": "",
             "airDateTo": "",
+            "airDatePreset": "clear",
             "releaseRegion": ""
           }
         },
         "description": "TMDB Discover (tv)",
-        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=10768&with_status=0%7C3%7C4%7C5&vote_count.gte=10"
+        "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=10768&without_keywords=210024&vote_average.gte=7&vote_average.lte=9.9&vote_count.gte=1000"
       }
     },
     {
@@ -7437,49 +7625,6 @@
         "description": "TMDB Discover (tv)",
         "url": "https://www.themoviedb.org/discover/tv?sort_by=vote_average.desc&include_adult=false&with_genres=37&with_status=0%7C3%7C4%7C5&vote_count.gte=25"
       }
-    },
-    {
-      "id": "tmdb.discover.movie.genres.popular.history",
-      "type": "movie",
-      "name": "🏛️ Histoire",
-      "enabled": true,
-      "showInHome": false,
-      "source": "tmdb",
-      "metadata": {
-        "discover": {
-          "version": 2,
-          "source": "tmdb",
-          "mediaType": "movie",
-          "params": {
-            "sort_by": "popularity.desc",
-            "include_adult": true,
-            "with_genres": "36",
-            "vote_count.gte": 100,
-            "vote_average.gte": 4,
-            "vote_average.lte": 9.9
-          },
-          "formState": {
-            "catalogName": "🏛️ Histoire",
-            "discoverSource": "tmdb",
-            "sortBy": "popularity.desc",
-            "catalogType": "movie",
-            "includeAdult": true,
-            "releasedOnly": true,
-            "includeGenres": [
-              {
-                "id": 36,
-                "label": "History"
-              }
-            ],
-            "voteCountMin": 100,
-            "voteAverageRange": [
-              4,
-              9.9
-            ]
-          }
-        }
-      },
-      "displayType": "movie"
     },
     {
       "id": "tmdb.discover.movie.theme.time-travel",
@@ -13762,33 +13907,14 @@
       }
     },
     {
-      "id": "mdblist.128062",
-      "type": "movie",
-      "name": "🛡️ MCU (Films)",
-      "enabled": true,
-      "showInHome": false,
-      "source": "mdblist",
-      "sort": "default",
-      "order": "asc",
-      "cacheTTL": 86400,
-      "genreSelection": "standard",
-      "enableRatingPosters": true,
-      "displayType": "Film",
-      "metadata": {
-        "itemCount": 40,
-        "url": "https://mdblist.com/lists/snoak/mcu-movies",
-        "mediatype": "movie",
-        "author": "snoak"
-      }
-    },
-    {
       "id": "tmdb.discover.movie.mcu.gvjm8vmx",
       "type": "movie",
-      "name": "🛡️ MCU (Films)",
+      "name": "🛡️ MCU",
       "enabled": true,
       "showInHome": false,
       "source": "tmdb",
       "cacheTTL": 86400,
+      "displayType": "movie",
       "metadata": {
         "discover": {
           "version": 2,
@@ -13797,16 +13923,24 @@
           "params": {
             "sort_by": "primary_release_date.desc",
             "include_adult": true,
-            "with_keywords": "180547"
+            "without_genres": "99",
+            "with_keywords": "180547",
+            "vote_count.gte": 200,
+            "with_runtime.gte": 60
           },
           "formState": {
-            "catalogName": "MCU",
+            "catalogName": "🛡️ MCU",
             "discoverSource": "tmdb",
             "sortBy": "primary_release_date.desc",
             "cacheTTL": 86400,
             "catalogType": "movie",
             "includeGenres": [],
-            "excludeGenres": [],
+            "excludeGenres": [
+              {
+                "id": 99,
+                "label": "Documentaire"
+              }
+            ],
             "genreJoinMode": "or",
             "originalLanguage": "",
             "originCountry": "",
@@ -13816,6 +13950,8 @@
             "includeAdult": true,
             "releasedOnly": false,
             "tmdbTvStatuses": [],
+            "tmdbMovieReleaseTypes": [],
+            "tmdbTvTypes": [],
             "selectedPeople": [],
             "peopleJoinMode": "or",
             "withCompanies": [],
@@ -13837,9 +13973,9 @@
               0,
               10
             ],
-            "voteCountMin": 0,
+            "voteCountMin": 200,
             "runtimeRange": [
-              0,
+              60,
               400
             ],
             "primaryReleaseFrom": "",
@@ -13854,13 +13990,14 @@
             "releaseRegion": ""
           }
         },
-        "description": "TMDB Discover (movie)"
+        "description": "TMDB Discover (movie)",
+        "url": "https://www.themoviedb.org/discover/movie?sort_by=primary_release_date.desc&include_adult=true&without_genres=99&with_keywords=180547&vote_count.gte=200&with_runtime.gte=60"
       }
     },
     {
       "id": "mdblist.128063",
       "type": "series",
-      "name": "🛡️ MCU (Séries)",
+      "name": "🛡️ MCU",
       "enabled": true,
       "showInHome": false,
       "source": "mdblist",
