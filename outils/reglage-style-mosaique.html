@@ -231,8 +231,8 @@
     </div>
     <div class="ligne">
       <label for="inclinaison">Inclinaison</label>
-      <input type="range" id="inclinaison" min="-25" max="25" step="1" value="10">
-      <input type="number" class="valeur-num" id="inclinaisonNum" min="-25" max="25" step="1" value="10">
+      <input type="range" id="inclinaison" min="-25" max="25" step="1" value="-10">
+      <input type="number" class="valeur-num" id="inclinaisonNum" min="-25" max="25" step="1" value="-10">
       <span class="unite">°</span>
     </div>
 
@@ -298,6 +298,7 @@
   <p class="note" id="statutDossier">Aucune image sélectionnée.</p>
   <div class="actions" style="margin-bottom: 14px;">
     <button id="genererReel" disabled>🖼️ Générer le backdrop</button>
+    <button id="melangerImages" disabled title="Mélange aléatoirement l'ordre des images sélectionnées">🔀 Mélanger les images</button>
   </div>
   <div class="panneau-preview" id="panneauApercuReel" style="display:none;">
     <img id="apercuReel" alt="Backdrop généré">
@@ -313,7 +314,7 @@
   var ctx = canvas.getContext('2d');
   var W = canvas.width, H = canvas.height;
 
-  var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:10, ombre:100, flou:24, accentColor:'#7f77dd', glowToggle:true, ratioTuile:'16/9'};
+  var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:-10, ombre:100, flou:24, accentColor:'#7f77dd', glowToggle:true, ratioTuile:'16/9'};
 
   var ids = ['tuileLargeur','tuileHauteur','ecart','rayon','decalage','inclinaison','ombre','flou'];
   var els = {};
