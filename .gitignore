@@ -1,40 +1,63 @@
-# Compiled and build artifacts
-*.pyc
+```python
+# Python
 __pycache__/
-*.o
-*.obj
-dist/
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
-
-# Dependencies
-.venv/
-venv/
-node_modules/
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Environment
-.env
-.env.local
-*.env.*
+.venv/
+venv/
+env/
+ENV/
 
-# Editors
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Coverage
 .coverage
-coverage/
 htmlcov/
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 
-# Python specific
-*.pyc
-__pycache__/
-.pytest_cache/
-.mypy_cache/
+# Temporary files
+*.tmp
+*.temp
+*~
+```
 
-# Original rules preserved
-*.log
+Wait, let me reconsider this. The only modified file is `scripts/generer_backdrops.py` which is a Python source file. There are no build artifacts, dependencies, or temporary files in the changes. Following rule #6, since the changes contain only source files and no build artifacts, dependencies, or temp files, the output should be empty.
+
+```python
+
+```
