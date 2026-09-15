@@ -640,7 +640,7 @@
     });
   });
 
-  boutonGenererReel.addEventListener('click', function(){
+  function genererBackdropReel(){
     if (imagesReelles.length === 0) return;
     var v = lireValeurs();
     var dims = resolutionSortie.value.split('x').map(Number);
@@ -658,12 +658,17 @@
       telechargerReel.href = url;
       zoneTelechargement.style.display = 'flex';
     }, 'image/jpeg', 0.92);
-  });
+  }
+
+  boutonGenererReel.addEventListener('click', genererBackdropReel);
 
   // --- Bouton Mélanger les images ---
   var boutonMelanger = document.getElementById('melangerImages');
   boutonMelanger.addEventListener('click', function(){
-    if (imagesReelles.length <= 1) return;
+    if (imagesReelles.length <= 1) {
+      statutDossier.textContent = 'Pas assez d\'images pour mélanger (il en faut au moins 2).';
+      return;
+    }
     // Algorithme de Fisher-Yates pour mélanger aléatoirement le tableau
     for (var i = imagesReelles.length - 1; i > 0; i--){
       var j = Math.floor(Math.random() * (i + 1));
@@ -671,7 +676,11 @@
       imagesReelles[i] = imagesReelles[j];
       imagesReelles[j] = temp;
     }
-    statutDossier.textContent = imagesReelles.length + ' image(s) mélangée(s). Cliquez sur "Générer le backdrop".';
+    // Régénère immédiatement l'aperçu avec le nouvel ordre -- ne pas se
+    // contenter de réordonner le tableau en mémoire, sinon l'aperçu déjà
+    // affiché reste celui d'avant le mélange et rien ne semble se passer.
+    statutDossier.textContent = imagesReelles.length + ' image(s) mélangée(s).';
+    genererBackdropReel();
   });
 
   // --- Presets nommés (localStorage -- propres à ce navigateur/appareil) ---
