@@ -8,20 +8,6 @@
         "title": "Recommandation",
         "sources": [
           {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.recommended.recommended.movies"
-          },
-          {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.recommended.recommended.movies"
-          },
-          {
             "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
@@ -81,23 +67,11 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🫵",
-        "focusGifUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/focused/recommended.webp",
+        "focusGifUrl": "",
         "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Recommandation_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Recommandation.png?raw=true",
         "catalogSources": [
-          {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.recommended.recommended.movies"
-          },
-          {
-            "type": "movie",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.recommended.recommended.movies"
-          },
           {
             "type": "Film",
             "genre": "None",
@@ -169,10 +143,10 @@
             "catalogId": "tmdb.trending_series"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "⬆️",
-        "focusGifUrl": "https://github.com/luckynumb3rs/stremio-perfect-setup/blob/main/collections/discover/focused/trending.gif?raw=true",
+        "focusGifUrl": "",
         "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Tendance_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Tendance.png?raw=true",
@@ -215,7 +189,7 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔥",
-        "focusGifUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/focused/popular.webp",
+        "focusGifUrl": "",
         "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Populaire_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Populaire.png?raw=true",
@@ -258,10 +232,10 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🏆",
-        "focusGifUrl": "https://cdn.jsdelivr.net/gh/luckynumb3rs/stremio-perfect-setup/collections/discover/focused/top-rated.webp",
+        "focusGifUrl": "",
         "heroVideoUrl": "",
-        "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/TOP_Logo.png?raw=true",
-        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/TOP.png?raw=true",
+        "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/Top_Logo.png?raw=true",
+        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/Top.png?raw=true",
         "catalogSources": [
           {
             "type": "movie",
@@ -379,15 +353,22 @@
             "addonId": "com.aiostreams.viren070.5a21f0f2-961",
             "provider": "addon",
             "catalogId": "3c4e3b0.dlstreams-live"
+          },
+          {
+            "type": "tv",
+            "genre": "None",
+            "addonId": "com.aiostreams.viren070.5a21f0f2-961",
+            "provider": "addon",
+            "catalogId": "276e3b0.uwu_tv"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📺",
         "focusGifUrl": "",
         "heroVideoUrl": "",
-        "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/TV_Logo.jpg?raw=true",
-        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/TV.webp?raw=true",
+        "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Logos/TV_Logo.png?raw=true",
+        "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Covers/TV.png?raw=true",
         "catalogSources": [
           {
             "type": "tv",
@@ -412,6 +393,12 @@
             "genre": "None",
             "addonId": "com.aiostreams.viren070.5a21f0f2-961",
             "catalogId": "3c4e3b0.dlstreams-live"
+          },
+          {
+            "type": "tv",
+            "genre": "None",
+            "addonId": "com.aiostreams.viren070.5a21f0f2-961",
+            "catalogId": "276e3b0.uwu_tv"
           }
         ],
         "focusGifEnabled": true,
@@ -429,7 +416,7 @@
             "catalogId": "custom.community_stremio_intell_debrid_search.other.IntellDebridSearch"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧲",
         "focusGifUrl": "",
@@ -451,7 +438,7 @@
     "pinToTop": false,
     "viewMode": "FOLLOW_LAYOUT",
     "showAllTab": true,
-    "backdropImageUrl": "",
+    "backdropImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Decouvertes/Decouverte.png?raw=true",
     "focusGlowEnabled": true
   },
   {
@@ -1142,6 +1129,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "💥",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Action_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Action.png?raw=true",
         "catalogSources": [
@@ -1235,6 +1224,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧭",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Aventure_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Aventure.png?raw=true",
         "catalogSources": [
@@ -1311,14 +1302,14 @@
             "catalogId": "tmdb.discover.series.genre_comedie.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.com_die_copy.mokbrgql"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -1328,6 +1319,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😆",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Comedie_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Com%C3%A9die.png?raw=true",
         "catalogSources": [
@@ -1356,13 +1349,13 @@
             "catalogId": "tmdb.discover.series.genre_comedie.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.com_die_copy.mokbrgql"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.com_die_copy.mokbtxpl"
@@ -1404,14 +1397,14 @@
             "catalogId": "tmdb.discover.series.genre_drame.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.drame_copy.mokby75k"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -1421,6 +1414,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😭",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Drame_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Drame.png?raw=true",
         "catalogSources": [
@@ -1449,13 +1444,13 @@
             "catalogId": "tmdb.discover.series.genre_drame.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.drame_copy.mokby75k"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.drame_copy.mokby9kf"
@@ -1490,14 +1485,14 @@
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.fantastique_copy.molqhipa"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -1507,6 +1502,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🐉",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Fantastique_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Fantastique.png?raw=true",
         "catalogSources": [
@@ -1529,13 +1526,13 @@
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.fantastique_copy.molqhipa"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.sci_fi_fantastique_copy.molq1svy"
@@ -1577,14 +1574,14 @@
             "catalogId": "tmdb.discover.series.genres.popular.war-politics"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.guerre_copy.molqt6j5"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -1594,6 +1591,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🪖",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Guerre_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Guerre.png?raw=true",
         "catalogSources": [
@@ -1622,13 +1621,13 @@
             "catalogId": "tmdb.discover.series.genres.popular.war-politics"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.guerre_copy.molqt6j5"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.guerre_politique_copy.molqtcqa"
@@ -1677,26 +1676,18 @@
             "catalogId": "tmdb.discover.movie.horreur_copy.molpqgh8"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.horreur_copy.molpv36g"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.horreur_copy.molpuols"
-          },
-          {
-            "title": "Collection: Horreur",
-            "sortBy": "rank",
-            "sortHow": "asc",
-            "provider": "trakt",
-            "mediaType": "MOVIE",
-            "traktListId": 28015387
           },
           {
             "type": "movie",
@@ -1709,6 +1700,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "👻",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Horreur_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Horreur.png?raw=true",
         "catalogSources": [
@@ -1743,13 +1736,13 @@
             "catalogId": "tmdb.discover.movie.horreur_copy.molpqgh8"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.horreur_copy.molpv36g"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.horreur_copy.molpuols"
@@ -1801,10 +1794,10 @@
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
-            "catalogId": "tmdb.discover.movie.genres.popular.mystery"
+            "catalogId": "tmdb.discover.movie.myst_re_copy.molqkg0x"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -1814,6 +1807,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🧩",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Mystere_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Mystere.png?raw=true",
         "catalogSources": [
@@ -1845,10 +1840,10 @@
             "type": "movie",
             "genre": "None",
             "addonId": "aio-metadata",
-            "catalogId": "tmdb.discover.movie.genres.popular.mystery"
+            "catalogId": "tmdb.discover.movie.myst_re_copy.molqkg0x"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.myst_re_copy.molqklz5"
@@ -1890,14 +1885,14 @@
             "catalogId": "tmdb.discover.series.genres.popular.crime"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.new_policier_copy.molqbo5z"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -1907,6 +1902,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🚔",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Policier_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Policier.png?raw=true",
         "catalogSources": [
@@ -1935,13 +1932,13 @@
             "catalogId": "tmdb.discover.series.genres.popular.crime"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.new_policier_copy.molqbo5z"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.policier_copy.molqdlf5"
@@ -1962,13 +1959,6 @@
             "catalogId": "mdblist.128261"
           },
           {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.128264"
-          },
-          {
             "type": "movie",
             "genre": "None",
             "addonId": "aio-metadata",
@@ -1976,7 +1966,7 @@
             "catalogId": "tmdb.discover.movie.genre_romance.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -1986,6 +1976,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "💕",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Romance_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Romance.png?raw=true",
         "catalogSources": [
@@ -1996,19 +1988,13 @@
             "catalogId": "mdblist.128261"
           },
           {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.128264"
-          },
-          {
             "type": "movie",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_romance.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.romance_copy.molqzu2d"
@@ -2050,14 +2036,14 @@
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.sci_fi_copy.molq0yrp"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -2067,6 +2053,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "👽",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Sci-Fi_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Sci-Fi.png?raw=true",
         "catalogSources": [
@@ -2095,13 +2083,13 @@
             "catalogId": "tmdb.discover.series.genre_sci_fi_and_fantastique.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.sci_fi_copy.molq0yrp"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.sci_fi_fantastique_copy.molq1svy"
@@ -2122,13 +2110,6 @@
             "catalogId": "mdblist.128049"
           },
           {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "provider": "addon",
-            "catalogId": "mdblist.128050"
-          },
-          {
             "type": "movie",
             "genre": "None",
             "addonId": "aio-metadata",
@@ -2136,7 +2117,7 @@
             "catalogId": "tmdb.discover.movie.genre_thriller.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -2146,6 +2127,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🔪",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Thriller_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Thriller.png?raw=true",
         "catalogSources": [
@@ -2156,19 +2139,13 @@
             "catalogId": "mdblist.128049"
           },
           {
-            "type": "Série",
-            "genre": "None",
-            "addonId": "aio-metadata",
-            "catalogId": "mdblist.128050"
-          },
-          {
             "type": "movie",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genre_thriller.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.thriller_copy.molq4zra"
@@ -2189,16 +2166,32 @@
             "catalogId": "tmdb.discover.movie.genres.popular.western"
           },
           {
+            "type": "movie",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "tmdb.discover.movie.western_copy.ms60m9pz"
+          },
+          {
             "type": "series",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.series.genres.popular.western"
+          },
+          {
+            "type": "series",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "provider": "addon",
+            "catalogId": "tmdb.discover.series.western_copy.ms60n8bd"
           }
         ],
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🤠",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Western_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Western.png?raw=true",
         "catalogSources": [
@@ -2209,10 +2202,22 @@
             "catalogId": "tmdb.discover.movie.genres.popular.western"
           },
           {
+            "type": "movie",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "tmdb.discover.movie.western_copy.ms60m9pz"
+          },
+          {
             "type": "series",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.popular.western"
+          },
+          {
+            "type": "series",
+            "genre": "None",
+            "addonId": "aio-metadata",
+            "catalogId": "tmdb.discover.series.western_copy.ms60n8bd"
           }
         ],
         "focusGifEnabled": false,
@@ -2251,14 +2256,14 @@
             "catalogId": "tmdb.discover.series.genre_animation.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
             "catalogId": "tmdb.discover.movie.animation_copy.molq6v0q"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -2268,6 +2273,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🎨",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Animation_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Animation.png?raw=true",
         "catalogSources": [
@@ -2296,13 +2303,13 @@
             "catalogId": "tmdb.discover.series.genre_animation.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.animation_copy.molq6v0q"
           },
           {
-            "type": "series",
+            "type": "Série",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.animation_copy.molq7s6h"
@@ -2344,7 +2351,7 @@
             "catalogId": "tmdb.discover.series.genre_documentaire.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "provider": "addon",
@@ -2361,6 +2368,8 @@
         "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "📽️",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Documentaires_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Documentaires.png?raw=true",
         "catalogSources": [
@@ -2389,7 +2398,7 @@
             "catalogId": "tmdb.discover.series.genre_documentaire.global"
           },
           {
-            "type": "movie",
+            "type": "Film",
             "genre": "None",
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.documentaire_copy.molq9500"
@@ -3159,9 +3168,11 @@
             "catalogId": "tmdb.discover.movie.recent_heureux.gky0ql1o"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🌞",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Joyeux_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Joyeux.png?raw=true",
         "catalogSources": [
@@ -3245,9 +3256,11 @@
             "catalogId": "tmdb.discover.movie.reconfortant_recent.3wsmkjlz"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😌",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Reconfort_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Reconfort.png?raw=true",
         "catalogSources": [
@@ -3353,9 +3366,11 @@
             "catalogId": "mdblist.174682"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "🤯",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Retourne_Cerveau_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Retourne_Cerveau.png?raw=true",
         "catalogSources": [
@@ -3471,9 +3486,11 @@
             "catalogId": "tmdb.discover.movie.recent_emotion.rqrtvc9t"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "LANDSCAPE",
         "coverEmoji": "😢",
+        "focusGifUrl": "",
+        "heroVideoUrl": "",
         "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Logos/Tristesse_Logo.png?raw=true",
         "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Vibes/Covers/Tristesse.png?raw=true",
         "catalogSources": [
@@ -3703,7 +3720,7 @@
           }
         ],
         "focusGifEnabled": false,
-        "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Animes/Backdrops/Fankai_Backdrop.jpg"
+        "heroBackdropUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Animes/Backdrops/Fankai_Backdrop.jpg?raw=true"
       },
       {
         "id": "folder-anime-ghibli",
@@ -4485,7 +4502,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -4746,7 +4763,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -4821,7 +4838,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -4871,7 +4888,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -4922,7 +4939,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -5047,7 +5064,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -5097,7 +5114,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -5147,7 +5164,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -5295,22 +5312,22 @@
           },
           {
             "title": "Collection: DC",
-            "sortBy": "rank",
-            "sortHow": "asc",
+            "sortBy": "released",
+            "sortHow": "desc",
             "provider": "trakt",
             "mediaType": "MOVIE",
             "traktListId": 3989015
           },
           {
-            "title": "Collection: DC (Séries)",
-            "sortBy": "rank",
-            "sortHow": "asc",
+            "title": "Collection: DC",
+            "sortBy": "released",
+            "sortHow": "desc",
             "provider": "trakt",
-            "mediaType": "MOVIE",
+            "mediaType": "TV",
             "traktListId": 6363557
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -5752,7 +5769,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -5935,7 +5952,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -6110,7 +6127,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -6434,7 +6451,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -6534,7 +6551,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -6721,7 +6738,7 @@
             "traktListId": 3989016
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -6768,7 +6785,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -6843,7 +6860,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -7193,7 +7210,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -7343,7 +7360,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -7451,7 +7468,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -7560,7 +7577,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -8247,7 +8264,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -8322,7 +8339,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -8422,7 +8439,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -8572,7 +8589,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
@@ -8746,7 +8763,7 @@
             "tmdbSourceType": "COLLECTION"
           }
         ],
-        "hideTitle": false,
+        "hideTitle": true,
         "tileShape": "POSTER",
         "coverEmoji": "",
         "focusGifUrl": "",
