@@ -1777,7 +1777,9 @@ class GenerateurBackdrops:
             index, candidat = index_et_candidat
             return index, self._resoudre_image_tuile(candidat)
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:
+        # Agrandi de 12 à 16 workers pour mieux saturer la connexion réseau
+        # lors du téléchargement simultané de multiples tuiles (I/O-bound)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
             for index, image in executor.map(_traiter, enumerate(candidats)):
                 if image is not None:
                     images[index] = image
