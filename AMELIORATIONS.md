@@ -534,6 +534,16 @@ précis :
 
 ---
 
+## ✅ Fait (session du 14 septembre 2026 -- titre sur backdrops sans titre, template aligné, bouton aléatoire, positionnement en spirale)
+
+- [x] **#13 - Titre sur les backdrops sans titre** : Généralisation du mécanisme FanKai à TOUTES les affiches sans titre détecté. Si aucune affiche avec titre FR/EN/original n'est trouvée sur TMDB, le script recherche maintenant un logo/titre TMDB (priorité fr-FR puis en-US) et l'incruste sur un backdrop nu. Nouvelle méthode `recuperer_logo_titre()` dans `ClientTMDB`, appelée depuis `_resoudre_image_tuile()` quand `champ_titre` est défini et qu'aucune affiche titrée n'est disponible.
+- [x] **#15 - Template initial aligné** : Les valeurs par défaut de `outils/reglage-style-mosaique.html` (inclinaison à -10°, et autres constantes) sont maintenant synchronisées avec les constantes réelles de `scripts/mosaique.py` utilisées pour la génération de backdrops. Le fichier HTML n'a plus de valeurs figées obsolètes.
+- [x] **#16 - Bouton aléatoire pour dossier d'images** : Ajout d'un bouton "🔀 Mélanger" dans la section "Générer un backdrop réel à partir d'un dossier d'images" de l'outil. Permet de mélanger aléatoirement l'ordre des images sélectionnées avant génération, sans modifier leur style. Utile pour tester différentes compositions visuelles rapidement.
+- [x] **#17 - Positionnement en spirale** : L'algorithme de placement des tuiles dans `scripts/mosaique.py` évolue d'une grille inclinée linéaire vers une disposition en spirale (du centre vers l'extérieur). Le mode aléatoire (#16) mélange l'ordre des images AVANT application de la spirale. Le style visuel des tuiles (inclinaison, ombre, etc.) reste inchangé. Test existant mis à jour pour valider que la première image est bien placée au centre.
+- [x] Suite complète vérifiée : **256 tests**, `ruff`/`mypy` propres.
+
+---
+
 ## 🔵 Reste à faire
 
 Rien pour l'instant -- tout le backlog connu a été traité (voir

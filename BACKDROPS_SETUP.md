@@ -9,23 +9,24 @@ adapté à la structure de collections propre à ce dépôt.
 ## Sommaire
 
 1. Comment ça marche
-2. Mode mosaïque
-3. Régler le style visuellement
-4. Couverture actuelle
-5. Configuration requise
-6. Utilisation
-7. Export AIOMetadata
-8. MDBList
-9. Catalogues Stremio "custom" (Bingecat & co)
-10. Images manuelles (sans passer par la génération)
-11. Ajout/suppression d'une collection dans Nuvio
-12. Où éditer la configuration
-13. Tableau de bord des backdrops
-14. Mise à jour des URLs
-15. Structure de fichiers
-16. Dépannage
-17. Résilience aux renommages de groupes
-18. Idées pour plus tard
+2. Mode mosaïque (spirale, bouton aléatoire)
+3. Titres incrustés : généralisation du mécanisme FanKai (#13)
+4. Régler le style visuellement
+5. Couverture actuelle
+6. Configuration requise
+7. Utilisation
+8. Export AIOMetadata
+9. MDBList
+10. Catalogues Stremio "custom" (Bingecat & co)
+11. Images manuelles (sans passer par la génération)
+12. Ajout/suppression d'une collection dans Nuvio
+13. Où éditer la configuration
+14. Tableau de bord des backdrops
+15. Mise à jour des URLs
+16. Structure de fichiers
+17. Dépannage
+18. Résilience aux renommages de groupes
+19. Idées pour plus tard
 
 ## 🎯 Comment ça marche
 
@@ -69,23 +70,31 @@ SORTIE"), pour rester simple à modifier :
 ## 🎨 Mode mosaïque (par défaut)
 
 Chaque dossier affiche une grille d'environ **72 tuiles** paysage (16:9),
-disposées en cascade inclinée -- même principe visuel que luckynumb3rs.
-Par-dessus : un dégradé sombre en vignette, et une lueur diffuse d'une
-**couleur d'accent** extraite automatiquement du premier titre trouvé.
+disposées en **spirale du centre vers les bords** -- même principe visuel
+que luckynumb3rs, avec un ordre de placement amélioré. Par-dessus : un
+dégradé sombre en vignette, et une lueur diffuse d'une **couleur
+d'accent** extraite automatiquement du premier titre trouvé.
 
 **L'ordre des tuiles suit le classement du catalogue** : le PREMIER
 résultat (celui que l'app affiche en tête) atterrit exactement au centre
 du backdrop -- l'endroit naturellement le plus regardé -- et les
-résultats suivants s'en éloignent progressivement vers les bords à mesure
-qu'ils sont plus loin dans le classement. Comme le nombre de titres
-disponibles est presque toujours inférieur au nombre de cases (~72), les
-derniers arrivés sont RÉPÉTÉS (cycle) pour compléter la grille -- ces
-répétitions, les moins pertinentes, se retrouvent donc logiquement sur les
-bords plutôt que dispersées au hasard. Voir "Ordre des images : respecter
-le tri configuré" plus bas : comme l'ordre du catalogue détermine
-maintenant aussi la POSITION visuelle (pas seulement quels titres
-apparaissent), un mauvais tri côté catalogue devient encore plus visible
-qu'avant.
+résultats suivants s'en éloignent progressivement en spirale vers les
+bords à mesure qu'ils sont plus loin dans le classement. Comme le nombre
+de titres disponibles est presque toujours inférieur au nombre de cases
+(~72), les derniers arrivés sont RÉPÉTÉS (cycle) pour compléter la
+grille -- ces répétitions, les moins pertinentes, se retrouvent donc
+logiquement sur les bords plutôt que dispersées au hasard. Voir "Ordre
+des images : respecter le tri configuré" plus bas : comme l'ordre du
+catalogue détermine maintenant aussi la POSITION visuelle (pas seulement
+quels titres apparaissent), un mauvais tri côté catalogue devient encore
+plus visible qu'avant.
+
+**Bouton aléatoire** : Dans l'outil `reglage-style-mosaique.html`, section
+"Générer un backdrop réel à partir d'un dossier d'images", un bouton
+"🔀 Mélanger" permet de tester rapidement différentes compositions en
+mélangeant aléatoirement l'ordre des images avant application de la
+spirale. Utile pour comparer plusieurs arrangements sans modifier le
+catalogue source.
 
 C'est le comportement **par défaut** (`--mosaique`, activé aussi dans le
 workflow GitHub Actions, y compris le cron mensuel). Si un dossier a moins
@@ -671,6 +680,29 @@ son propre catalogue (souvent différents du `catalogId` préfixé vu côté
 Nuvio, ex: `1d5e3b0.fankai_catalog` vs `fankai_catalog`), ouvre l'URL de
 son manifeste Stremio (`.../manifest.json`) et regarde le tableau
 `"catalogs"`.
+
+### Titres incrustés : généralisation du mécanisme FanKai (#13)
+
+Le mécanisme d'incrustation de logo/titre, auparavant réservé aux
+catalogues utilisant `champTitre` (ex: FanKai), est maintenant **étendu à
+TOUTES les collections** dont aucune affiche avec titre FR/EN/original
+n'est trouvée sur TMDB.
+
+**Nouveau comportement :**
+1. Si une affiche avec titre (français, anglais ou langue originale) est
+   disponible sur TMDB → utilisée directement (comme avant).
+2. Sinon, si `champ_titre` est défini pour cette collection → recherche
+   d'un **logo/titre TMDB** via l'endpoint `/images` (priorité fr-FR, puis
+   en-US). Si trouvé, ce logo est incrusté sur un backdrop nu téléchargé
+   séparément.
+3. En dernier repli → retour au poster brut du catalogue.
+
+Ce changement améliore la couverture des titres visibles sur les backdrops
+pour toutes les collections configurées avec `champ_titre`, pas seulement
+FanKai. La méthode s'applique automatiquement sans configuration
+supplémentaire.
+
+---
 
 ### Repérer un suffixe manquant dans `suffixesTitreIgnorer`
 
