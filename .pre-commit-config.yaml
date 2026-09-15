@@ -1,0 +1,30 @@
+# Configuration des hooks pre-commit
+# Installation : pip install pre-commit && pre-commit install
+
+repos:
+  # Linting et formatage avec Ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # Type checking avec MyPy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        args: [--ignore-missing-imports]
+        additional_dependencies:
+          - types-requests==2.32.0.20241016
+
+  # Validation du schéma JSON des collections
+  - repo: local
+    hooks:
+      - id: validate-schema
+        name: Valider le schéma JSON des collections
+        entry: python3 scripts/valider_collections.py Templates/collections.json
+        language: system
+        files: Templates/.*\.json$
+        pass_filenames: false
