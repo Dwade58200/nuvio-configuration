@@ -1,0 +1,21 @@
+{
+  "catalogs": [
+    {
+      "id": "1d5e3b0.fankai_catalog",
+      "type": "tv",
+      "source": "custom",
+      "sourceUrl": "https://streamio.fankai.fr/eyJjdXN0b21Tb3VyY2VzT25seSI6ZmFsc2UsInN0cmVhbUZpbHRlciI6ImFsbCIsImRlYnJpZFNlcnZpY2VzIjpbeyJzZXJ2aWNlIjoidG9ycmVudCJ9XSwiZGVicmlkU3RyZWFtUHJveHlQYXNzd29yZCI6IiIsIm1heEFjdG9yc0Rpc3BsYXkiOiJhbGwiLCJkZWZhdWx0U29ydCI6Imxhc3RfdXBkYXRlIn0=/catalog/anime/fankai_catalog.json",
+      "champImage": "poster",
+      "champTitre": "name",
+      "suffixesTitreIgnorer": [
+        "Henshū",
+        "Kaï",
+        "Kai",
+        "Yabai",
+        "Fan-Cut"
+      ],
+      "champLogo": "logo",
+      "genreObligatoire": "anime"
+    }
+  ]
+}
