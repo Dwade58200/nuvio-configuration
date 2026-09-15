@@ -1719,8 +1719,19 @@ class GenerateurBackdrops:
                     )
                     return image
 
-        # 5) TMDB générique (non tagué, sans texte).
+        # 5) TMDB générique (non tagué, sans texte) -- mais avant de le
+        # renvoyer tel quel, on tente d'y incruster un logo/titre TMDB
+        # (mécanisme FanKai généralisé à TOUTE affiche n'ayant trouvé aucun
+        # backdrop avec langue aux étapes 1-4 ci-dessus). Cette tentative
+        # DOIT précéder l'étape 6 (repli brut) : `backdrop_path` étant
+        # presque toujours renseigné pour un candidat TMDB classique,
+        # placée après le repli brut elle ne s'exécutait quasiment jamais.
         chemin_generique = meilleur_backdrop_tmdb_langue(images_tmdb, None)
+
+        image_avec_logo = self._resoudre_tuile_sans_titre_avec_logo_tmdb(tmdb_id, media_type)
+        if image_avec_logo is not None:
+            return image_avec_logo
+
         if chemin_generique:
             image = self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{chemin_generique}")
             if image:
@@ -1731,11 +1742,6 @@ class GenerateurBackdrops:
         if backdrop_path:
             logging.info("[TUILE] tmdb_id=%s -> retenu (6, dernier recours) : backdrop brut du candidat", tmdb_id)
             return self._telecharger_une_image(f"{TMDB_IMAGE_BASE}/w1280{backdrop_path}")
-
-        # 7) Tentative logo/titre TMDB pour les affiches sans titre (#13 - généralisé)
-        image_avec_logo = self._resoudre_tuile_sans_titre_avec_logo_tmdb(tmdb_id, media_type)
-        if image_avec_logo is not None:
-            return image_avec_logo
 
         logging.warning("[TUILE] tmdb_id=%s -> ÉCHEC TOTAL : aucune image trouvée", tmdb_id)
         return None
