@@ -33,7 +33,7 @@ TUILE_HAUTEUR = 210
 ECART = 9                 # espace entre tuiles
 RAYON_COIN = 9              # arrondi des coins de chaque tuile
 DECALAGE_LIGNE = 0.5      # décalage horizontal d'une ligne à l'autre (cascade)
-INCLINAISON_DEG = 10       # angle de rotation de la grille entière
+INCLINAISON_DEG = -10       # angle de rotation de la grille entière
 MARGE_CASES = 3           # cases en trop (au-delà du canvas) pour couvrir les coins après rotation
 
 INTENSITE_OMBRE = 1.0        # multiplie l'alpha des 3 dégradés de vignette (gauche/bas/coin) -- 1.0 = valeurs par défaut ci-dessous, inchangées
