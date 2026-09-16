@@ -5,7 +5,7 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 
-## [Non publié] - 2026-XX-XX
+## [Non publié] - 2026-09-16
 
 ### Ajouté
 - **Généralisation du logo/titre TMDB (#13)** : Le mécanisme d'incrustation de logo/titre TMDB sur les backdrops nus, auparavant réservé à FanKai, est maintenant appliqué à TOUTES les collections utilisant `champ_titre` quand aucune affiche avec titre FR/EN/original n'est trouvée. Recherche prioritaire fr-FR puis en-US.
