@@ -217,6 +217,25 @@
     flex: 1;
   }
   .case-a-cocher { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-secondary); flex-shrink: 0; }
+  /* Accessibilité clavier : contour visible sur tous les contrôles interactifs
+     (le focus par défaut du navigateur est parfois trop discret sur ce fond
+     sombre -- important pour naviguer l'outil sans souris). */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .ligne label[title], .section-reglage summary[title] { cursor: help; border-bottom: 1px dotted var(--text-secondary); }
+  button.mini-info {
+    flex: 0 0 auto;
+    width: 22px; height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 11px;
+    line-height: 1;
+    background: var(--surface-3);
+    color: var(--text-secondary);
+    cursor: help;
+  }
   .separateur { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
   .separateur-section { border: none; border-top: 1px solid var(--border); margin: 36px 0 28px; }
 
@@ -358,14 +377,16 @@
         <summary>🧩 Grille de tuiles <span class="chevron">▸</span></summary>
         <div class="contenu-section">
           <div class="ligne">
-            <label for="tuileLargeur">Largeur tuile</label>
-            <input type="range" id="tuileLargeur" min="150" max="500" step="2" value="372">
+            <label for="tuileLargeur" title="Double-clic sur le curseur pour revenir à la valeur par défaut">Largeur tuile</label>
+            <input type="range" id="tuileLargeur" min="150" max="500" step="2" value="372" title="Double-clic pour réinitialiser ce réglage">
             <input type="number" class="valeur-num" id="tuileLargeurNum" min="150" max="500" step="2" value="372">
+            <span class="unite">px</span>
           </div>
           <div class="ligne">
-            <label for="tuileHauteur">Hauteur tuile</label>
-            <input type="range" id="tuileHauteur" min="80" max="280" step="2" value="210">
+            <label for="tuileHauteur" title="Double-clic sur le curseur pour revenir à la valeur par défaut">Hauteur tuile</label>
+            <input type="range" id="tuileHauteur" min="80" max="280" step="2" value="210" title="Double-clic pour réinitialiser ce réglage">
             <input type="number" class="valeur-num" id="tuileHauteurNum" min="80" max="280" step="2" value="210">
+            <span class="unite">px</span>
           </div>
           <div class="ligne">
             <label for="ratioTuile">Ratio des tuiles</label>
@@ -378,24 +399,35 @@
             </select>
           </div>
           <div class="ligne">
-            <label for="ecart">Écart entre tuiles</label>
-            <input type="range" id="ecart" min="0" max="30" step="1" value="9">
+            <label for="ratioCanvas" title="Ratio du backdrop final entier (pas celui des tuiles ci-dessus) -- correspond au flag --ratio-canvas de generer_backdrops.py. Change uniquement la forme de l'aperçu ci-contre.">Ratio du canvas final</label>
+            <select id="ratioCanvas">
+              <option value="16:9" selected>16:9 (défaut)</option>
+              <option value="21:9">21:9 (ultra-large)</option>
+              <option value="4:3">4:3</option>
+              <option value="1:1">1:1 (carré)</option>
+            </select>
+          </div>
+          <div class="ligne">
+            <label for="ecart" title="Double-clic sur le curseur pour revenir à la valeur par défaut">Écart entre tuiles</label>
+            <input type="range" id="ecart" min="0" max="30" step="1" value="9" title="Double-clic pour réinitialiser ce réglage">
             <input type="number" class="valeur-num" id="ecartNum" min="0" max="30" step="1" value="9">
+            <span class="unite">px</span>
           </div>
           <div class="ligne">
-            <label for="rayon">Arrondi des coins</label>
-            <input type="range" id="rayon" min="0" max="40" step="1" value="9">
+            <label for="rayon" title="Double-clic sur le curseur pour revenir à la valeur par défaut">Arrondi des coins</label>
+            <input type="range" id="rayon" min="0" max="40" step="1" value="9" title="Double-clic pour réinitialiser ce réglage">
             <input type="number" class="valeur-num" id="rayonNum" min="0" max="40" step="1" value="9">
+            <span class="unite">px</span>
           </div>
           <div class="ligne">
-            <label for="decalage">Décalage cascade</label>
-            <input type="range" id="decalage" min="0" max="100" step="5" value="50">
+            <label for="decalage" title="Décale chaque ligne de tuiles horizontalement par rapport à la précédente, pour un effet de cascade en diagonale (0% = lignes alignées). Double-clic sur le curseur pour réinitialiser.">Décalage cascade</label>
+            <input type="range" id="decalage" min="0" max="100" step="5" value="50" title="Double-clic pour réinitialiser ce réglage">
             <input type="number" class="valeur-num" id="decalageNum" min="0" max="100" step="5" value="50">
             <span class="unite">%</span>
           </div>
           <div class="ligne">
-            <label for="inclinaison">Inclinaison</label>
-            <input type="range" id="inclinaison" min="-25" max="25" step="1" value="-10">
+            <label for="inclinaison" title="Fait pivoter toute la grille de tuiles autour du centre du backdrop (négatif = sens antihoraire). Double-clic sur le curseur pour réinitialiser.">Inclinaison</label>
+            <input type="range" id="inclinaison" min="-25" max="25" step="1" value="-10" title="Double-clic pour réinitialiser ce réglage">
             <input type="number" class="valeur-num" id="inclinaisonNum" min="-25" max="25" step="1" value="-10">
             <span class="unite">°</span>
           </div>
@@ -406,15 +438,16 @@
         <summary>✨ Ombre &amp; lueur <span class="chevron">▸</span></summary>
         <div class="contenu-section">
           <div class="ligne">
-            <label for="ombre">Intensité ombre</label>
-            <input type="range" id="ombre" min="0" max="200" step="5" value="100">
+            <label for="ombre" title="Double-clic sur le curseur pour revenir à la valeur par défaut">Intensité ombre</label>
+            <input type="range" id="ombre" min="0" max="200" step="5" value="100" title="Double-clic pour réinitialiser ce réglage">
             <input type="number" class="valeur-num" id="ombreNum" min="0" max="200" step="5" value="100">
             <span class="unite">%</span>
           </div>
           <div class="ligne">
-            <label for="flou">Flou de la lueur</label>
-            <input type="range" id="flou" min="0" max="80" step="2" value="24">
+            <label for="flou" title="Rayon du flou gaussien appliqué au dégradé de couleur d'accent, dans le coin haut-droit. Double-clic sur le curseur pour réinitialiser.">Flou de la lueur</label>
+            <input type="range" id="flou" min="0" max="80" step="2" value="24" title="Double-clic pour réinitialiser ce réglage">
             <input type="number" class="valeur-num" id="flouNum" min="0" max="80" step="2" value="24">
+            <span class="unite">px</span>
           </div>
           <div class="ligne">
             <label for="accentColor">Couleur d'accent</label>
@@ -447,10 +480,18 @@
             <button id="presetCharger" style="flex: 0 0 auto;">Charger</button>
             <button id="presetSupprimer" style="flex: 0 0 auto;">🗑️</button>
           </div>
+          <div class="ligne">
+            <label>Transférer</label>
+            <button id="presetExporter">⬇️ Exporter en JSON</button>
+            <button id="presetImporter">⬆️ Importer un JSON</button>
+            <input type="file" id="presetImporterFichier" accept="application/json" style="display:none;">
+          </div>
           <p class="note">
             Enregistre plusieurs réglages pour comparer différents styles
             avant de choisir — stocké uniquement dans ce navigateur (rien
-            n'est envoyé où que ce soit), donc propre à cet appareil.
+            n'est envoyé où que ce soit), donc propre à cet appareil. Utilise
+            Exporter/Importer pour transférer tes presets vers un autre
+            navigateur ou machine, ou pour en garder une sauvegarde.
           </p>
         </div>
       </details>
@@ -519,6 +560,17 @@
   var canvas = document.getElementById('preview');
   var ctx = canvas.getContext('2d');
   var W = canvas.width, H = canvas.height;
+  var LARGEUR_APERCU_BASE = canvas.width; // largeur fixe de l'aperçu, la hauteur suit le ratio choisi
+
+  // --- Ratio du canvas final (aperçu uniquement -- correspond à --ratio-canvas
+  // de generer_backdrops.py, un réglage distinct du ratio des tuiles) ---
+  var ratioCanvas = document.getElementById('ratioCanvas');
+  function appliquerRatioCanvas(){
+    var parts = ratioCanvas.value.split(':').map(Number);
+    canvas.width = LARGEUR_APERCU_BASE;
+    canvas.height = Math.round(LARGEUR_APERCU_BASE * (parts[1] / parts[0]));
+    W = canvas.width; H = canvas.height;
+  }
 
   var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:-10, ombre:100, flou:24, accentColor:'#7f77dd', glowToggle:true, ratioTuile:'16/9'};
 
@@ -701,7 +753,9 @@
       'INCLINAISON_DEG = ' + v.inclinaison + '\n\n' +
       '# Intensité ombre : ' + v.ombre + '% -- multiplie l\'alpha des 3 dégradés\n' +
       '# Flou lueur : ' + v.flou + 'px -- rayon du flou dans appliquer_degrade\n' +
-      '# Accent : ' + accentColor.value + (glowToggle.checked ? '' : ' (lueur désactivée)');
+      '# Accent : ' + accentColor.value + (glowToggle.checked ? '' : ' (lueur désactivée)') + '\n\n' +
+      '# Ratio du canvas final (aperçu seulement, PAS une constante de mosaique.py) --\n' +
+      '# à reporter en CLI : python3 scripts/generer_backdrops.py --ratio-canvas ' + ratioCanvas.value;
 
     derniereValeurJson = {
       tuile_largeur: v.tuileLargeur,
@@ -713,7 +767,8 @@
       intensite_ombre: parseFloat((v.ombre / 100).toFixed(2)),
       flou_lueur: v.flou,
       accent: accentColor.value,
-      lueur_active: glowToggle.checked
+      lueur_active: glowToggle.checked,
+      ratio_canvas_apercu: ratioCanvas.value
     };
   }
 
@@ -721,6 +776,20 @@
   idsSansRatio.forEach(function(id){ els[id].addEventListener('input', render); });
   accentColor.addEventListener('input', render);
   glowToggle.addEventListener('change', render);
+  ratioCanvas.addEventListener('change', function(){
+    appliquerRatioCanvas();
+    render();
+  });
+
+  // Double-clic sur un curseur : réinitialise CE réglage à sa valeur par
+  // défaut, sans toucher aux autres (le bouton "Réinitialiser" global reste
+  // pour tout remettre à zéro d'un coup).
+  ids.forEach(function(id){
+    els[id].addEventListener('dblclick', function(){
+      els[id].value = defaults[id];
+      els[id].dispatchEvent(new Event('input'));
+    });
+  });
 
   // Saisie numérique : répercute vers le curseur correspondant puis
   // redéclenche son propre événement 'input' (au lieu d'appeler render()
@@ -780,6 +849,8 @@
     accentColor.value = defaults.accentColor;
     glowToggle.checked = defaults.glowToggle;
     ratioTuile.value = defaults.ratioTuile;
+    ratioCanvas.value = '16:9';
+    appliquerRatioCanvas();
     render();
   });
   document.getElementById('copierJson').addEventListener('click', function(){
@@ -848,22 +919,33 @@
 
   function genererBackdropReel(){
     if (imagesReelles.length === 0) return;
-    var v = lireValeurs();
-    var dims = resolutionSortie.value.split('x').map(Number);
-    var canvasSortie = document.createElement('canvas');
-    canvasSortie.width = dims[0];
-    canvasSortie.height = dims[1];
-    var ctxSortie = canvasSortie.getContext('2d');
-    composerBackdrop(ctxSortie, dims[0], dims[1], v, imagesReelles);
+    // Sur un gros lot d'images en haute résolution, la composition peut
+    // prendre une seconde ou deux -- un retour visuel immédiat évite
+    // l'impression que le clic n'a rien fait (l'interface semble figée
+    // le temps du calcul synchrone du canvas).
+    var texteOriginal = boutonGenererReel.textContent;
+    boutonGenererReel.disabled = true;
+    boutonGenererReel.textContent = '⏳ Génération…';
+    setTimeout(function(){
+      var v = lireValeurs();
+      var dims = resolutionSortie.value.split('x').map(Number);
+      var canvasSortie = document.createElement('canvas');
+      canvasSortie.width = dims[0];
+      canvasSortie.height = dims[1];
+      var ctxSortie = canvasSortie.getContext('2d');
+      composerBackdrop(ctxSortie, dims[0], dims[1], v, imagesReelles);
 
-    apercuReel.src = canvasSortie.toDataURL('image/jpeg', 0.92);
-    panneauApercuReel.style.display = 'block';
-    canvasSortie.toBlob(function(blob){
-      if (!blob) return;
-      var url = URL.createObjectURL(blob);
-      telechargerReel.href = url;
-      zoneTelechargement.style.display = 'flex';
-    }, 'image/jpeg', 0.92);
+      apercuReel.src = canvasSortie.toDataURL('image/jpeg', 0.92);
+      panneauApercuReel.style.display = 'block';
+      canvasSortie.toBlob(function(blob){
+        boutonGenererReel.disabled = false;
+        boutonGenererReel.textContent = texteOriginal;
+        if (!blob) return;
+        var url = URL.createObjectURL(blob);
+        telechargerReel.href = url;
+        zoneTelechargement.style.display = 'flex';
+      }, 'image/jpeg', 0.92);
+    }, 30);
   }
 
   boutonGenererReel.addEventListener('click', genererBackdropReel);
@@ -930,9 +1012,13 @@
     var nom = (presetNom.value || '').trim();
     if (!nom) { presetNom.focus(); return; }
     var presets = chargerPresets();
+    if (presets[nom] && !window.confirm('Un preset nommé "' + nom + '" existe déjà. Le remplacer ?')) {
+      return;
+    }
     presets[nom] = {
       valeurs: lireValeurs(),
       ratioTuile: ratioTuile.value,
+      ratioCanvas: ratioCanvas.value,
       accentColor: accentColor.value,
       glowToggle: glowToggle.checked
     };
@@ -950,6 +1036,8 @@
       if (preset.valeurs[id] !== undefined) els[id].value = preset.valeurs[id];
     });
     ratioTuile.value = preset.ratioTuile || '16/9';
+    ratioCanvas.value = preset.ratioCanvas || '16:9';
+    appliquerRatioCanvas();
     accentColor.value = preset.accentColor || defaults.accentColor;
     glowToggle.checked = preset.glowToggle !== undefined ? preset.glowToggle : true;
     render();
@@ -958,10 +1046,67 @@
   presetSupprimer.addEventListener('click', function(){
     var nom = presetListe.value;
     if (!nom) return;
+    if (!window.confirm('Supprimer le preset "' + nom + '" ? Cette action est irréversible.')) return;
     var presets = chargerPresets();
     delete presets[nom];
     sauvegarderPresets(presets);
     rafraichirListePresets();
+  });
+
+  // --- Export / import des presets (fichier JSON) --------------------------
+  // Les presets sont en localStorage, donc propres à ce navigateur/appareil.
+  // Exporter/importer un fichier permet de les transférer vers un autre
+  // navigateur ou une autre machine, ou d'en garder une sauvegarde.
+  var presetExporter = document.getElementById('presetExporter');
+  var presetImporter = document.getElementById('presetImporter');
+  var presetImporterFichier = document.getElementById('presetImporterFichier');
+
+  presetExporter.addEventListener('click', function(){
+    var presets = chargerPresets();
+    if (Object.keys(presets).length === 0){
+      window.alert('Aucun preset à exporter pour l\'instant.');
+      return;
+    }
+    var blob = new Blob([JSON.stringify(presets, null, 2)], {type: 'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'presets-mosaique-nuvio.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  });
+
+  presetImporter.addEventListener('click', function(){ presetImporterFichier.click(); });
+  presetImporterFichier.addEventListener('change', function(e){
+    var fichier = e.target.files[0];
+    if (!fichier) return;
+    var lecteur = new FileReader();
+    lecteur.onload = function(){
+      var importes;
+      try {
+        importes = JSON.parse(lecteur.result);
+      } catch (err) {
+        window.alert('Fichier invalide : ce n\'est pas un JSON de presets valide.');
+        return;
+      }
+      var presets = chargerPresets();
+      var noms = Object.keys(importes);
+      var ecrases = noms.filter(function(n){ return presets[n]; });
+      if (ecrases.length > 0 && !window.confirm(
+        ecrases.length + ' preset(s) existant(s) portent le même nom (' + ecrases.join(', ') +
+        ') et seront remplacés. Continuer ?'
+      )) {
+        return;
+      }
+      noms.forEach(function(n){ presets[n] = importes[n]; });
+      sauvegarderPresets(presets);
+      rafraichirListePresets();
+      window.alert(noms.length + ' preset(s) importé(s).');
+    };
+    lecteur.readAsText(fichier);
+    presetImporterFichier.value = '';
   });
 
   rafraichirListePresets();
