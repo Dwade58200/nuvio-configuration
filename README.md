@@ -3,7 +3,7 @@
 [![Tests](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/tests.yml/badge.svg)](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/tests.yml)
 [![Backdrops](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/generer-backdrops.yml/badge.svg)](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/generer-backdrops.yml)
 
-**🎨 [Outil de réglage du style des mosaïques](https://dwade58200.github.io/nuvio-configuration/outils/reglage-style-mosaique.html)** --
+**🎨 [Outil de réglage du style des mosaïques](https://dwade58200.github.io/nuvio-configuration/reglage-style-mosaique.html)** --
 aperçu en direct des tuiles + génération d'un backdrop depuis vos propres
 images (100% local, aucun envoi réseau).
 
@@ -115,7 +115,7 @@ au démarrage.
 ## Qualité & CI
 
 À chaque push/PR, `.github/workflows/tests.yml` fait tourner :
-- **pytest** (216 tests) -- résolution des sources, composition des
+- **pytest** (263+ tests, en croissance) -- résolution des sources, composition des
   mosaïques, mise à jour des URLs, validation du schéma ;
 - **ruff** -- lint (bloquant) ;
 - **mypy** -- vérification de types (bloquant) ;
@@ -130,7 +130,7 @@ au démarrage.
 | [`BACKDROPS_SETUP.md`](BACKDROPS_SETUP.md) | Référence technique complète du pipeline : fonctionnement détaillé, options CLI, configuration MDBList/AIOMetadata, dépannage |
 | [`AMELIORATIONS.md`](AMELIORATIONS.md) | Liste de travail : ce qui a été fait, ce qui reste, pistes non planifiées |
 | [`APPLIQUER.md`](APPLIQUER.md) | Journal des corrections de la dernière session en date, pour suivre ce qui a changé |
-| [**Générer un backdrop réel à partir d'un dossier d'images**](https://dwade58200.github.io/nuvio-configuration/outils/reglage-style-mosaique.html) | Outil en ligne pour créer une mosaïque personnalisée depuis vos propres images (sélection locale, aperçu en direct, téléchargement) |
+| [**Générer un backdrop réel à partir d'un dossier d'images**](https://dwade58200.github.io/nuvio-configuration/reglage-style-mosaique.html) | Outil en ligne pour créer une mosaïque personnalisée depuis vos propres images (sélection locale, aperçu en direct, téléchargement) |
 
 ## Licence
 
