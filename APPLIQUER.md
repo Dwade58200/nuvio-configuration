@@ -1,4 +1,5 @@
-# Session du 14 septembre 2026 — dépendances pinnées, validation des variables d'environnement, retry API, stubs mypy
+# Session du 16 septembre 2026 — ergonomie de `outils/reglage-style-mosaique.html
+# + session du 14 septembre 2026 — dépendances pinnées, validation des variables d'environnement, retry API, stubs mypy
 # + session du 12 septembre 2026 — mosaïque : ordre centre → bord, consolidation logo FanKai
 # + session suivante (même jour) — optimisation preparer_tuile, nettoyage code mort
 # + session suivante (même jour) — simplification du déclenchement manuel du workflow
@@ -8,10 +9,106 @@
 # + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
 
+# Session du 16 septembre 2026 — ergonomie de `outils/reglage-style-mosaique.html`
+
+À fusionner dans `AMELIORATIONS.md` (section "✅ Fait") si tu valides
+les changements. Un seul fichier modifié : `outils/reglage-style-mosaique.html`.
+
+## ✅ Fait dans cette session
+
+- **Réinitialisation par champ** : double-clic sur n'importe quel curseur
+  pour revenir à SA valeur par défaut, sans toucher aux autres réglages
+  (le bouton "↺ Réinitialiser" global reste pour tout remettre à zéro
+  d'un coup). Indiqué par un `title` au survol.
+- **Unités manquantes affichées** : "px" ajouté à côté de Largeur/Hauteur
+  de tuile, Écart, Arrondi des coins, Flou de la lueur -- ces cinq champs
+  n'affichaient qu'un nombre nu, contrairement à Décalage (%) et
+  Inclinaison (°).
+- **Info-bulles sur les réglages les moins évidents** : "Décalage cascade",
+  "Inclinaison" et "Flou de la lueur" ont maintenant un `title` expliquant
+  ce qu'ils font concrètement (peu intuitif rien qu'au nom du champ).
+- **Nouveau réglage "Ratio du canvas final"** (16:9 / 21:9 / 4:3 / 1:1) :
+  l'outil avait pris du retard sur `generer_backdrops.py`, qui accepte
+  déjà un flag `--ratio-canvas` (session du 13 septembre) -- mais
+  l'aperçu de l'outil restait figé en 800×450 (16:9) quel que soit le
+  ratio réellement utilisé côté script. Ce nouveau menu redimensionne
+  l'aperçu en conséquence et rappelle la commande CLI correspondante dans
+  le bloc de valeurs exporté. C'est un réglage de l'APERÇU uniquement
+  (pas une constante de `mosaique.py`) -- clairement distingué du "Ratio
+  des tuiles" existant, qui reste un concept différent. Pris en compte
+  dans la sauvegarde/chargement des presets.
+- **Presets : confirmation avant écrasement et avant suppression** --
+  auparavant, sauvegarder sous un nom déjà utilisé ou supprimer un preset
+  se faisait sans confirmation, donc sans filet de rattrapage en cas de
+  clic accidentel.
+- **Presets : export/import en fichier JSON** -- les presets restent en
+  `localStorage` (propres à ce navigateur/appareil, limite déjà
+  documentée), mais deux nouveaux boutons ("⬇️ Exporter en JSON" /
+  "⬆️ Importer un JSON") permettent de les transférer vers un autre
+  navigateur ou une autre machine, ou d'en garder une sauvegarde externe.
+  L'import détecte les collisions de noms et demande confirmation avant
+  d'écraser quoi que ce soit.
+- **Retour visuel pendant la génération réelle** : le bouton "🖼️ Générer
+  le backdrop" affiche "⏳ Génération…" et se désactive le temps du
+  calcul -- utile sur un gros lot d'images en haute résolution, où le
+  calcul synchrone du canvas peut prendre une ou deux secondes et donnait
+  l'impression que le clic n'avait rien fait.
+- **Accessibilité clavier** : contour de focus (`outline`) explicite sur
+  tous les contrôles interactifs (boutons, champs, listes déroulantes,
+  liens) -- le focus par défaut du navigateur est parfois trop discret
+  sur le fond sombre de l'outil, rendant la navigation au clavier
+  difficile à suivre.
+
+Aucun changement de comportement sur l'existant : tous les réglages,
+presets et l'export JSON déjà en place continuent de fonctionner à
+l'identique ; les ajouts sont additifs. Vérifié : JS syntaxiquement
+valide (`node --check`), balises HTML équilibrées. Non testé dans un
+vrai navigateur (pas d'environnement graphique ici) -- à valider
+visuellement avant de merger, en particulier le redimensionnement du
+canvas selon le ratio choisi.
+
+---
+
+## 🔵 Autres pistes d'amélioration (pas encore implémentées)
+
+Classées par effort croissant.
+
+**Petites** :
+- Bouton "Copier en JSON" : ajouter aussi un bouton "⬇️ Télécharger en
+  .py" qui génère directement un extrait `mosaique.py` prêt à coller
+  (le bloc actuel est déjà formaté pour ça, juste pas téléchargeable).
+- Ajouter un raccourci clavier (ex. `R`) pour "🔀 Affiches" et un autre
+  pour "↺ Réinitialiser", pour les allers-retours rapides sans souris.
+- Champ "Nom du preset" : appuyer sur Entrée devrait déclencher la
+  sauvegarde (actuellement il faut cliquer sur le bouton).
+
+**Moyennes** :
+- Un mode "comparaison" : figer l'aperçu actuel dans un second canvas
+  à côté, pour comparer visuellement deux réglages (ou un preset chargé
+  vs les réglages en cours) sans devoir mémoriser à quoi ressemblait
+  l'un des deux.
+- Avertissement visuel (pas bloquant) quand une combinaison de valeurs
+  produit un résultat probablement dégénéré -- ex. arrondi des coins
+  supérieur à la moitié de la hauteur de tuile, ou écart nul avec
+  inclinaison forte qui laisse deviner des artefacts de bord. Simple
+  message discret sous l'aperçu plutôt qu'une validation qui bloque.
+- Étendre le sélecteur de résolution de la génération réelle
+  (actuellement 3 résolutions fixes, toutes proches du 16:9) pour
+  proposer aussi des résolutions alignées sur le nouveau "Ratio du
+  canvas final", plutôt que les deux réglages restent indépendants.
+
+**Plus loin (refonte, pas juste de l'ergonomie)** :
+- Remplacer le rendu canvas de l'outil par un appel réel à un mini
+  moteur Python compilé en WASM (ou un endpoint local) pour que
+  l'aperçu soit pixel-perfect avec `mosaique.py`, au lieu d'une
+  approximation JS parallèle à maintenir en synchro manuelle -- gros
+  chantier, seulement si les écarts aperçu/rendu réel deviennent
+  gênants en pratique.
+
+
 ## ✅ Dépendances pinnées, validation des variables d'environnement, retry API, stubs mypy
 
-Session du 14 septembre 2026 : corrections haute priorité suite à l'audit
-de qualité professionnelle.
+# Session du 14 septembre 2026 : corrections haute priorité suite à l'audit de qualité professionnelle.
 
 - **Dépendances pinnées** (`requirements.txt` et `requirements-dev.txt`) :
   versions fixes (`requests==2.32.3`, `Pillow==11.0.0`, `pytest==8.3.3`,
