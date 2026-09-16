@@ -6,6 +6,57 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
+## ✅ Fait (session du 16 septembre 2026 -- ergonomie de l'outil de réglage des backdrops)
+
+Un seul fichier modifié : `outils/reglage-style-mosaique.html`. Aucun
+changement de comportement sur l'existant, tous les ajouts sont additifs.
+
+- [x] **Réinitialisation par champ** : double-clic sur n'importe quel
+      curseur pour revenir à SA valeur par défaut, sans toucher aux
+      autres réglages (le bouton "↺ Réinitialiser" global reste pour
+      tout remettre à zéro d'un coup).
+- [x] **Unités manquantes affichées** : "px" ajouté à côté de
+      Largeur/Hauteur de tuile, Écart, Arrondi des coins, Flou de la
+      lueur -- ces cinq champs n'affichaient qu'un nombre nu,
+      contrairement à Décalage (%) et Inclinaison (°).
+- [x] **Info-bulles sur les réglages les moins évidents** : "Décalage
+      cascade", "Inclinaison" et "Flou de la lueur" ont maintenant un
+      `title` expliquant ce qu'ils font concrètement.
+- [x] **Nouveau réglage "Ratio du canvas final"** (16:9 / 21:9 / 4:3 /
+      1:1) : l'outil avait pris du retard sur `generer_backdrops.py`,
+      qui accepte déjà un flag `--ratio-canvas` (session du 13
+      septembre) -- mais l'aperçu de l'outil restait figé en 800×450
+      (16:9) quel que soit le ratio réellement utilisé côté script. Ce
+      menu redimensionne l'aperçu en conséquence et rappelle la commande
+      CLI correspondante dans le bloc de valeurs exporté. Réglage de
+      l'APERÇU uniquement (pas une constante de `mosaique.py`),
+      clairement distingué du "Ratio des tuiles" existant. Pris en
+      compte dans la sauvegarde/chargement des presets.
+- [x] **Presets : confirmation avant écrasement et avant suppression**
+      -- auparavant sans filet de rattrapage en cas de clic accidentel.
+- [x] **Presets : export/import en fichier JSON** -- restent en
+      `localStorage` (propre à ce navigateur/appareil, limite déjà
+      documentée), mais deux boutons permettent désormais de les
+      transférer vers un autre navigateur/machine ou d'en garder une
+      sauvegarde externe. L'import détecte les collisions de noms et
+      demande confirmation avant d'écraser.
+- [x] **Retour visuel pendant la génération réelle** : le bouton
+      "🖼️ Générer le backdrop" affiche "⏳ Génération…" et se désactive
+      le temps du calcul -- utile sur un gros lot d'images en haute
+      résolution, où le calcul synchrone du canvas peut prendre une ou
+      deux secondes et donnait l'impression que le clic n'avait rien
+      fait.
+- [x] **Accessibilité clavier** : contour de focus explicite sur tous
+      les contrôles interactifs -- le focus par défaut du navigateur
+      est parfois trop discret sur le fond sombre de l'outil.
+
+JS revalidé syntaxiquement (`node --check`) et balises HTML rééquilibrées,
+mais **pas testé dans un vrai navigateur** (pas d'environnement graphique
+disponible ici) -- à valider visuellement avant de merger, en particulier
+le redimensionnement du canvas selon le ratio choisi.
+
+---
+
 ## ✅ Fait (session du 13 septembre 2026, suite 2 -- ratio du canvas, anti-dérive de l'outil, presets)
 
 Propositions faites par Claude lui-même après la session précédente
@@ -551,16 +602,41 @@ précis :
 
 ## 🔵 Reste à faire
 
-Rien pour l'instant -- tout le backlog connu a été traité (voir
-l'historique ci-dessus). Prochaines pistes à explorer si tu en as :
-la liste "Idées plus lointaines" juste en dessous, ou tes propres idées
-à ajouter au fil de l'eau.
+Pistes identifiées lors de l'audit ergonomie de l'outil de réglage des
+backdrops (session du 16 septembre 2026), pas encore implémentées,
+classées par effort croissant :
+
+- Bouton "⬇️ Télécharger en .py" à côté de "📋 Copier en JSON" : le bloc
+  de valeurs affiché est déjà formaté comme un extrait `mosaique.py`,
+  juste pas téléchargeable en fichier.
+- Raccourcis clavier (ex. `R` pour "🔀 Affiches", un autre pour
+  "↺ Réinitialiser") pour les allers-retours rapides sans souris.
+- Champ "Nom du preset" : appuyer sur Entrée devrait déclencher la
+  sauvegarde (il faut actuellement cliquer sur le bouton).
+- Mode "comparaison" : figer l'aperçu actuel dans un second canvas à
+  côté, pour comparer visuellement deux réglages (ou un preset chargé
+  vs les réglages en cours) sans avoir à mémoriser à quoi ressemblait
+  l'un des deux.
+- Avertissement visuel (discret, pas bloquant) quand une combinaison de
+  valeurs produit un résultat probablement dégénéré -- ex. arrondi des
+  coins supérieur à la moitié de la hauteur de tuile, ou écart nul avec
+  inclinaison forte.
+- Étendre le sélecteur de résolution de la génération réelle
+  (actuellement 3 résolutions fixes, toutes proches du 16:9) pour
+  proposer aussi des résolutions alignées sur le nouveau "Ratio du
+  canvas final", plutôt que les deux réglages restent indépendants.
 
 ---
 
 ## ⚪ Idées plus lointaines (pas de demande explicite pour l'instant)
 
 - Génération de variantes `.webp` en plus du `.jpg`.
+- Remplacer le rendu canvas de l'outil par un appel réel à un mini
+  moteur Python compilé en WASM (ou un endpoint local) pour que
+  l'aperçu soit pixel-perfect avec `mosaique.py`, au lieu d'une
+  approximation JS parallèle à maintenir en synchro manuelle -- gros
+  chantier, seulement si les écarts aperçu/rendu réel deviennent
+  gênants en pratique.
 
 
 ## ❌ Explicitement écarté (ne pas reproposer)
@@ -578,3 +654,5 @@ la liste "Idées plus lointaines" juste en dessous, ou tes propres idées
   est configuré sur une instance hébergée externe, aucun script ici ne la
   gère. À traiter depuis la config AIOStreams elle-même, pas depuis ce
   dépôt.
+
+

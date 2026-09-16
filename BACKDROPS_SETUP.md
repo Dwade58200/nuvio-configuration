@@ -188,7 +188,10 @@ sortir par erreur du format choisi. Les préréglages 4:3/3:2/1:1 sont là
 pour expérimenter d'autres formats de tuile ; choisis "Libre" pour piloter
 largeur et hauteur indépendamment, sans contrainte. Ceci ne change QUE la
 forme des tuiles à l'intérieur -- pour changer la forme du backdrop entier,
-voir `--ratio-canvas` plus haut.
+voir `--ratio-canvas` plus haut, ou directement le menu **"Ratio du canvas
+final"** juste en dessous dans l'outil (16:9/21:9/4:3/1:1), qui redimensionne
+l'aperçu pour correspondre au flag CLI et rappelle la commande
+correspondante dans le bloc de valeurs exporté.
 
 **Les valeurs par défaut affichées à l'ouverture restent alignées sur les
 vraies constantes de `scripts/mosaique.py`** : `scripts/generer_defaults_outil.py`
@@ -199,9 +202,12 @@ manuellement après un `appliquer_style_mosaique.py` lancé ailleurs.
 
 **Presets nommés** : une section dédiée permet de sauvegarder plusieurs
 réglages sous un nom, pour comparer différents styles avant de choisir --
-"Charger"/"🗑️" pour les relire/supprimer. Stockés uniquement dans le
+"Charger"/"🗑️" pour les relire/supprimer (une confirmation est demandée
+avant d'écraser ou de supprimer un preset existant). Stockés dans le
 `localStorage` du navigateur (propre à cet appareil, rien n'est envoyé où
-que ce soit) -- à refaire si tu changes de navigateur/machine.
+que ce soit) -- utilise "⬇️ Exporter en JSON" / "⬆️ Importer un JSON" pour
+les transférer vers un autre navigateur/machine ou en garder une
+sauvegarde externe, plutôt que de les refaire à la main.
 
 **Déployé automatiquement sur GitHub Pages** (`.github/workflows/deployer-outils.yml`,
 déclenché à chaque modification de `outils/`) : accessible à
