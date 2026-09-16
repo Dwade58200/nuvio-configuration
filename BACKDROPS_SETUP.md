@@ -205,7 +205,10 @@ que ce soit) -- à refaire si tu changes de navigateur/machine.
 
 **Déployé automatiquement sur GitHub Pages** (`.github/workflows/deployer-outils.yml`,
 déclenché à chaque modification de `outils/`) : accessible à
-`https://<utilisateur>.github.io/<nom-du-repo>/`. **Première utilisation
+`https://dwade58200.github.io/nuvio-configuration/reglage-style-mosaique.html`
+-- **attention**, le workflow publie le CONTENU du dossier `outils/` (pas
+le dossier lui-même) comme racine du site : l'URL ne contient donc PAS de
+segment `/outils/`. **Première utilisation
 seulement** : le premier déploiement échoue systématiquement avec une
 erreur `404 Not Found` sur `configure-pages` tant que Pages n'a jamais été
 activé sur le repo -- dans **Settings → Pages** du repository GitHub,
