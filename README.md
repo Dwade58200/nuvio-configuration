@@ -3,6 +3,10 @@
 [![Tests](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/tests.yml/badge.svg)](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/tests.yml)
 [![Backdrops](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/generer-backdrops.yml/badge.svg)](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/generer-backdrops.yml)
 
+**🎨 [Outil de réglage du style des mosaïques](https://dwade58200.github.io/nuvio-configuration/outils/reglage-style-mosaique.html)** --
+aperçu en direct des tuiles + génération d'un backdrop depuis vos propres
+images (100% local, aucun envoi réseau).
+
 Configuration personnelle de mes **Collections Nuvio**, avec un pipeline
 Python qui génère automatiquement les images de fond (*backdrops*) de
 chaque dossier de collection à partir de TMDB, Fanart.tv et MDBList.
