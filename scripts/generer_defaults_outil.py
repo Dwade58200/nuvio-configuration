@@ -54,7 +54,7 @@ def extraire_constantes(contenu_mosaique: str) -> dict[str, float]:
     `NOM = valeur` (un float ou un int) dans le texte de mosaique.py."""
     valeurs: dict[str, float] = {}
     for nom in CONSTANTES:
-        motif = re.compile(rf"^{re.escape(nom)}\s*=\s*([0-9.]+)", re.MULTILINE)
+        motif = re.compile(rf"^{re.escape(nom)}\s*=\s*(-?[0-9.]+)", re.MULTILINE)
         trouve = motif.search(contenu_mosaique)
         if trouve:
             valeurs[nom] = float(trouve.group(1))
@@ -80,7 +80,7 @@ def mettre_a_jour_html(contenu_html: str, valeurs_outil: dict[str, int]) -> tupl
     # Attributs HTML value="..." -- curseur ET champ numérique jumeau.
     for id_html, valeur in valeurs_outil.items():
         for cible in (id_html, f"{id_html}Num"):
-            motif = re.compile(rf'(id="{re.escape(cible)}"[^>\n]*?value=")\d+(")')
+            motif = re.compile(rf'(id="{re.escape(cible)}"[^>\n]*?value=")-?\d+(")')
             if not motif.search(nouveau):
                 introuvables.append(cible)
                 continue
@@ -95,7 +95,7 @@ def mettre_a_jour_html(contenu_html: str, valeurs_outil: dict[str, int]) -> tupl
 
     # Objet JS `var defaults = {tuileLargeur:372, ...}`.
     for cle, valeur in valeurs_outil.items():
-        motif_js = re.compile(rf"(\b{re.escape(cle)}:)\d+")
+        motif_js = re.compile(rf"(\b{re.escape(cle)}:)-?\d+")
         if not motif_js.search(nouveau):
             introuvables.append(f"defaults.{cle}")
             continue
