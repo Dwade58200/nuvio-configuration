@@ -881,8 +881,10 @@ class ClientTMDB:
         titre = (titre or "").strip()
         if not titre:
             return None
+        titre_norm = normaliser(titre)
         ordre = ["tv", "movie"] if media_type_hint != "movie" else ["movie", "tv"]
         meilleur: tuple[int, str, float] | None = None
+        meilleur_est_exact = False
         for media_type in ordre:
             chemin = "movie" if media_type == "movie" else "tv"
             try:
@@ -896,11 +898,27 @@ class ClientTMDB:
                     for r in resultats
                     if 16 in (r.get("genre_ids") or []) and r.get("original_language") == "ja"
                 ]
-            if resultats:
-                top = max(resultats, key=lambda r: r.get("popularity") or 0)
-                popularite = top.get("popularity") or 0
-                if meilleur is None or popularite > meilleur[2]:
-                    meilleur = (top["id"], media_type, popularite)
+            if not resultats:
+                continue
+            # Un titre comme "Naruto" matche aussi bien "Naruto" que "Naruto:
+            # Shippuden" côté recherche TMDB -- sans ce filtre, le spin-off
+            # (souvent plus populaire) l'emportait systématiquement sur
+            # l'original. On restreint donc d'abord aux résultats dont le
+            # titre correspond EXACTEMENT (normalisé) à la recherche, et on
+            # ne retombe sur l'ensemble des résultats que si aucun ne matche.
+            exacts = [r for r in resultats if normaliser(r.get("name") or r.get("title") or "") == titre_norm]
+            bassin = exacts if exacts else resultats
+            top = max(bassin, key=lambda r: r.get("popularity") or 0)
+            popularite = top.get("popularity") or 0
+            est_exact = bool(exacts)
+            # Un résultat exact l'emporte toujours sur un résultat approximatif,
+            # même moins populaire ; entre deux résultats de même "exactitude",
+            # on départage par popularité comme avant.
+            if meilleur is None or (est_exact and not meilleur_est_exact) or (
+                est_exact == meilleur_est_exact and popularite > meilleur[2]
+            ):
+                meilleur = (top["id"], media_type, popularite)
+                meilleur_est_exact = est_exact
         if meilleur is None:
             return None
         return meilleur[0], meilleur[1]
@@ -1655,7 +1673,24 @@ class GenerateurBackdrops:
             )
             with self._verrou_titres_non_resolus:
                 self.titres_champ_titre_non_resolus.append(titre_a_incruster.titre_affiche)
-            return self._telecharger_une_image(self._url_image_depuis_chemin(backdrop_path)) if backdrop_path else None
+            if not backdrop_path:
+                return None
+            image_repli = self._telecharger_une_image(self._url_image_depuis_chemin(backdrop_path))
+            if image_repli is not None and image_repli.height > image_repli.width:
+                # Le repli catalogue (`champ_image_repli`, ex: "poster" chez
+                # FanKai) est presque toujours un visuel PORTRAIT -- l'utiliser
+                # tel quel comme tuile paysage produit un recadrage "cover"
+                # écrasé/zoomé, visuellement incohérent au milieu des tuiles
+                # paysage normales ("les backdrops ne sont pas tous dans le
+                # même sens"). On préfère écarter la tuile (elle sera
+                # comptabilisée en échec, sans casser la mosaïque) plutôt que
+                # de forcer un mauvais recadrage.
+                logging.debug(
+                    "[TUILE] titre=%r : repli catalogue écarté (image portrait %dx%d)",
+                    titre_a_incruster.titre_affiche, image_repli.width, image_repli.height,
+                )
+                return None
+            return image_repli
 
         if not tmdb_id:
             logging.debug("[TUILE] Pas de tmdb_id -> backdrop brut du candidat directement")
