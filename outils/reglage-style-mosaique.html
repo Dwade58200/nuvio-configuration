@@ -9,6 +9,7 @@
     --bg: #121214;
     --surface: #1c1c1f;
     --surface-2: #232326;
+    --surface-3: #2a2a2e;
     --border: #33333a;
     --text: #ececef;
     --text-secondary: #9a9aa3;
@@ -17,23 +18,83 @@
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    padding: 24px 16px 48px;
+    padding: 0 0 64px;
     background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
-  .conteneur { max-width: 720px; margin: 0 auto; }
-  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
-  .sous-titre { font-size: 14px; color: var(--text-secondary); margin: 0 0 24px; line-height: 1.5; }
+
+  /* ---------- En-tête ---------- */
+  .entete {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    background: rgba(18,18,20,0.92);
+    backdrop-filter: blur(8px);
+    z-index: 20;
+  }
+  .entete-titre { display: flex; flex-direction: column; gap: 2px; }
+  .entete h1 { font-size: 16px; font-weight: 600; margin: 0; }
+  .entete .sous-titre-mini { font-size: 12.5px; color: var(--text-secondary); }
+  .lien-retour {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    white-space: nowrap;
+  }
+  .lien-retour:hover { color: var(--text); border-color: var(--text-secondary); }
+
+  .conteneur { max-width: 1180px; margin: 0 auto; padding: 20px 16px 0; }
+
+  .intro {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 760px;
+    margin: 0 0 20px;
+  }
+
+  /* ---------- Mise en page à deux colonnes ---------- */
+  .mise-en-page {
+    display: grid;
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 880px) {
+    .mise-en-page { grid-template-columns: 1fr; }
+  }
+
+  .colonne-apercu {
+    position: sticky;
+    top: 76px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  @media (max-width: 880px) {
+    .colonne-apercu { position: static; }
+  }
+
   .panneau-preview {
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
     background: #0a0a0c;
-    margin-bottom: 20px;
   }
   canvas, .panneau-preview img { display: block; width: 100%; height: auto; }
-  .actions { display: flex; gap: 10px; margin-bottom: 24px; }
+
+  .actions { display: flex; gap: 10px; }
+  .actions.empiler { flex-direction: column; }
   button, .bouton-lien {
     flex: 1;
     background: var(--surface-2);
@@ -45,29 +106,72 @@
     cursor: pointer;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
   }
-  button:hover, .bouton-lien:hover { background: #2a2a2e; }
+  button:hover, .bouton-lien:hover { background: var(--surface-3); }
   button:active, .bouton-lien:active { transform: scale(0.98); }
   button:disabled { opacity: 0.45; cursor: not-allowed; }
   button:disabled:hover { background: var(--surface-2); }
-  .bouton-lien.accent {
+  .bouton-lien.accent, button.accent {
     background: var(--accent);
     color: #101014;
     font-weight: 600;
     border-color: var(--accent);
   }
-  .grille-controles {
+  .bouton-lien.accent:hover, button.accent:hover { background: #8f87ea; }
+  button.fantome {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-secondary);
+  }
+  button.fantome:hover { background: var(--surface-2); color: var(--text); }
+
+  /* ---------- Sections repliables (réglages) ---------- */
+  .section-reglage {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 20px;
+    margin-bottom: 14px;
+    overflow: hidden;
   }
-  .ligne { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .section-reglage > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+    user-select: none;
+  }
+  .section-reglage > summary::-webkit-details-marker { display: none; }
+  .section-reglage > summary .chevron {
+    color: var(--text-secondary);
+    transition: transform 0.15s ease;
+    font-size: 12px;
+  }
+  .section-reglage[open] > summary .chevron { transform: rotate(90deg); }
+  .section-reglage > summary:hover { background: var(--surface-2); }
+  .section-reglage .contenu-section {
+    padding: 4px 18px 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+  .section-reglage .sous-note {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-secondary);
+  }
+
+  .ligne { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
   .ligne:last-child { margin-bottom: 0; }
   .ligne label {
-    min-width: 150px;
-    font-size: 14px;
+    min-width: 140px;
+    font-size: 13.5px;
     color: var(--text-secondary);
     flex-shrink: 0;
   }
@@ -76,7 +180,7 @@
     accent-color: var(--accent);
   }
   .ligne input[type=number].valeur-num {
-    width: 66px;
+    width: 62px;
     flex-shrink: 0;
     text-align: right;
     font-size: 14px;
@@ -95,12 +199,13 @@
     flex-shrink: 0;
   }
   .ligne input[type=color] {
-    width: 48px;
+    width: 44px;
     height: 32px;
     padding: 0;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: none;
+    flex-shrink: 0;
   }
   .ligne select {
     background: var(--surface-2);
@@ -111,26 +216,27 @@
     font-size: 14px;
     flex: 1;
   }
-  .case-a-cocher { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-secondary); }
+  .case-a-cocher { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-secondary); flex-shrink: 0; }
   .separateur { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
-  h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-secondary); margin: 24px 0 12px; }
+  .separateur-section { border: none; border-top: 1px solid var(--border); margin: 36px 0 28px; }
+
   pre#sortie {
     background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 14px;
     font-family: "SF Mono", Consolas, Monaco, monospace;
-    font-size: 12.5px;
+    font-size: 12px;
     line-height: 1.6;
     white-space: pre-wrap;
     overflow-x: auto;
-    margin-top: 20px;
+    margin: 12px 0 0;
   }
   .note {
     font-size: 12.5px;
     color: var(--text-secondary);
     line-height: 1.6;
-    margin-top: 14px;
+    margin-top: 12px;
   }
   input[type=file] {
     flex: 1;
@@ -146,166 +252,266 @@
     padding: 7px 10px;
     font-size: 14px;
   }
+
+  /* ---------- Section "génération réelle", en pleine largeur ---------- */
+  .section-large-titre { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+  .section-large-titre h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text);
+  }
+  .badge-local {
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    padding: 2px 9px;
+    font-weight: 600;
+  }
+  .etapes-generation {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+  }
+  @media (max-width: 760px) {
+    .etapes-generation { grid-template-columns: 1fr; }
+  }
+  .etape {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .etape-numero {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .etape-titre { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; }
+  .etape .ligne { margin-bottom: 0; }
+  .etape .ligne label { min-width: unset; }
+  .zone-resultat { margin-top: 18px; }
 </style>
 </head>
 <body>
+
+<div class="entete">
+  <div class="entete-titre">
+    <h1>🎨 Réglage du style mosaïque</h1>
+    <span class="sous-titre-mini">Backdrops Nuvio · outil local, rien n'est envoyé sur le réseau</span>
+  </div>
+  <a class="lien-retour" href="https://github.com/Dwade58200/nuvio-configuration#readme">← Retour au dépôt</a>
+</div>
+
 <div class="conteneur">
-  <h1>Réglage du style mosaïque</h1>
-  <p class="sous-titre">
-    Aperçu approximatif (canvas HTML) de la grille de tuiles + vignette
-    utilisée par <code>scripts/mosaique.py</code>. Ajuste les curseurs (ou
-    tape une valeur directement), copie le bloc de valeurs en bas dans le
-    script une fois satisfait. Ceci est un outil de préréglage visuel, pas
-    le vrai moteur de rendu PIL -- à confirmer sur un run réel avant
-    adoption définitive.
+  <p class="intro">
+    Aperçu approximatif (canvas HTML) de la grille de tuiles utilisée par
+    <code>scripts/mosaique.py</code>. Réglez à gauche, l'aperçu à droite se
+    met à jour en direct ; une fois satisfait, copiez le bloc de valeurs en
+    bas de la colonne de réglages. C'est un outil de préréglage visuel, pas
+    le vrai moteur de rendu PIL — à confirmer sur un run réel avant adoption
+    définitive.
   </p>
 
-  <div class="panneau-preview">
-    <canvas id="preview" width="800" height="450"></canvas>
+  <div class="mise-en-page">
+
+    <!-- ================= Colonne aperçu (épinglée) ================= -->
+    <aside class="colonne-apercu">
+      <div class="panneau-preview">
+        <canvas id="preview" width="800" height="450"></canvas>
+      </div>
+
+      <div class="actions">
+        <button id="shuffle" title="Change les affiches de démo, sans toucher aux réglages">🔀 Affiches</button>
+        <button id="reset" class="fantome" title="Remet tous les curseurs à leur valeur d'origine">↺ Réinitialiser</button>
+      </div>
+
+      <details class="section-reglage">
+        <summary>📋 Valeurs &amp; export <span class="chevron">▸</span></summary>
+        <div class="contenu-section">
+          <pre id="sortie"></pre>
+          <div class="actions" style="margin-top:12px;">
+            <button id="copierJson">📋 Copier en JSON</button>
+          </div>
+          <p class="note">
+            Copie le JSON puis applique-le directement :<br>
+            <code>python3 scripts/appliquer_style_mosaique.py --json-inline '&lt;coller ici&gt;'</code>
+          </p>
+        </div>
+      </details>
+    </aside>
+
+    <!-- ================= Colonne réglages (sections repliables) ================= -->
+    <main>
+
+      <details class="section-reglage" open>
+        <summary>🧩 Grille de tuiles <span class="chevron">▸</span></summary>
+        <div class="contenu-section">
+          <div class="ligne">
+            <label for="tuileLargeur">Largeur tuile</label>
+            <input type="range" id="tuileLargeur" min="150" max="500" step="2" value="372">
+            <input type="number" class="valeur-num" id="tuileLargeurNum" min="150" max="500" step="2" value="372">
+          </div>
+          <div class="ligne">
+            <label for="tuileHauteur">Hauteur tuile</label>
+            <input type="range" id="tuileHauteur" min="80" max="280" step="2" value="210">
+            <input type="number" class="valeur-num" id="tuileHauteurNum" min="80" max="280" step="2" value="210">
+          </div>
+          <div class="ligne">
+            <label for="ratioTuile">Ratio des tuiles</label>
+            <select id="ratioTuile">
+              <option value="16/9" selected>16:9 (défaut)</option>
+              <option value="4/3">4:3</option>
+              <option value="3/2">3:2</option>
+              <option value="1/1">1:1 (carré)</option>
+              <option value="libre">Libre (pas de contrainte)</option>
+            </select>
+          </div>
+          <div class="ligne">
+            <label for="ecart">Écart entre tuiles</label>
+            <input type="range" id="ecart" min="0" max="30" step="1" value="9">
+            <input type="number" class="valeur-num" id="ecartNum" min="0" max="30" step="1" value="9">
+          </div>
+          <div class="ligne">
+            <label for="rayon">Arrondi des coins</label>
+            <input type="range" id="rayon" min="0" max="40" step="1" value="9">
+            <input type="number" class="valeur-num" id="rayonNum" min="0" max="40" step="1" value="9">
+          </div>
+          <div class="ligne">
+            <label for="decalage">Décalage cascade</label>
+            <input type="range" id="decalage" min="0" max="100" step="5" value="50">
+            <input type="number" class="valeur-num" id="decalageNum" min="0" max="100" step="5" value="50">
+            <span class="unite">%</span>
+          </div>
+          <div class="ligne">
+            <label for="inclinaison">Inclinaison</label>
+            <input type="range" id="inclinaison" min="-25" max="25" step="1" value="-10">
+            <input type="number" class="valeur-num" id="inclinaisonNum" min="-25" max="25" step="1" value="-10">
+            <span class="unite">°</span>
+          </div>
+        </div>
+      </details>
+
+      <details class="section-reglage" open>
+        <summary>✨ Ombre &amp; lueur <span class="chevron">▸</span></summary>
+        <div class="contenu-section">
+          <div class="ligne">
+            <label for="ombre">Intensité ombre</label>
+            <input type="range" id="ombre" min="0" max="200" step="5" value="100">
+            <input type="number" class="valeur-num" id="ombreNum" min="0" max="200" step="5" value="100">
+            <span class="unite">%</span>
+          </div>
+          <div class="ligne">
+            <label for="flou">Flou de la lueur</label>
+            <input type="range" id="flou" min="0" max="80" step="2" value="24">
+            <input type="number" class="valeur-num" id="flouNum" min="0" max="80" step="2" value="24">
+          </div>
+          <div class="ligne">
+            <label for="accentColor">Couleur d'accent</label>
+            <input type="color" id="accentColor" value="#7f77dd">
+            <span class="case-a-cocher">
+              <input type="checkbox" id="glowToggle" checked> Lueur activée
+            </span>
+          </div>
+          <p class="note">
+            L'intensité de l'ombre et le flou de la lueur sont des constantes
+            modifiables dans <code>mosaique.py</code>
+            (<code>INTENSITE_OMBRE</code>, <code>RAYON_FLOU_LUEUR_MIN</code>).
+          </p>
+        </div>
+      </details>
+
+      <details class="section-reglage">
+        <summary>💾 Presets <span class="chevron">▸</span> <span class="sous-note">sauvegardés dans ce navigateur</span></summary>
+        <div class="contenu-section">
+          <div class="ligne">
+            <label for="presetNom">Nom du preset</label>
+            <input type="text" id="presetNom" placeholder="ex: Style FanKai">
+            <button id="presetSauvegarder" style="flex: 0 0 auto;">💾 Sauvegarder</button>
+          </div>
+          <div class="ligne">
+            <label for="presetListe">Presets enregistrés</label>
+            <select id="presetListe">
+              <option value="">-- Aucun preset --</option>
+            </select>
+            <button id="presetCharger" style="flex: 0 0 auto;">Charger</button>
+            <button id="presetSupprimer" style="flex: 0 0 auto;">🗑️</button>
+          </div>
+          <p class="note">
+            Enregistre plusieurs réglages pour comparer différents styles
+            avant de choisir — stocké uniquement dans ce navigateur (rien
+            n'est envoyé où que ce soit), donc propre à cet appareil.
+          </p>
+        </div>
+      </details>
+
+    </main>
   </div>
 
-  <div class="actions">
-    <button id="shuffle">↻ Régénérer les affiches</button>
-    <button id="reset">Réinitialiser les valeurs</button>
-  </div>
+  <hr class="separateur-section">
 
-  <div class="grille-controles" style="margin-bottom: 20px;">
-    <h2 style="margin-top:0">Presets (sauvegardés dans ce navigateur)</h2>
-    <div class="ligne">
-      <label for="presetNom">Nom du preset</label>
-      <input type="text" id="presetNom" placeholder="ex: Style FanKai">
-      <button id="presetSauvegarder" style="flex: 0 0 auto;">💾 Sauvegarder</button>
+  <!-- ================= Génération réelle depuis un dossier d'images ================= -->
+  <section>
+    <div class="section-large-titre">
+      <h2>🖼️ Générer un backdrop réel à partir d'un dossier d'images</h2>
+      <span class="badge-local">100% local</span>
     </div>
-    <div class="ligne">
-      <label for="presetListe">Presets enregistrés</label>
-      <select id="presetListe">
-        <option value="">-- Aucun preset --</option>
-      </select>
-      <button id="presetCharger" style="flex: 0 0 auto;">Charger</button>
-      <button id="presetSupprimer" style="flex: 0 0 auto;">🗑️</button>
-    </div>
-    <p class="note" style="margin-top: 10px;">
-      Enregistre plusieurs réglages pour comparer différents styles avant
-      de choisir -- stocké uniquement dans ce navigateur (rien n'est
-      envoyé où que ce soit), donc propre à cet appareil.
+    <p class="note" style="margin-top:6px;">
+      Les images sélectionnées ne quittent jamais ton navigateur (aucun
+      envoi réseau). Utile pour un lot d'images sans référence TMDB
+      (fan-arts, scans, captures perso...) — applique le style réglé
+      ci-dessus à de VRAIES images et produit un fichier téléchargeable,
+      sans passer par <code>generer_backdrops.py</code>.
     </p>
-  </div>
 
-  <div class="grille-controles">
-    <h2 style="margin-top:0">Grille de tuiles</h2>
-    <div class="ligne">
-      <label for="tuileLargeur">Largeur tuile</label>
-      <input type="range" id="tuileLargeur" min="150" max="500" step="2" value="372">
-      <input type="number" class="valeur-num" id="tuileLargeurNum" min="150" max="500" step="2" value="372">
-    </div>
-    <div class="ligne">
-      <label for="tuileHauteur">Hauteur tuile</label>
-      <input type="range" id="tuileHauteur" min="80" max="280" step="2" value="210">
-      <input type="number" class="valeur-num" id="tuileHauteurNum" min="80" max="280" step="2" value="210">
-    </div>
-    <div class="ligne">
-      <label for="ratioTuile">Ratio des tuiles</label>
-      <select id="ratioTuile">
-        <option value="16/9" selected>16:9 (défaut)</option>
-        <option value="4/3">4:3</option>
-        <option value="3/2">3:2</option>
-        <option value="1/1">1:1 (carré)</option>
-        <option value="libre">Libre (pas de contrainte)</option>
-      </select>
-    </div>
-    <div class="ligne">
-      <label for="ecart">Écart entre tuiles</label>
-      <input type="range" id="ecart" min="0" max="30" step="1" value="9">
-      <input type="number" class="valeur-num" id="ecartNum" min="0" max="30" step="1" value="9">
-    </div>
-    <div class="ligne">
-      <label for="rayon">Arrondi des coins</label>
-      <input type="range" id="rayon" min="0" max="40" step="1" value="9">
-      <input type="number" class="valeur-num" id="rayonNum" min="0" max="40" step="1" value="9">
-    </div>
-    <div class="ligne">
-      <label for="decalage">Décalage cascade</label>
-      <input type="range" id="decalage" min="0" max="100" step="5" value="50">
-      <input type="number" class="valeur-num" id="decalageNum" min="0" max="100" step="5" value="50">
-      <span class="unite">%</span>
-    </div>
-    <div class="ligne">
-      <label for="inclinaison">Inclinaison</label>
-      <input type="range" id="inclinaison" min="-25" max="25" step="1" value="-10">
-      <input type="number" class="valeur-num" id="inclinaisonNum" min="-25" max="25" step="1" value="-10">
-      <span class="unite">°</span>
+    <div class="etapes-generation">
+      <div class="etape">
+        <div class="etape-titre"><span class="etape-numero">1</span> Choisir les images</div>
+        <div class="ligne">
+          <input type="file" id="dossierImages" webkitdirectory multiple accept="image/*">
+        </div>
+        <p class="note" id="statutDossier" style="margin-top:0;">Aucune image sélectionnée.</p>
+      </div>
+
+      <div class="etape">
+        <div class="etape-titre"><span class="etape-numero">2</span> Régler la sortie</div>
+        <div class="ligne">
+          <label for="resolutionSortie">Résolution</label>
+          <select id="resolutionSortie">
+            <option value="1280x720">1280×720 (standard)</option>
+            <option value="1920x1080">1920×1080 (haute)</option>
+            <option value="780x439">780×439 (compressé)</option>
+          </select>
+        </div>
+        <button id="melangerImages" disabled title="Mélange aléatoirement l'ordre des images sélectionnées, puis régénère l'aperçu">🔀 Mélanger les images</button>
+      </div>
+
+      <div class="etape">
+        <div class="etape-titre"><span class="etape-numero">3</span> Générer &amp; télécharger</div>
+        <button id="genererReel" class="accent" disabled>🖼️ Générer le backdrop</button>
+        <p class="note" style="margin-top:0;">Le style appliqué est celui réglé plus haut.</p>
+      </div>
     </div>
 
-    <hr class="separateur">
-    <h2 style="margin-top:0">Ombre et lueur</h2>
-    <div class="ligne">
-      <label for="ombre">Intensité ombre</label>
-      <input type="range" id="ombre" min="0" max="200" step="5" value="100">
-      <input type="number" class="valeur-num" id="ombreNum" min="0" max="200" step="5" value="100">
-      <span class="unite">%</span>
+    <div class="zone-resultat">
+      <div class="panneau-preview" id="panneauApercuReel" style="display:none;">
+        <img id="apercuReel" alt="Backdrop généré">
+      </div>
+      <div class="actions" id="zoneTelechargement" style="display:none; margin-top:12px;">
+        <a id="telechargerReel" class="bouton-lien accent" download="backdrop-mosaique.jpg">💾 Télécharger le backdrop généré</a>
+      </div>
     </div>
-    <div class="ligne">
-      <label for="flou">Flou de la lueur</label>
-      <input type="range" id="flou" min="0" max="80" step="2" value="24">
-      <input type="number" class="valeur-num" id="flouNum" min="0" max="80" step="2" value="24">
-    </div>
-    <div class="ligne">
-      <label for="accentColor">Couleur d'accent</label>
-      <input type="color" id="accentColor" value="#7f77dd">
-      <span class="case-a-cocher">
-        <input type="checkbox" id="glowToggle" checked> Lueur activée
-      </span>
-    </div>
-  </div>
-
-  <pre id="sortie"></pre>
-  <div style="display:flex; gap:10px; margin-top:12px;">
-    <button id="copierJson" style="flex:1;">📋 Copier en JSON</button>
-  </div>
-  <p class="note">
-    Copie le JSON puis applique-le directement :<br>
-    <code>python3 scripts/appliquer_style_mosaique.py --json-inline '&lt;coller ici&gt;'</code>
-  </p>
-  <p class="note">
-    L'intensité de l'ombre et le flou de la lueur sont maintenant des
-    constantes modifiables dans <code>mosaique.py</code>
-    (<code>INTENSITE_OMBRE</code>, <code>RAYON_FLOU_LUEUR_MIN</code>).
-  </p>
-
-  <hr class="separateur">
-  <h2 style="margin-top:0">Générer un backdrop réel à partir d'un dossier d'images</h2>
-  <p class="note">
-    100% local : les images sélectionnées ne quittent jamais ton
-    navigateur (aucun envoi réseau). Utile pour un lot d'images sans
-    référence TMDB (fan-arts, scans, captures perso...) -- applique le
-    style réglé au-dessus à de VRAIES images et produit un fichier
-    téléchargeable, sans passer par <code>generer_backdrops.py</code>.
-  </p>
-  <div class="grille-controles">
-    <div class="ligne">
-      <label for="dossierImages">Dossier ou images</label>
-      <input type="file" id="dossierImages" webkitdirectory multiple accept="image/*">
-    </div>
-    <div class="ligne">
-      <label for="resolutionSortie">Résolution de sortie</label>
-      <select id="resolutionSortie">
-        <option value="1280x720">1280×720 (profil standard)</option>
-        <option value="1920x1080">1920×1080 (profil haute)</option>
-        <option value="780x439">780×439 (profil compressé)</option>
-      </select>
-    </div>
-  </div>
-  <p class="note" id="statutDossier">Aucune image sélectionnée.</p>
-  <div class="actions" style="margin-bottom: 14px;">
-    <button id="genererReel" disabled>🖼️ Générer le backdrop</button>
-    <button id="melangerImages" disabled title="Mélange aléatoirement l'ordre des images sélectionnées">🔀 Mélanger les images</button>
-  </div>
-  <div class="panneau-preview" id="panneauApercuReel" style="display:none;">
-    <img id="apercuReel" alt="Backdrop généré">
-  </div>
-  <div class="actions" id="zoneTelechargement" style="display:none;">
-    <a id="telechargerReel" class="bouton-lien accent" download="backdrop-mosaique.jpg">💾 Télécharger le backdrop généré</a>
-  </div>
+  </section>
 </div>
 
 <script>
