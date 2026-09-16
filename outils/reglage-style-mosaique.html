@@ -349,11 +349,24 @@
       <div class="panneau-preview">
         <canvas id="preview" width="800" height="450"></canvas>
       </div>
+      <p class="note" id="avertissementCombo" style="display:none; color:#e2a33d;">⚠️</p>
 
       <div class="actions">
-        <button id="shuffle" title="Change les affiches de démo, sans toucher aux réglages">🔀 Affiches</button>
-        <button id="reset" class="fantome" title="Remet tous les curseurs à leur valeur d'origine">↺ Réinitialiser</button>
+        <button id="shuffle" title="Change les affiches de démo, sans toucher aux réglages (raccourci : A)">🔀 Affiches</button>
+        <button id="reset" class="fantome" title="Remet tous les curseurs à leur valeur d'origine (raccourci : R)">↺ Réinitialiser</button>
       </div>
+
+      <div class="actions">
+        <button id="figerComparaison" class="fantome" title="Capture l'aperçu actuel pour le comparer avec un autre réglage, sans perdre de vue lequel des deux tu regardes">📌 Figer pour comparer</button>
+      </div>
+      <div class="panneau-preview" id="panneauComparaison" style="display:none; position: relative;">
+        <img id="apercuFige" alt="Aperçu figé pour comparaison" style="display:block; width:100%; height:auto;">
+        <button id="effacerComparaison" class="fantome" style="position:absolute; top:8px; right:8px; flex:none; padding:4px 8px; font-size:12px;">✕ Effacer</button>
+      </div>
+      <p class="note" id="noteComparaison" style="display:none;">
+        Aperçu figé au moment du clic, à gauche/au-dessus de l'aperçu en
+        direct -- change les réglages et compare visuellement.
+      </p>
 
       <details class="section-reglage">
         <summary>📋 Valeurs &amp; export <span class="chevron">▸</span></summary>
@@ -361,6 +374,7 @@
           <pre id="sortie"></pre>
           <div class="actions" style="margin-top:12px;">
             <button id="copierJson">📋 Copier en JSON</button>
+            <button id="telechargerPy" class="fantome">⬇️ Télécharger en .py</button>
           </div>
           <p class="note">
             Copie le JSON puis applique-le directement :<br>
@@ -731,6 +745,26 @@
     }
   }
 
+  function verifierComboDegeneree(v){
+    var el = document.getElementById('avertissementCombo');
+    var messages = [];
+    if (v.rayon > v.tuileHauteur / 2){
+      messages.push('l\'arrondi des coins dépasse la moitié de la hauteur de tuile (tuiles presque ovales)');
+    }
+    if (v.ecart === 0 && Math.abs(v.inclinaison) >= 15){
+      messages.push('écart nul + forte inclinaison : des artefacts de bord sont probables entre les tuiles');
+    }
+    if (v.ombre >= 180 && (!glowToggle.checked || v.flou <= 4)){
+      messages.push('ombre très forte sans lueur pour compenser : le résultat peut paraître presque noir');
+    }
+    if (messages.length === 0){
+      el.style.display = 'none';
+      return;
+    }
+    el.style.display = 'block';
+    el.textContent = '⚠️ ' + messages.join(' · ');
+  }
+
   function lireValeurs(){
     var v = {};
     ids.forEach(function(id){ v[id] = parseInt(els[id].value, 10); });
@@ -742,6 +776,7 @@
     ids.forEach(function(id){ elsNum[id].value = v[id]; });
 
     composerBackdrop(ctx, W, H, v, posters);
+    verifierComboDegeneree(v);
 
     sortie.textContent =
       '# Valeurs choisies -- à reporter dans scripts/mosaique.py\n' +
@@ -1108,6 +1143,90 @@
     lecteur.readAsText(fichier);
     presetImporterFichier.value = '';
   });
+
+  // Entrée dans le champ "Nom du preset" -- déclenche la sauvegarde sans
+  // avoir à attraper le bouton à la souris.
+  presetNom.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      presetSauvegarder.click();
+    }
+  });
+
+  // --- Raccourcis clavier -----------------------------------------------
+  // Ignorés quand le focus est dans un champ de saisie/liste/textarea, pour
+  // ne jamais interférer avec la frappe d'un nom de preset par exemple.
+  document.addEventListener('keydown', function(e){
+    var actif = document.activeElement;
+    var dansChamp = actif && /^(INPUT|SELECT|TEXTAREA)$/.test(actif.tagName);
+    if (dansChamp || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'a' || e.key === 'A'){
+      document.getElementById('shuffle').click();
+    } else if (e.key === 'r' || e.key === 'R'){
+      document.getElementById('reset').click();
+    }
+  });
+
+  // --- Téléchargement en extrait .py --------------------------------------
+  document.getElementById('telechargerPy').addEventListener('click', function(){
+    var blob = new Blob([sortie.textContent + '\n'], {type: 'text/x-python'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'style-mosaique.py';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  });
+
+  // --- Comparaison : figer l'aperçu actuel dans un second panneau ---------
+  var figerComparaison = document.getElementById('figerComparaison');
+  var panneauComparaison = document.getElementById('panneauComparaison');
+  var apercuFige = document.getElementById('apercuFige');
+  var noteComparaison = document.getElementById('noteComparaison');
+  var effacerComparaison = document.getElementById('effacerComparaison');
+
+  figerComparaison.addEventListener('click', function(){
+    apercuFige.src = canvas.toDataURL('image/jpeg', 0.92);
+    panneauComparaison.style.display = 'block';
+    noteComparaison.style.display = 'block';
+  });
+  effacerComparaison.addEventListener('click', function(){
+    panneauComparaison.style.display = 'none';
+    noteComparaison.style.display = 'none';
+    apercuFige.src = '';
+  });
+
+  // --- Résolutions de sortie alignées sur le ratio du canvas choisi -------
+  // Le ratio du canvas (aperçu) et la résolution de génération réelle sont
+  // deux réglages distincts -- ceci ne fait qu'aligner les CHOIX proposés,
+  // rien n'empêche de garder l'ancienne liste 16:9 si le ratio choisi est
+  // 16:9 (comportement par défaut inchangé).
+  var RESOLUTIONS_PAR_RATIO = {
+    '16:9': [['1280x720', '1280×720 (standard)'], ['1920x1080', '1920×1080 (haute)'], ['780x439', '780×439 (compressé)']],
+    '21:9': [['1680x720', '1680×720 (standard)'], ['2560x1080', '2560×1080 (haute)']],
+    '4:3': [['960x720', '960×720 (standard)'], ['1440x1080', '1440×1080 (haute)']],
+    '1:1': [['720x720', '720×720 (standard)'], ['1080x1080', '1080×1080 (haute)']]
+  };
+  function actualiserResolutionsSortie(){
+    var options = RESOLUTIONS_PAR_RATIO[ratioCanvas.value] || RESOLUTIONS_PAR_RATIO['16:9'];
+    var valeurActuelle = resolutionSortie.value;
+    resolutionSortie.innerHTML = '';
+    options.forEach(function(paire){
+      var opt = document.createElement('option');
+      opt.value = paire[0];
+      opt.textContent = paire[1];
+      resolutionSortie.appendChild(opt);
+    });
+    // Conserve la sélection si elle existe encore dans la nouvelle liste,
+    // sinon revient au premier choix plutôt que de laisser une valeur
+    // orpheline invisible pour l'utilisateur.
+    var valeurs = options.map(function(p){ return p[0]; });
+    resolutionSortie.value = valeurs.indexOf(valeurActuelle) !== -1 ? valeurActuelle : valeurs[0];
+  }
+  ratioCanvas.addEventListener('change', actualiserResolutionsSortie);
+  actualiserResolutionsSortie();
 
   rafraichirListePresets();
 

@@ -1,4 +1,5 @@
-# Session du 16 septembre 2026 — ergonomie de l'outil de réglage des backdrops
+# Session du 16 septembre 2026, suite — raccourcis, comparaison, avertissements, export .py
+# + session du 16 septembre 2026 — ergonomie de l'outil de réglage des backdrops
 # + session du 14 septembre 2026 — dépendances pinnées, validation des variables d'environnement, retry API, stubs mypy
 # + session du 12 septembre 2026 — mosaïque : ordre centre → bord, consolidation logo FanKai
 # + session suivante (même jour) — optimisation preparer_tuile, nettoyage code mort
@@ -8,6 +9,26 @@
 # + session suivante (même jour) — logo FanKai + filtre genre anime (bug "Monster" corrigé)
 # + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
+
+## ✅ Raccourcis, comparaison, avertissements, export .py (outils/reglage-style-mosaique.html)
+
+Suite de la session précédente (même jour), même fichier.
+
+- **Téléchargement en `.py`** du bloc de valeurs, sans passer par le
+  presse-papiers.
+- **Raccourcis clavier** `A` (affiches) / `R` (réinitialiser), inactifs
+  quand le focus est dans un champ de saisie.
+- **Entrée** dans le champ nom de preset = sauvegarde.
+- **Mode comparaison** : capture l'aperçu actuel dans un panneau à part
+  pour le comparer visuellement à un autre réglage.
+- **Avertissement discret** sur les combinaisons de valeurs
+  probablement dégénérées (arrondi > moitié de la hauteur de tuile,
+  écart nul + forte inclinaison, ombre très forte sans lueur).
+- **Résolutions de génération réelle** désormais alignées sur le
+  "Ratio du canvas final" choisi, au lieu de rester figées en 16:9.
+
+JS revalidé (`node --check`), pas de doublon d'`id` ; toujours pas testé
+dans un vrai navigateur.
 
 ## ✅ Ergonomie de l'outil de réglage des backdrops (outils/reglage-style-mosaique.html)
 

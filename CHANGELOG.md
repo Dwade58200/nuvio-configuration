@@ -24,6 +24,7 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 - Badge de couverture de code dans le README
 
 ### Modifié
+- **Ergonomie de l'outil de réglage des backdrops, suite** : mode comparaison (figer/effacer un aperçu), avertissement discret sur les combinaisons de valeurs dégénérées, raccourcis clavier (A/R), téléchargement direct du bloc de valeurs en `.py`, résolutions de génération réelle alignées sur le ratio du canvas choisi.
 - **Ergonomie de l'outil de réglage des backdrops** : réinitialisation par champ (double-clic), unités manquantes affichées, info-bulles sur les réglages peu intuitifs, nouveau réglage "Ratio du canvas final" (aligné sur `--ratio-canvas`), confirmation avant écrasement/suppression de preset, export/import des presets en JSON, retour visuel pendant la génération réelle, contour de focus clavier.
 - **Template initial aligné (#15)** : Les valeurs par défaut de l'outil `reglage-style-mosaique.html` sont synchronisées avec les constantes de `mosaique.py` (inclinaison corrigée à -10°).
 - **Test mis à jour** : `test_construire_grille_inclinee_place_le_premier_resultat_au_centre` adapté pour valider le placement central avec suffisamment d'images distinctes.

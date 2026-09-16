@@ -209,6 +209,17 @@ que ce soit) -- utilise "⬇️ Exporter en JSON" / "⬆️ Importer un JSON" po
 les transférer vers un autre navigateur/machine ou en garder une
 sauvegarde externe, plutôt que de les refaire à la main.
 
+**Comparaison, avertissements et raccourcis** : "📌 Figer pour comparer"
+capture l'aperçu courant dans un panneau à part pour le comparer
+visuellement à un autre réglage ("✕ Effacer" pour le retirer) ; un
+message discret apparaît sous l'aperçu si la combinaison de valeurs
+choisie est probablement dégénérée (arrondi trop grand, écart nul avec
+forte inclinaison, ombre très forte sans lueur) ; les raccourcis clavier
+`A` (affiches) et `R` (réinitialiser) fonctionnent tant que le focus
+n'est pas dans un champ de saisie. Le bloc de valeurs peut aussi être
+téléchargé directement en `.py` ("⬇️ Télécharger en .py"), sans passer
+par le presse-papiers.
+
 **Déployé automatiquement sur GitHub Pages** (`.github/workflows/deployer-outils.yml`,
 déclenché à chaque modification de `outils/`) : accessible à
 `https://dwade58200.github.io/nuvio-configuration/reglage-style-mosaique.html`

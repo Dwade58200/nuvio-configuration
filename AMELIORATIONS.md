@@ -6,6 +6,46 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
+## ✅ Fait (session du 16 septembre 2026, suite -- raccourcis, comparaison, avertissements, export .py)
+
+Suite de la session précédente (même jour), toujours sur le seul fichier
+`outils/reglage-style-mosaique.html`. Reprend les pistes listées dans
+"Reste à faire" ci-dessous (catégories "Petites" et une partie des
+"Moyennes").
+
+- [x] **Téléchargement en `.py`** : bouton "⬇️ Télécharger en .py" à côté
+      de "📋 Copier en JSON", qui télécharge directement le bloc de
+      valeurs déjà formaté en extrait Python, sans repasser par le
+      presse-papiers.
+- [x] **Raccourcis clavier** : `A` pour "🔀 Affiches", `R` pour
+      "↺ Réinitialiser" -- désactivés automatiquement quand le focus est
+      dans un champ de saisie/liste, pour ne jamais interférer avec la
+      frappe (ex. nom de preset).
+- [x] **Entrée pour sauvegarder un preset** : appuyer sur Entrée dans le
+      champ "Nom du preset" déclenche la sauvegarde, plus besoin de
+      cliquer sur le bouton.
+- [x] **Mode comparaison** : nouveau bouton "📌 Figer pour comparer" qui
+      capture l'aperçu actuel dans un second panneau juste en dessous
+      (avec un bouton "✕ Effacer") -- permet de changer les réglages et
+      de comparer visuellement avec l'état figé, sans avoir à mémoriser
+      à quoi ressemblait l'un des deux.
+- [x] **Avertissement sur combinaisons dégénérées** : message discret
+      (non bloquant) sous l'aperçu si l'arrondi des coins dépasse la
+      moitié de la hauteur de tuile, si l'écart est nul avec une forte
+      inclinaison (artefacts de bord probables), ou si l'ombre est très
+      forte sans lueur pour compenser.
+- [x] **Résolutions de génération réelle alignées sur le ratio du
+      canvas** : la liste déroulante "Résolution" (section génération
+      depuis un dossier d'images) se recalcule désormais selon le
+      "Ratio du canvas final" choisi (16:9/21:9/4:3/1:1), au lieu de
+      rester figée sur 3 résolutions toutes proches du 16:9 quel que
+      soit le ratio sélectionné par ailleurs.
+
+JS revalidé (`node --check`), balises et `id` vérifiés sans doublon.
+Toujours **pas testé dans un vrai navigateur**.
+
+---
+
 ## ✅ Fait (session du 16 septembre 2026 -- ergonomie de l'outil de réglage des backdrops)
 
 Un seul fichier modifié : `outils/reglage-style-mosaique.html`. Aucun
@@ -602,29 +642,10 @@ précis :
 
 ## 🔵 Reste à faire
 
-Pistes identifiées lors de l'audit ergonomie de l'outil de réglage des
-backdrops (session du 16 septembre 2026), pas encore implémentées,
-classées par effort croissant :
-
-- Bouton "⬇️ Télécharger en .py" à côté de "📋 Copier en JSON" : le bloc
-  de valeurs affiché est déjà formaté comme un extrait `mosaique.py`,
-  juste pas téléchargeable en fichier.
-- Raccourcis clavier (ex. `R` pour "🔀 Affiches", un autre pour
-  "↺ Réinitialiser") pour les allers-retours rapides sans souris.
-- Champ "Nom du preset" : appuyer sur Entrée devrait déclencher la
-  sauvegarde (il faut actuellement cliquer sur le bouton).
-- Mode "comparaison" : figer l'aperçu actuel dans un second canvas à
-  côté, pour comparer visuellement deux réglages (ou un preset chargé
-  vs les réglages en cours) sans avoir à mémoriser à quoi ressemblait
-  l'un des deux.
-- Avertissement visuel (discret, pas bloquant) quand une combinaison de
-  valeurs produit un résultat probablement dégénéré -- ex. arrondi des
-  coins supérieur à la moitié de la hauteur de tuile, ou écart nul avec
-  inclinaison forte.
-- Étendre le sélecteur de résolution de la génération réelle
-  (actuellement 3 résolutions fixes, toutes proches du 16:9) pour
-  proposer aussi des résolutions alignées sur le nouveau "Ratio du
-  canvas final", plutôt que les deux réglages restent indépendants.
+Rien pour l'instant côté ergonomie de l'outil -- tout le backlog de la
+session du 16 septembre 2026 a été traité (voir historique ci-dessus).
+Reste seulement la piste de refonte plus lourde listée dans "Idées plus
+lointaines" ci-dessous.
 
 ---
 
