@@ -1605,13 +1605,31 @@ class GenerateurBackdrops:
         hauteur = round(largeur / self.ratio_canvas)
         return largeur, hauteur
 
-    def _telecharger_une_image(self, url: str) -> Image.Image | None:
-        try:
-            r = self.session.get(url, timeout=20)
-            r.raise_for_status()
-            return mosaique_module.image_depuis_bytes(r.content)
-        except Exception:  # noqa: BLE001
-            return None
+    def _telecharger_une_image(self, url: str, tentatives: int = 2) -> Image.Image | None:
+        """Télécharge une image. `self.session` a déjà un retry réseau
+        (urllib3.Retry, voir __init__ : 429/500/502/503/504 avec backoff)
+        qui couvre déjà la plupart des aléas de connexion -- inutile de le
+        dupliquer ici. Le trou restant, non couvert par ce retry réseau,
+        est une réponse HTTP 200 mais au contenu corrompu/tronqué (le
+        décodage PIL échoue alors qu'aucune erreur réseau ne s'est
+        produite) : on retente une seule fois ce cas précis plutôt que de
+        perdre pour de bon une image pourtant bien résolue, ce qui
+        forcerait une répétition évitable ailleurs dans la mosaïque."""
+        derniere_exception: Exception | None = None
+        for tentative in range(tentatives):
+            try:
+                r = self.session.get(url, timeout=20)
+                r.raise_for_status()
+                return mosaique_module.image_depuis_bytes(r.content)
+            except Exception as exc:  # noqa: BLE001
+                derniere_exception = exc
+                if tentative < tentatives - 1:
+                    time.sleep(0.3)
+        logging.debug(
+            "[TELECHARGEMENT] échec définitif après %d tentative(s) pour %s : %s",
+            tentatives, url, derniere_exception,
+        )
+        return None
 
     @staticmethod
     def _url_image_depuis_chemin(chemin: str) -> str:
@@ -1989,14 +2007,24 @@ class GenerateurBackdrops:
         # nombre de cases de la grille -> on vise ce nombre d'images DISTINCTES
         # pour éviter les répétitions rapprochées d'une même affiche
         cible = mosaique_module.nombre_cellules_grille(largeur, hauteur, echelle=largeur / 1920)
-        pages_necessaires = min(6, math.ceil(cible / 18) + 1)
+        # On demande volontairement PLUS que `cible` candidats uniques : une
+        # résolution TMDB/Fanart ou un téléchargement peuvent échouer
+        # ponctuellement (réseau, image manquante...) même après les
+        # tentatives de _telecharger_une_image. Sans cette marge, le moindre
+        # échec fait passer sous `cible` images distinctes et force des
+        # répétitions ÉVITABLES (une affiche déjà présente réapparaît) alors
+        # que d'autres titres, uniques, existent mais n'ont simplement pas
+        # été demandés -- typiquement visible sur une collection à catalogue
+        # restreint (ex: Studio Ghibli).
+        cible_avec_marge = math.ceil(cible * 1.3) + 4
+        pages_necessaires = min(6, math.ceil(cible_avec_marge / 18) + 1)
 
         candidats: list[CandidatTuile] = []
         vus: set[tuple[str, int | str | None]] = set()
 
         # on interleave les requêtes pour ne pas être dominé par la première
         listes_par_requete = [
-            self._resoudre_liste_candidats(req, cible, pages_necessaires) for req in requetes
+            self._resoudre_liste_candidats(req, cible_avec_marge, pages_necessaires) for req in requetes
         ]
         max_len = max((len(liste) for liste in listes_par_requete), default=0)
         for i in range(max_len):
@@ -2014,13 +2042,13 @@ class GenerateurBackdrops:
                     if cle not in vus:
                         vus.add(cle)
                         candidats.append((backdrop_path, tmdb_id, media_type, langue_originale, titre_a_incruster))
-            if len(candidats) >= cible:
+            if len(candidats) >= cible_avec_marge:
                 break
 
         if not mosaique_module.assez_d_images(len(candidats)):
             return None  # pas assez d'images -> repli sur le mode single-image
 
-        images = self._telecharger_images_pour_mosaique(candidats[:cible])
+        images = self._telecharger_images_pour_mosaique(candidats[:cible_avec_marge])
         if not mosaique_module.assez_d_images(len(images)):
             return None  # trop d'échecs de téléchargement -> repli aussi
 
