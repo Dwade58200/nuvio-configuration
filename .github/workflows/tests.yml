@@ -8,6 +8,8 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Récupérer le repository
@@ -39,3 +41,21 @@ jobs:
 
       - name: Tests (pytest)
         run: pytest tests/ -v
+
+      - name: Générer et commiter le badge de couverture
+        # Seulement sur push vers main : jamais sur une PR (pas de droit
+        # d'écriture garanti, et on ne veut pas polluer les branches de
+        # travail avec des commits automatiques).
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          pip install coverage-badge==1.1.2
+          coverage-badge -o coverage.svg -f
+          git add coverage.svg
+          if git diff --cached --quiet; then
+            echo "Couverture inchangée, rien à commiter."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: mettre à jour le badge de couverture"
+          git push
