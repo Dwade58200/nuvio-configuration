@@ -902,6 +902,62 @@ def test_analyser_ratio_canvas_rejette_les_formats_invalides():
             _analyser_ratio_canvas(valeur_invalide)
 
 
+def test_telecharger_une_image_reessaie_apres_un_echec_transitoire(monkeypatch):
+    """Un échec réseau ponctuel (timeout, erreur 5xx...) ne doit pas faire
+    perdre l'image pour de bon si une tentative suivante réussit -- sans
+    quoi une affiche pourtant bien résolue disparaît de la mosaïque et
+    force une répétition évitable ailleurs."""
+    import io
+
+    from PIL import Image as PILImage
+
+    from generer_backdrops import GenerateurBackdrops
+
+    tampon = io.BytesIO()
+    PILImage.new("RGB", (10, 10)).save(tampon, format="JPEG")
+    octets_image = tampon.getvalue()
+
+    appels = {"n": 0}
+
+    class _FausseReponse:
+        content = octets_image
+
+        def raise_for_status(self):
+            return None
+
+    class _FausseSession:
+        def get(self, url, timeout=None, **kwargs):
+            appels["n"] += 1
+            if appels["n"] < 2:
+                raise TimeoutError("réseau capricieux")
+            return _FausseReponse()
+
+    monkeypatch.setattr("generer_backdrops.time.sleep", lambda _: None)
+    generateur = GenerateurBackdrops(cle_tmdb="x", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"))
+    generateur.session = _FausseSession()
+
+    resultat = generateur._telecharger_une_image("https://exemple/image.jpg")  # noqa: SLF001
+    assert resultat is not None
+    assert appels["n"] == 2
+
+
+def test_telecharger_une_image_abandonne_apres_le_nombre_de_tentatives_prevu(monkeypatch):
+    """A contrario, un échec qui persiste au-delà du nombre de tentatives
+    doit bien renvoyer None (pas de boucle infinie, pas d'exception qui
+    remonte)."""
+    from generer_backdrops import GenerateurBackdrops
+
+    class _FausseSessionToujoursEnEchec:
+        def get(self, url, timeout=None, **kwargs):
+            raise ConnectionError("indisponible")
+
+    monkeypatch.setattr("generer_backdrops.time.sleep", lambda _: None)
+    generateur = GenerateurBackdrops(cle_tmdb="x", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"))
+    generateur.session = _FausseSessionToujoursEnEchec()
+
+    assert generateur._telecharger_une_image("https://exemple/image.jpg") is None  # noqa: SLF001
+
+
 def test_dimensions_canvas_utilise_le_ratio_par_defaut_16_9():
     from generer_backdrops import GenerateurBackdrops
 
@@ -1463,6 +1519,68 @@ def test_rechercher_titre_choisit_le_media_type_le_plus_populaire():
 
     client = ClientTMDB(cle_api="fake", session=_FausseSessionRecherche())
     assert client.rechercher_titre("Boruto", media_type_hint="tv") == (20, "movie")
+
+
+def test_rechercher_titre_prefere_correspondance_exacte_a_la_popularite():
+    """Cas réel FanKai : chercher "Naruto" ne doit PAS retourner "Naruto:
+    Shippuden" (spin-off homonyme bien plus populaire) -- un résultat dont
+    le titre correspond EXACTEMENT à la recherche l'emporte toujours sur
+    un résultat seulement approchant, même moins populaire."""
+    class _FausseSessionRecherche:
+        def get(self, url, params=None, timeout=None, **kwargs):
+            if "/search/tv" in url:
+                return _FausseReponseCatalogueCustom(
+                    {
+                        "results": [
+                            {"id": 46260, "name": "Naruto", "popularity": 80.0},
+                            {"id": 31910, "name": "Naruto: Shippuden", "popularity": 450.0},
+                        ]
+                    }
+                )
+            if "/search/movie" in url:
+                return _FausseReponseCatalogueCustom({"results": []})
+            raise AssertionError(f"URL inattendue: {url}")
+
+    client = ClientTMDB(cle_api="fake", session=_FausseSessionRecherche())
+    assert client.rechercher_titre("Naruto") == (46260, "tv")
+
+
+def test_champ_titre_repli_catalogue_portrait_est_ecarte():
+    """Quand la recherche TMDB échoue pour un candidat "champ_titre" (ex:
+    FanKai), le repli sur l'image brute du catalogue (`champ_image_repli`,
+    typiquement "poster") ne doit PAS être utilisé tel quel si elle est
+    PORTRAIT -- l'écraser dans une tuile paysage produit un recadrage
+    incohérent avec le reste de la mosaïque ("les backdrops ne sont pas
+    tous dans le même sens")."""
+    from PIL import Image as PILImage
+
+    from generer_backdrops import CandidatTuile, GenerateurBackdrops, InfoTitreCatalogue
+
+    generateur = GenerateurBackdrops(cle_tmdb="x", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"))
+    generateur.tmdb.rechercher_titre = lambda *a, **k: None  # type: ignore[method-assign]
+    generateur._telecharger_une_image = lambda url: PILImage.new("RGB", (500, 750))  # type: ignore[method-assign]
+
+    info = InfoTitreCatalogue(titre_affiche="Naruto Kaï", titre_recherche="Naruto")
+    candidat: CandidatTuile = ("https://exemple/poster-portrait.jpg", None, "tv", None, info)
+    assert generateur._resoudre_image_tuile(candidat) is None  # noqa: SLF001
+
+
+def test_champ_titre_repli_catalogue_paysage_est_conserve():
+    """A contrario, un repli catalogue déjà PAYSAGE reste utilisé -- on ne
+    veut écarter que les visuels portrait, pas tout repli."""
+    from PIL import Image as PILImage
+
+    from generer_backdrops import CandidatTuile, GenerateurBackdrops, InfoTitreCatalogue
+
+    generateur = GenerateurBackdrops(cle_tmdb="x", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"))
+    generateur.tmdb.rechercher_titre = lambda *a, **k: None  # type: ignore[method-assign]
+    generateur._telecharger_une_image = lambda url: PILImage.new("RGB", (1280, 720))  # type: ignore[method-assign]
+
+    info = InfoTitreCatalogue(titre_affiche="Naruto Kaï", titre_recherche="Naruto")
+    candidat: CandidatTuile = ("https://exemple/backdrop-paysage.jpg", None, "tv", None, info)
+    resultat = generateur._resoudre_image_tuile(candidat)  # noqa: SLF001
+    assert resultat is not None
+    assert resultat.size == (1280, 720)
 
 
 def test_rechercher_titre_introuvable_retourne_none():

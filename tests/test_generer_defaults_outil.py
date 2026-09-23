@@ -43,6 +43,36 @@ def test_extraire_constantes_lit_les_valeurs_entieres_et_flottantes():
     assert constantes["INTENSITE_OMBRE"] == 1.0
 
 
+def test_extraire_constantes_lit_une_valeur_negative():
+    """INCLINAISON_DEG est négatif en pratique (ex: -10) -- doit être lu
+    correctement, et pas seulement les valeurs positives des fixtures
+    ci-dessus."""
+    mosaique_negatif = MOSAIQUE_FACTICE.replace("INCLINAISON_DEG = 10", "INCLINAISON_DEG = -10")
+    constantes = extraire_constantes(mosaique_negatif)
+    assert constantes["INCLINAISON_DEG"] == -10.0
+
+
+def test_mettre_a_jour_html_gere_une_valeur_negative():
+    """Le remplacement dans l'attribut HTML value="..." et dans l'objet JS
+    `defaults` doit fonctionner aussi pour une valeur négative (ex:
+    inclinaison=-10), pas seulement en écriture depuis une valeur
+    positive."""
+    outil_avec_inclinaison_negative = OUTIL_FACTICE.replace(
+        "var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:10,",
+        "var defaults = {tuileLargeur:372, tuileHauteur:210, ecart:9, rayon:9, decalage:50, inclinaison:-10,",
+    )
+    outil_avec_inclinaison_negative = (
+        outil_avec_inclinaison_negative
+        + '\n<input type="range" id="inclinaison" min="-25" max="25" step="1" value="-10">'
+        + '\n<input type="number" class="valeur-num" id="inclinaisonNum" min="-25" max="25" step="1" value="-10">'
+    )
+    nouveau, modifies, introuvables = mettre_a_jour_html(outil_avec_inclinaison_negative, {"inclinaison": -15})
+    assert introuvables == []
+    assert 'id="inclinaison" min="-25" max="25" step="1" value="-15"' in nouveau
+    assert 'id="inclinaisonNum" min="-25" max="25" step="1" value="-15"' in nouveau
+    assert "inclinaison:-15" in nouveau
+
+
 def test_extraire_constantes_absente_est_simplement_omise():
     """Une constante renommée/retirée de mosaique.py ne doit pas planter
     l'extraction -- juste être absente du dict retourné (signalée par
