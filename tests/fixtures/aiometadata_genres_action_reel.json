@@ -1,0 +1,104 @@
+{
+  "_source": "Extrait verbatim (champs pertinents uniquement) de Templates/aiometadata-setup.json, pour les catalogId réellement référencés par le dossier Action du groupe Genres -- au 16 septembre 2026.",
+  "version": 1,
+  "config": {
+    "catalogs": [
+      {
+        "id": "mdblist.128037",
+        "type": "movie",
+        "source": "mdblist",
+        "sort": "default",
+        "order": "asc",
+        "metadata": {
+          "url": "https://mdblist.com/lists/snoak/latest-action-movies",
+          "mediatype": "movie"
+        }
+      },
+      {
+        "id": "mdblist.128029",
+        "type": "series",
+        "source": "mdblist",
+        "sort": "default",
+        "order": "asc",
+        "metadata": {
+          "url": "https://mdblist.com/lists/snoak/latest-action-tv-shows",
+          "mediatype": "show"
+        }
+      },
+      {
+        "id": "tmdb.discover.movie.genre_action.global",
+        "type": "movie",
+        "source": "tmdb",
+        "metadata": {
+          "discover": {
+            "mediaType": "movie",
+            "params": {
+              "sort_by": "popularity.desc",
+              "include_adult": true,
+              "with_genres": "28",
+              "vote_average.gte": 4,
+              "vote_average.lte": 9.9,
+              "vote_count.gte": 100
+            }
+          }
+        }
+      },
+      {
+        "id": "tmdb.discover.series.genre_action_and_aventure.global",
+        "type": "series",
+        "source": "tmdb",
+        "metadata": {
+          "discover": {
+            "mediaType": "tv",
+            "params": {
+              "sort_by": "popularity.desc",
+              "include_adult": true,
+              "with_genres": "10759",
+              "vote_average.gte": 4,
+              "vote_average.lte": 9.9,
+              "vote_count.gte": 100
+            }
+          }
+        }
+      },
+      {
+        "id": "tmdb.discover.movie.action_copy.mokbfuip",
+        "type": "movie",
+        "source": "tmdb",
+        "metadata": {
+          "discover": {
+            "mediaType": "movie",
+            "params": {
+              "sort_by": "vote_average.desc",
+              "include_adult": false,
+              "with_genres": "28",
+              "without_keywords": "210024",
+              "vote_average.gte": 7,
+              "vote_average.lte": 9.9,
+              "vote_count.gte": 5000
+            }
+          }
+        }
+      },
+      {
+        "id": "tmdb.discover.series.action_aventure_copy.mokbk464",
+        "type": "series",
+        "source": "tmdb",
+        "metadata": {
+          "discover": {
+            "mediaType": "tv",
+            "params": {
+              "sort_by": "vote_average.desc",
+              "include_adult": false,
+              "with_genres": "10759",
+              "without_keywords": "210024",
+              "vote_average.gte": 7,
+              "vote_average.lte": 9.9,
+              "vote_count.gte": 2000
+            }
+          }
+        }
+      }
+    ]
+  }
+}

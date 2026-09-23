@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 from generer_backdrops import (  # noqa: E402
     GROUPE_GENRES,
     GenerateurBackdrops,
+    charger_catalogues_aiometadata,
 )
 
 
@@ -542,6 +543,104 @@ def test_fankai_champ_logo_absent_ou_en_echec_retombe_sur_le_titre_en_texte(tmp_
 
     assert resultat.statut == "genere"
     assert (tmp_path / resultat.chemin).exists()
+
+
+def test_pipeline_avec_le_vrai_dossier_action_du_groupe_genres(tmp_path):
+    """Cas réel (pas inventé pour le test) : le dossier "Action" du groupe
+    Genres, tel qu'il existe aujourd'hui dans
+    Templates/Nuvio-Collections-Dwade58200.json (voir fixtures/
+    dossier_genres_action_reel.json), avec les VRAIS catalogId AIOMetadata
+    qu'il référence, extraits de Templates/aiometadata-setup.json (voir
+    fixtures/aiometadata_genres_action_reel.json). Vérifie que le pipeline
+    complet -- résolution addon/aio-metadata (priorité absolue, sans repli
+    heuristique) -> MDBList + TMDB discover -> dédup -> mosaïque ->
+    sauvegarde -- fonctionne de bout en bout sur cette vraie configuration,
+    en ne simulant que les réponses réseau.
+
+    Si ce test casse après une modification de la config réelle (renommage
+    de catalogue, nouveau filtre...), c'est le signal qu'il faut
+    resynchroniser les deux fixtures depuis les Templates/ à jour plutôt
+    que d'ajuster le test à l'aveugle.
+    """
+    fixture_dossier = json.loads(
+        (Path(__file__).resolve().parent / "fixtures" / "dossier_genres_action_reel.json").read_text(encoding="utf-8")
+    )
+    chemin_aiometadata = Path(__file__).resolve().parent / "fixtures" / "aiometadata_genres_action_reel.json"
+    catalogues_aiometadata = charger_catalogues_aiometadata(chemin_aiometadata)
+
+    # Les 6 sources du dossier réel référencent bien ces 6 catalogId --
+    # tous doivent être résolus via l'export AIOMetadata, sans repli
+    # heuristique. Si l'un d'eux manque, la fixture aiometadata a dérivé
+    # de la vraie config et doit être régénérée.
+    ids_attendus = {
+        "mdblist.128037",
+        "mdblist.128029",
+        "tmdb.discover.movie.genre_action.global",
+        "tmdb.discover.series.genre_action_and_aventure.global",
+        "tmdb.discover.movie.action_copy.mokbfuip",
+        "tmdb.discover.series.action_aventure_copy.mokbk464",
+    }
+    assert ids_attendus.issubset(catalogues_aiometadata.keys())
+
+    generateur = GenerateurBackdrops(
+        cle_tmdb="fausse-cle",
+        cle_fanart=None,
+        repertoire_sortie=tmp_path,
+        profil="standard",
+        mosaique=True,
+        catalogues_aiometadata=catalogues_aiometadata,
+    )
+
+    # Pool volontairement chevauchant entre MDBList et discover (comme en
+    # pratique : le même film ressort souvent à la fois d'une liste
+    # MDBList "New Action" et d'un discover popularité) -- vérifie la
+    # dédup documentée dans BACKDROPS_SETUP.md avec de vrais ids qui se
+    # recoupent, plutôt qu'un mock qui évite artificiellement le cas.
+    ids_films = list(range(500, 520))  # 20 films distincts au total
+    ids_series = list(range(600, 620))  # 20 séries distinctes au total
+
+    def fausse_get(url, params=None, timeout=None, **kwargs):
+        params = params or {}
+        if "mdblist.com" in url and "action-movies" in url:
+            return FausseReponse([{"id": i, "type": "movie"} for i in ids_films[:12]])
+        if "mdblist.com" in url and "action-tv-shows" in url:
+            return FausseReponse([{"id": i, "type": "tv"} for i in ids_series[:12]])
+        if "discover/movie" in url:
+            if params.get("page", 1) != 1:
+                return FausseReponse({"results": []})
+            return FausseReponse(
+                {"results": [{"id": i, "backdrop_path": f"/movie-{i}.jpg", "original_language": "en"} for i in ids_films]}
+            )
+        if "discover/tv" in url:
+            if params.get("page", 1) != 1:
+                return FausseReponse({"results": []})
+            return FausseReponse(
+                {"results": [{"id": i, "backdrop_path": f"/tv-{i}.jpg", "original_language": "en"} for i in ids_series]}
+            )
+        if ("/movie/" in url or "/tv/" in url) and url.endswith("/images"):
+            # Backdrop taggé français, pays FR -- résolu dès l'étape 1 de
+            # _resoudre_image_tuile, pas de détour Fanart nécessaire ici.
+            return FausseReponse({"backdrops": [{"file_path": "/nu.jpg", "iso_639_1": "fr", "iso_3166_1": "FR"}]})
+        if "image.tmdb.org" in url:
+            return FausseReponse(content=_image_factice_bytes())
+        raise AssertionError(f"URL inattendue: {url}")
+
+    generateur.session.get = MagicMock(side_effect=fausse_get)
+
+    resultat = generateur.traiter_dossier(fixture_dossier["groupe_titre"], fixture_dossier["dossier"])
+
+    assert resultat.statut == "genere", resultat.detail
+    assert "mosa" in resultat.detail.lower()  # confirme le mode mosaïque, pas un repli single-backdrop
+    assert resultat.chemin is not None
+    chemin_final = tmp_path / resultat.chemin
+    assert chemin_final.exists()
+    # Chemin de sortie cohérent avec le vrai groupe/dossier (pas un slug générique)
+    assert "genres" in str(chemin_final).lower()
+    assert "action" in str(chemin_final).lower()
+
+    with Image.open(chemin_final) as img:
+        assert img.format == "JPEG"
+        assert img.width > 0 and img.height > 0
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 ## [Non publié] - 2024-XX-XX
 
 ### Ajouté
+- **Test d'intégration sur un cas réel** : `test_pipeline_avec_le_vrai_dossier_action_du_groupe_genres`, qui exerce le pipeline complet (addon AIOMetadata -> MDBList + TMDB discover -> dédup -> mosaïque) sur le dossier "Action" du groupe Genres tel qu'il existe réellement dans `Templates/Nuvio-Collections-Dwade58200.json`, avec les vrais catalogId associés (fixtures `dossier_genres_action_reel.json` / `aiometadata_genres_action_reel.json`).
 - **Généralisation du logo/titre TMDB (#13)** : Le mécanisme d'incrustation de logo/titre TMDB sur les backdrops nus, auparavant réservé à FanKai, est maintenant appliqué à TOUTES les collections utilisant `champ_titre` quand aucune affiche avec titre FR/EN/original n'est trouvée. Recherche prioritaire fr-FR puis en-US.
 - **Bouton aléatoire (#16)** : Nouvel outil dans l'interface de génération depuis un dossier d'images pour mélanger aléatoirement l'ordre des images avant composition.
 - **Positionnement en spirale (#17)** : Algorithme de placement des tuiles révisé pour une disposition en spirale (du centre vers l'extérieur) au lieu d'une grille inclinée linéaire. Conserve le style visuel des tuiles.

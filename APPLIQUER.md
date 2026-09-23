@@ -1,4 +1,5 @@
-# Session du 16 septembre 2026, suite — raccourcis, comparaison, avertissements, export .py
+# Session du 16 septembre 2026, suite 2 — test d'intégration sur le vrai dossier "Action" (Genres)
+# + session du 16 septembre 2026, suite — raccourcis, comparaison, avertissements, export .py
 # + session du 16 septembre 2026 — ergonomie de l'outil de réglage des backdrops
 # + session du 14 septembre 2026 — dépendances pinnées, validation des variables d'environnement, retry API, stubs mypy
 # + session du 12 septembre 2026 — mosaïque : ordre centre → bord, consolidation logo FanKai
@@ -9,6 +10,21 @@
 # + session suivante (même jour) — logo FanKai + filtre genre anime (bug "Monster" corrigé)
 # + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
+
+## ✅ Test d'intégration sur le vrai dossier "Action" (tests/test_pipeline_integration.py)
+
+Ajout d'un test, aucun changement de code de production.
+
+- Nouveau test `test_pipeline_avec_le_vrai_dossier_action_du_groupe_genres` :
+  prend le dossier "Action" du groupe Genres tel qu'il existe réellement
+  dans `Templates/Nuvio-Collections-Dwade58200.json`, avec les vrais
+  catalogId AIOMetadata qu'il référence (extrait réel de
+  `Templates/aiometadata-setup.json`), et vérifie le pipeline complet de
+  bout en bout (addon -> MDBList + discover -> dédup -> mosaïque ->
+  JPEG), réseau simulé.
+- Deux nouvelles fixtures : `dossier_genres_action_reel.json` et
+  `aiometadata_genres_action_reel.json`.
+- Suite complète revérifiée : `python3 -m pytest tests/ -q` -> 264 passed.
 
 ## ✅ Raccourcis, comparaison, avertissements, export .py (outils/reglage-style-mosaique.html)
 

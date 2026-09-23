@@ -1,0 +1,99 @@
+{
+  "_source": "Extrait verbatim de Templates/Nuvio-Collections-Dwade58200.json (groupe Genres, dossier Action), au 16 septembre 2026 -- à resynchroniser si la config réelle change.",
+  "groupe_titre": "🎭 Genres",
+  "dossier": {
+    "id": "folder-eb5d2957",
+    "title": "Action",
+    "sources": [
+      {
+        "type": "Film",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "provider": "addon",
+        "catalogId": "mdblist.128037"
+      },
+      {
+        "type": "Série",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "provider": "addon",
+        "catalogId": "mdblist.128029"
+      },
+      {
+        "type": "Film",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "provider": "addon",
+        "catalogId": "tmdb.discover.movie.genre_action.global"
+      },
+      {
+        "type": "Série",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "provider": "addon",
+        "catalogId": "tmdb.discover.series.genre_action_and_aventure.global"
+      },
+      {
+        "type": "Film",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "provider": "addon",
+        "catalogId": "tmdb.discover.movie.action_copy.mokbfuip"
+      },
+      {
+        "type": "Série",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "provider": "addon",
+        "catalogId": "tmdb.discover.series.action_aventure_copy.mokbk464"
+      }
+    ],
+    "hideTitle": true,
+    "tileShape": "LANDSCAPE",
+    "coverEmoji": "💥",
+    "focusGifUrl": "",
+    "heroVideoUrl": "",
+    "titleLogoUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Logos/Action_Logo.png?raw=true",
+    "coverImageUrl": "https://github.com/Dwade58200/nuvio-configuration/blob/main/Collections/Genres/Covers/Action.png?raw=true",
+    "catalogSources": [
+      {
+        "type": "Film",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "catalogId": "mdblist.128037"
+      },
+      {
+        "type": "Série",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "catalogId": "mdblist.128029"
+      },
+      {
+        "type": "Film",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "catalogId": "tmdb.discover.movie.genre_action.global"
+      },
+      {
+        "type": "Série",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "catalogId": "tmdb.discover.series.genre_action_and_aventure.global"
+      },
+      {
+        "type": "Film",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "catalogId": "tmdb.discover.movie.action_copy.mokbfuip"
+      },
+      {
+        "type": "Série",
+        "genre": "None",
+        "addonId": "aio-metadata",
+        "catalogId": "tmdb.discover.series.action_aventure_copy.mokbk464"
+      }
+    ],
+    "focusGifEnabled": false,
+    "heroBackdropUrl": "https://cdn.jsdelivr.net/gh/Dwade58200/nuvio-configuration@main/Collections/Genres/Backdrops/Action_Backdrop.jpg"
+  }
+}

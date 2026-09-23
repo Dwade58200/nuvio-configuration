@@ -6,6 +6,37 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
+## ✅ Fait (session du 16 septembre 2026, suite 2 -- test d'intégration sur un vrai dossier)
+
+Contrairement aux sessions précédentes (toutes sur `outils/reglage-style-mosaique.html`),
+celle-ci ajoute un **test**, sans toucher au code de production.
+
+- [x] **`test_pipeline_avec_le_vrai_dossier_action_du_groupe_genres`**
+      (`tests/test_pipeline_integration.py`) : reprend TEL QUEL le dossier
+      "Action" du groupe Genres depuis `Templates/Nuvio-Collections-Dwade58200.json`,
+      avec les vrais catalogId qu'il référence résolus depuis un extrait
+      réel de `Templates/aiometadata-setup.json` -- pas des données
+      inventées pour l'occasion. Vérifie que le pipeline complet (addon
+      aio-metadata -> MDBList + TMDB discover -> dédup -> mosaïque ->
+      sauvegarde JPEG) fonctionne de bout en bout sur cette config réelle,
+      en simulant volontairement un chevauchement d'ids entre MDBList et
+      discover pour couvrir la dédup documentée plus haut ("un même film
+      provient à la fois d'une collection et d'un catalogue discover").
+  - Nouvelles fixtures : `tests/fixtures/dossier_genres_action_reel.json`
+    (groupe + dossier verbatim) et
+    `tests/fixtures/aiometadata_genres_action_reel.json` (les 6 entrées
+    AIOMetadata correspondantes, champs utiles uniquement -- sans le
+    `formState` volumineux de l'export d'origine).
+  - Si ce test casse après un changement dans les vrais `Templates/`
+    (catalogue renommé, filtre modifié...), c'est le signal qu'il faut
+    régénérer les deux fixtures depuis la config à jour, pas ajuster le
+    test à l'aveugle.
+
+Vérifié : `python3 -m pytest tests/ -q` -> 264 passed (suite complète,
+aucune régression).
+
+---
+
 ## ✅ Fait (session du 16 septembre 2026, suite -- raccourcis, comparaison, avertissements, export .py)
 
 Suite de la session précédente (même jour), toujours sur le seul fichier
