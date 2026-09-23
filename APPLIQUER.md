@@ -1,4 +1,5 @@
-# Session du 16 septembre 2026, suite 2 — test d'intégration sur le vrai dossier "Action" (Genres)
+# Session du 16 septembre 2026, suite 3 — nettoyage recommandé par l'audit (dépendances, couverture, badge, noqa, code mort)
+# + session du 16 septembre 2026, suite 2 — test d'intégration sur le vrai dossier "Action" (Genres)
 # + session du 16 septembre 2026, suite — raccourcis, comparaison, avertissements, export .py
 # + session du 16 septembre 2026 — ergonomie de l'outil de réglage des backdrops
 # + session du 14 septembre 2026 — dépendances pinnées, validation des variables d'environnement, retry API, stubs mypy
@@ -10,6 +11,46 @@
 # + session suivante (même jour) — logo FanKai + filtre genre anime (bug "Monster" corrigé)
 # + session du 27 août 2026 — bug MDBList, retrait de Trakt, optimisations
 # + session suivante (même jour) — nettoyage ruff, pool de connexions, budget TMDB retiré
+
+## ✅ Nettoyage recommandé par l'audit externe (dépendances, couverture, badge, noqa, code mort)
+
+Cinq points "quick win" retenus après discussion de l'audit externe --
+priorité haute/moyenne écartée pour l'instant (refonte modulaire de
+`generer_backdrops.py`, matrice Python, dossier `docs/`).
+
+- **`requirements.txt`** : retiré `types-requests` et `pytest-cov`
+  (dépendances de dev uniquement, elles restent dans
+  `requirements-dev.txt` qui les déclare correctement).
+- **`--cov-fail-under=75`** ajouté à `pyproject.toml` (`addopts`) --
+  couverture actuelle 77%, marge de ~2 points. Objectif : qu'une
+  régression de couverture comme celle qui vient de se produire (perte
+  accidentelle de 7 tests) fasse échouer la CI au lieu de passer
+  inaperçue.
+- **Badge de couverture** dans le README, généré via `coverage-badge` et
+  commité automatiquement par `tests.yml` (nouvelle étape, seulement sur
+  push vers `main`, même logique de garde que `deployer-outils.yml`).
+  Le CHANGELOG l'annonçait déjà sans qu'il existe réellement.
+- **`# noqa: E402` locaux retirés** (31 occurrences, 20 fichiers) --
+  redondants puisque E402 est déjà ignoré globalement dans
+  `[tool.ruff.lint] ignore` avec un commentaire expliquant pourquoi. Les
+  2 occurrences qui portaient un commentaire explicatif complémentaire
+  ("accès direct pour appliquer_config_externe") l'ont conservé, seul le
+  tag `noqa: E402` a été retiré.
+- **`ClientMDBList.rechercher_listes()` supprimée**, avec ses 2 tests
+  dédiés (`tests/test_mosaique_integration.py`). Tranché : elle
+  dupliquait une logique déjà présente en autonome dans
+  `scripts/mdblist_recherche.py` (le vrai outil utilisé en pratique), et
+  ne correspond pas au besoin réel identifié (tester une liste MDBList
+  *connue* dans l'outil de réglage visuel -- ça, c'est
+  `recuperer_items_liste()`, pas `rechercher_listes()`, et ce serait de
+  toute façon une fonctionnalité neuve côté navigateur, pas une
+  réutilisation de ce code Python).
+
+Vérifié : `ruff check scripts/ tests/` -> clean (3 imports mal triés
+corrigés au passage dans `test_generer_backdrops.py`, pré-existants,
+sans lien avec ce nettoyage). `mypy scripts/ --ignore-missing-imports`
+-> clean. `pytest tests/ -q` -> 264 passed, seuil de couverture
+respecté (77.07% >= 75%).
 
 ## ✅ Test d'intégration sur le vrai dossier "Action" (tests/test_pipeline_integration.py)
 
@@ -204,14 +245,20 @@ aucun appelant nulle part dans le dépôt) :
   `aplatir_transparence()` le mentionnait en cross-référence dans son
   docstring (retirée avec la fonction).
 
-**Signalé mais PAS supprimé** (jugement à faire, pas un cas évident) :
-`ClientMDBList.rechercher_listes()` (generer_backdrops.py) n'est appelée
-par aucun script de la pipeline -- seuls 2 tests l'exercisent. Elle
-duplique une logique quasi identique déjà présente, en autonome, dans
-`scripts/mdblist_recherche.py` (le vrai outil CLI utilisé en pratique
-pour chercher une liste MDBList). Possiblement une méthode utilitaire
-gardée pour un usage interactif futur (REPL) plutôt qu'un oubli -- laissée
-en l'état, à trancher par toi.
+**Signalé, puis tranché (session du 16 septembre 2026, suite 3)** :
+`ClientMDBList.rechercher_listes()` (generer_backdrops.py) a été
+**supprimée**. Elle n'était appelée par aucun script de la pipeline --
+seuls 2 tests l'exerçaient -- et dupliquait une logique quasi identique
+déjà présente, en autonome, dans `scripts/mdblist_recherche.py` (le vrai
+outil CLI utilisé en pratique pour chercher une liste MDBList). Le besoin
+réel qui l'avait fait suspecter utile (tester une liste MDBList dans
+l'outil de réglage visuel `outils/reglage-style-mosaique.html`) ne
+correspond de toute façon pas à cette méthode : ce besoin voudrait
+`recuperer_items_liste()` (lire une liste déjà connue, pas en chercher
+une par mot-clé), et resterait à construire côté navigateur (l'outil est
+100% client, sans accès réseau externe aujourd'hui) -- pas une simple
+réutilisation de code Python existant. Non fait, laissé en attente d'une
+demande explicite.
 
 Tests : 221 -> 222 (nouveau test de non-régression sur le nombre d'appels
 à `preparer_tuile`). ruff + mypy toujours propres.

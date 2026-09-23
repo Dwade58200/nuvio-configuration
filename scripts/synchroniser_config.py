@@ -41,8 +41,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from config_collections import CRITERES_GROUPES  # noqa: E402
-from generer_backdrops import charger_collections, normaliser, slugifier  # noqa: E402
+from config_collections import CRITERES_GROUPES
+from generer_backdrops import charger_collections, normaliser, slugifier
 
 
 def charger_config_existante(chemin: Path) -> dict[str, dict[str, Any]]:

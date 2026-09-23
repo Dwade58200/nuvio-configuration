@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from generer_defaults_outil import (  # noqa: E402
+from generer_defaults_outil import (
     extraire_constantes,
     mettre_a_jour_html,
     valeurs_outil_depuis_constantes,

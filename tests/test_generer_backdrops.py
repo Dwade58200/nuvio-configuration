@@ -17,7 +17,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from generer_backdrops import (  # noqa: E402
+from generer_backdrops import (
     GROUPE_ANIMES,
     GROUPE_DECOUVRIR,
     GROUPE_FRANCHISES,
@@ -909,9 +909,8 @@ def test_telecharger_une_image_reessaie_apres_un_echec_transitoire(monkeypatch):
     force une répétition évitable ailleurs."""
     import io
 
-    from PIL import Image as PILImage
-
     from generer_backdrops import GenerateurBackdrops
+    from PIL import Image as PILImage
 
     tampon = io.BytesIO()
     PILImage.new("RGB", (10, 10)).save(tampon, format="JPEG")
@@ -1552,9 +1551,8 @@ def test_champ_titre_repli_catalogue_portrait_est_ecarte():
     PORTRAIT -- l'écraser dans une tuile paysage produit un recadrage
     incohérent avec le reste de la mosaïque ("les backdrops ne sont pas
     tous dans le même sens")."""
-    from PIL import Image as PILImage
-
     from generer_backdrops import CandidatTuile, GenerateurBackdrops, InfoTitreCatalogue
+    from PIL import Image as PILImage
 
     generateur = GenerateurBackdrops(cle_tmdb="x", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"))
     generateur.tmdb.rechercher_titre = lambda *a, **k: None  # type: ignore[method-assign]
@@ -1568,9 +1566,8 @@ def test_champ_titre_repli_catalogue_portrait_est_ecarte():
 def test_champ_titre_repli_catalogue_paysage_est_conserve():
     """A contrario, un repli catalogue déjà PAYSAGE reste utilisé -- on ne
     veut écarter que les visuels portrait, pas tout repli."""
-    from PIL import Image as PILImage
-
     from generer_backdrops import CandidatTuile, GenerateurBackdrops, InfoTitreCatalogue
+    from PIL import Image as PILImage
 
     generateur = GenerateurBackdrops(cle_tmdb="x", cle_fanart=None, repertoire_sortie=Path("/tmp/inutilise"))
     generateur.tmdb.rechercher_titre = lambda *a, **k: None  # type: ignore[method-assign]

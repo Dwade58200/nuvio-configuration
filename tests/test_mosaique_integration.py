@@ -26,7 +26,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from generer_backdrops import GROUPE_GENRES, GenerateurBackdrops, construire_requetes  # noqa: E402
+from generer_backdrops import GROUPE_GENRES, GenerateurBackdrops, construire_requetes
 
 
 def _image_bytes(couleur, taille=(1280, 720)):
@@ -619,36 +619,6 @@ def test_mdblist_resultats_mis_en_cache():
     client.recuperer_items_liste("dwade", "james-bond")
     client.recuperer_items_liste("dwade", "james-bond")
     assert compteur["n"] == 1
-
-
-def test_mdblist_rechercher_listes_trie_par_nombre_d_items():
-    from generer_backdrops import ClientMDBList
-
-    client = ClientMDBList(api_key="fausse-cle-mdblist")
-
-    def fausse_get(url, params=None, timeout=None, **kwargs):
-        assert url == "https://api.mdblist.com/lists/search"
-        assert params == {"apikey": "fausse-cle-mdblist", "query": "james bond"}
-        return FausseReponse([
-            {"id": 1, "name": "Petite liste 007", "slug": "petite", "user_name": "a", "items": 5},
-            {"id": 2, "name": "Grande liste 007", "slug": "grande", "user_name": "b", "items": 50},
-        ])
-
-    client.session.get = MagicMock(side_effect=fausse_get)
-    resultats = client.rechercher_listes("james bond")
-    assert [r["id"] for r in resultats] == [2, 1]
-
-
-def test_mdblist_rechercher_listes_sans_cle_retourne_liste_vide():
-    from generer_backdrops import ClientMDBList
-
-    client = ClientMDBList(api_key=None)
-
-    def fausse_get(*args, **kwargs):
-        raise AssertionError("ne devrait jamais être appelé sans clé MDBList")
-
-    client.session.get = MagicMock(side_effect=fausse_get)
-    assert client.rechercher_listes("james bond") == []
 
 
 if __name__ == "__main__":

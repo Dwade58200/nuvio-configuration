@@ -13,7 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from comparer_collections import comparer  # noqa: E402
+from comparer_collections import comparer
 
 
 def _groupe(titre, titres_dossiers):

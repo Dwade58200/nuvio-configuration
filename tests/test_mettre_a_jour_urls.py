@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from mettre_a_jour_urls import construire_url_cdn, mettre_a_jour  # noqa: E402
+from mettre_a_jour_urls import construire_url_cdn, mettre_a_jour
 
 
 def test_construire_url_cdn():

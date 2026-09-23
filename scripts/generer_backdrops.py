@@ -87,7 +87,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-import config_collections  # noqa: E402  (accès direct pour appliquer_config_externe)
+import config_collections  # (accès direct pour appliquer_config_externe)
 import mosaique as mosaique_module  # module compagnon, scripts/mosaique.py
 
 # Toute la configuration éditable (groupes, filtres de dossiers, noms de
@@ -101,7 +101,7 @@ import mosaique as mosaique_module  # module compagnon, scripts/mosaique.py
 # scripts (mettre_a_jour_urls.py) les importent depuis generer_backdrops
 # pour compatibilité -- la syntaxe `as` indique explicitement à ruff qu'il
 # ne s'agit pas d'imports inutilisés.
-from config_collections import (  # noqa: E402
+from config_collections import (
     ACRONYMES_BACKDROP,
     CATALOGID_VERS_ENDPOINT,
     CRITERES_GROUPES,
@@ -1285,34 +1285,6 @@ class ClientMDBList:
             tentatives.append((f"{self.API_BASE}/lists/{username}/{slug}/items", params_api))
         tentatives.append((f"{self.SITE_BASE}/lists/{username}/{slug}/json/", {}))
         return self._recuperer(cle_cache, tentatives)
-
-    def rechercher_listes(self, requete: str, limite: int = 20) -> list[dict[str, Any]]:
-        """Recherche des listes PUBLIQUES par titre (endpoint confirmé par
-        lecture du code source officiel du client Go `mdblist-cli` :
-        GET /lists/search?apikey=...&query=... -- voir
-        github.com/luckylittle/mdblist-cli/blob/main/internal/client/mdblist.go).
-
-        Retourne les résultats bruts (dicts avec au moins : id, name, slug,
-        user_name, mediatype, items, likes, private) triés par nombre
-        d'items décroissant, sans exception en cas d'échec (liste vide).
-        Nécessite une clé API (contrairement à la lecture d'une liste
-        déjà connue, qui a un repli public sans clé)."""
-        if not self.api_key or not requete.strip():
-            return []
-        try:
-            r = self.session.get(
-                f"{self.API_BASE}/lists/search",
-                params={"apikey": self.api_key, "query": requete.strip()},
-                timeout=15,
-            )
-            if r.status_code != 200:
-                return []
-            resultats = r.json()
-            if not isinstance(resultats, list):
-                return []
-            return sorted(resultats, key=lambda liste: -(liste.get("items") or 0))[:limite]
-        except (requests.RequestException, ValueError):
-            return []
 
 
 # ---------------------------------------------------------------------------

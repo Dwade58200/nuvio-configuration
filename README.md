@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/tests.yml/badge.svg)](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/tests.yml)
 [![Backdrops](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/generer-backdrops.yml/badge.svg)](https://github.com/Dwade58200/nuvio-configuration/actions/workflows/generer-backdrops.yml)
+[![Coverage](coverage.svg)](.github/workflows/tests.yml)
 
 **🎨 [Outil de réglage du style des mosaïques](https://dwade58200.github.io/nuvio-configuration/reglage-style-mosaique.html)** --
 aperçu en direct des tuiles + génération d'un backdrop depuis vos propres

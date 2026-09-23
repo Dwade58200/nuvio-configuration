@@ -13,8 +13,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-import config_collections as cc  # noqa: E402
-from lint_config import (  # noqa: E402
+import config_collections as cc
+from lint_config import (
     verifier_coherence_groupes,
     verifier_collisions_noms_fichiers,
     verifier_collisions_slugs,

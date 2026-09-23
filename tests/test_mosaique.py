@@ -7,7 +7,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from mosaique import (  # noqa: E402
+from mosaique import (
     MINIMUM_IMAGES_DISTINCTES,
     TUILES_CIBLE,
     aplatir_transparence,

@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from appliquer_style_mosaique import appliquer, construire_remplacements  # noqa: E402
+from appliquer_style_mosaique import appliquer, construire_remplacements
 
 CONTENU_EXEMPLE = """\
 TUILE_LARGEUR = 372       # commentaire existant

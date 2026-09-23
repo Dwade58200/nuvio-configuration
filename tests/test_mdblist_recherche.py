@@ -12,8 +12,8 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-import mdblist_recherche  # noqa: E402
-from mdblist_recherche import afficher, main, rechercher  # noqa: E402
+import mdblist_recherche
+from mdblist_recherche import afficher, main, rechercher
 
 
 class FausseReponse:

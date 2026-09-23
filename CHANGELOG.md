@@ -25,6 +25,7 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 - Badge de couverture de code dans le README
 
 ### Modifié
+- **Nettoyage recommandé par un audit externe** : dépendances de dev (`types-requests`, `pytest-cov`) sorties de `requirements.txt` vers `requirements-dev.txt` uniquement ; seuil `--cov-fail-under=75` ajouté (`pyproject.toml`) ; 31 `# noqa: E402` locaux retirés (redondants avec l'ignore global déjà en place).
 - **Ergonomie de l'outil de réglage des backdrops, suite** : mode comparaison (figer/effacer un aperçu), avertissement discret sur les combinaisons de valeurs dégénérées, raccourcis clavier (A/R), téléchargement direct du bloc de valeurs en `.py`, résolutions de génération réelle alignées sur le ratio du canvas choisi.
 - **Ergonomie de l'outil de réglage des backdrops** : réinitialisation par champ (double-clic), unités manquantes affichées, info-bulles sur les réglages peu intuitifs, nouveau réglage "Ratio du canvas final" (aligné sur `--ratio-canvas`), confirmation avant écrasement/suppression de preset, export/import des presets en JSON, retour visuel pendant la génération réelle, contour de focus clavier.
 - **Template initial aligné (#15)** : Les valeurs par défaut de l'outil `reglage-style-mosaique.html` sont synchronisées avec les constantes de `mosaique.py` (inclinaison corrigée à -10°).
@@ -47,6 +48,9 @@ et ce projet adhère au [Versionnage Sémantique](https://semver.org/lang/fr/).
 ### Modifié
 - **Refonte ergonomique de l'outil de style (#14)** : `outils/reglage-style-mosaique.html` restructuré (aperçu épinglé, sections repliables, génération réelle en 3 étapes), sans changement des `id` ni de la logique JS.
 - **Mélange + génération liés** : cliquer sur "Mélanger" régénère désormais immédiatement l'aperçu, au lieu de nécessiter un second clic sur "Générer".
+
+### Supprimé
+- **`ClientMDBList.rechercher_listes()`** (`scripts/generer_backdrops.py`) : orpheline, appelée par aucun script de la pipeline, dupliquait une logique déjà présente dans `scripts/mdblist_recherche.py`. Ses 2 tests dédiés retirés avec elle.
 
 ## [1.0.0] - 2024-09-14
 

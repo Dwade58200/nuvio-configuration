@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from valider_collections import valider  # noqa: E402
+from valider_collections import valider
 
 RACINE = Path(__file__).resolve().parent.parent
 SCHEMA = RACINE / "schema" / "nuvio-collections.schema.json"

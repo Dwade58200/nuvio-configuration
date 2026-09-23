@@ -29,8 +29,8 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import config_collections  # noqa: E402
-from generer_backdrops import (  # noqa: E402
+import config_collections
+from generer_backdrops import (
     GROUPE_SLUGS,
     NOM_DOSSIER_BACKDROPS,
     charger_collections,

@@ -6,6 +6,45 @@ de qualité professionnelle, pas des correctifs urgents.
 
 ---
 
+## ✅ Fait (session du 16 septembre 2026, suite 3 -- nettoyage recommandé par un audit externe)
+
+Un audit externe du dépôt (partagé pour avis) a soulevé plusieurs points ;
+voici les 5 retenus comme "quick win" après discussion -- sans risque de
+régression, contrairement à la refonte modulaire de
+`generer_backdrops.py` qu'il plaçait en priorité haute et qu'on a
+délibérément écartée pour l'instant (fichier stable, bien testé, et
+plusieurs tests font du `monkeypatch.setattr` sur des chemins précis
+qu'un découpage casserait).
+
+- [x] **`requirements.txt` nettoyé** : `types-requests` et `pytest-cov`
+      (dépendances de dev) retirées du runtime -- elles restent
+      déclarées dans `requirements-dev.txt`.
+- [x] **`--cov-fail-under=75`** dans `pyproject.toml` -- couverture
+      actuelle 77%, ~2 points de marge. Objectif direct : une régression
+      de couverture comme celle qu'on vient de vivre (perte accidentelle
+      de 7 tests) ferait désormais échouer la CI au lieu de passer
+      inaperçue.
+- [x] **Badge de couverture réel dans le README**, généré par
+      `coverage-badge` et commité automatiquement par `tests.yml`
+      (nouvelle étape, seulement sur push vers `main`). Le CHANGELOG
+      l'annonçait déjà sans qu'il existe.
+- [x] **31 `# noqa: E402` locaux retirés** (20 fichiers) -- redondants,
+      E402 est déjà ignoré globalement dans `pyproject.toml`. Les 2
+      commentaires explicatifs qui les accompagnaient ont été conservés.
+- [x] **`ClientMDBList.rechercher_listes()` supprimée** (+ ses 2 tests
+      dédiés) -- orpheline, dupliquait `scripts/mdblist_recherche.py`.
+      Vérifié qu'elle ne correspond pas au besoin réel identifié
+      entretemps (tester une liste MDBList dans l'outil de réglage
+      visuel) : ce besoin voudrait `recuperer_items_liste()` côté
+      navigateur, une fonctionnalité neuve à construire, pas cette
+      méthode. Détail dans `APPLIQUER.md`.
+
+Vérifié : `ruff check` clean (3 imports mal triés pré-existants corrigés
+au passage), `mypy scripts/ --ignore-missing-imports` clean, `pytest
+tests/ -q` -> 264 passed, seuil de couverture respecté.
+
+---
+
 ## ✅ Fait (session du 16 septembre 2026, suite 2 -- test d'intégration sur un vrai dossier)
 
 Contrairement aux sessions précédentes (toutes sur `outils/reglage-style-mosaique.html`),
@@ -673,10 +712,26 @@ précis :
 
 ## 🔵 Reste à faire
 
-Rien pour l'instant côté ergonomie de l'outil -- tout le backlog de la
-session du 16 septembre 2026 a été traité (voir historique ci-dessus).
-Reste seulement la piste de refonte plus lourde listée dans "Idées plus
-lointaines" ci-dessous.
+Côté ergonomie de l'outil, rien -- tout le backlog de la session du 16
+septembre 2026 a été traité. Côté audit externe (voir ci-dessus), il
+reste les points jugés moins urgents ou nécessitant une décision :
+
+- `pip-audit` (ou `safety`) en CI pour détecter les CVE des dépendances
+  pinnées -- pas fait, bon rapport valeur/risque si tu veux l'ajouter.
+- Matrice Python 3.10/3.11/3.12 en CI -- le CHANGELOG annonce ce support
+  mais `tests.yml` ne tourne qu'en 3.12. À ajouter si le support doit
+  être garanti, ou à corriger dans le CHANGELOG sinon (l'un ou l'autre,
+  pas les deux qui se contredisent).
+- Dependabot/Renovate -- utile sur la durée, mais génère des PR à trier
+  régulièrement ; vaut le coup seulement si tu comptes t'en occuper.
+
+Volontairement écarté pour l'instant (voir le détail dans la session
+ci-dessus) : la modularisation de `generer_backdrops.py` en plusieurs
+fichiers, mise en priorité haute par l'audit -- risque de régression
+jugé supérieur au gain de confort tant que le fichier reste
+compréhensible. Idem pour le dossier `docs/` (casserait les liens
+relatifs entre les `.md` pour un gain cosmétique) et la fusion
+`APPLIQUER.md`/`CHANGELOG.md` (les deux rôles restent utiles distincts).
 
 ---
 

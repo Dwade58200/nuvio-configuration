@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from etat_backdrops import etat_dossier  # noqa: E402
+from etat_backdrops import etat_dossier
 
 
 def test_etat_dossier_manquant_si_actif_et_aucun_fichier(tmp_path):

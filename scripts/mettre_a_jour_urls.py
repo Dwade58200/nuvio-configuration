@@ -35,8 +35,8 @@ from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import config_collections  # noqa: E402  (accès direct pour appliquer_config_externe)
-from generer_backdrops import (  # noqa: E402
+import config_collections  # (accès direct pour appliquer_config_externe)
+from generer_backdrops import (
     GROUPE_SLUGS,
     NOM_DOSSIER_BACKDROPS,
     NOM_DOSSIER_RACINE,

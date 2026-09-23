@@ -15,7 +15,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from generer_backdrops import (  # noqa: E402
+from generer_backdrops import (
     GROUPE_GENRES,
     GenerateurBackdrops,
     charger_catalogues_aiometadata,

@@ -29,12 +29,12 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from config_collections import (  # noqa: E402
+from config_collections import (
     CRITERES_GROUPES,
     GROUPE_SLUGS,
     NOMS_BACKDROP_PERSONNALISES,
 )
-from generer_backdrops import charger_collections, nom_fichier_backdrop  # noqa: E402
+from generer_backdrops import charger_collections, nom_fichier_backdrop
 
 
 def verifier_coherence_groupes() -> list[str]:

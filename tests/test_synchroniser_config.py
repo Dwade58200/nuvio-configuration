@@ -11,13 +11,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from config_collections import (  # noqa: E402
+from config_collections import (
     CRITERES_GROUPES,
     GROUPE_SLUGS,
     appliquer_config_externe,
     charger_config_groupes_externe,
 )
-from synchroniser_config import synchroniser  # noqa: E402
+from synchroniser_config import synchroniser
 
 
 def _groupe(titre, titres_dossiers):

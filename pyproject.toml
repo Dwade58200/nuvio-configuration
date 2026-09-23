@@ -24,4 +24,4 @@ exclude = ["tests/"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=scripts --cov-report=term-missing --cov-report=html"
+addopts = "--cov=scripts --cov-report=term-missing --cov-report=html --cov-fail-under=75"

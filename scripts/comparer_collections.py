@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from generer_backdrops import normaliser  # noqa: E402
+from generer_backdrops import normaliser
 
 
 def _titres_dossiers(groupe: dict[str, Any]) -> set[str]:
