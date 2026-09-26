@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "exportedAt": "2026-09-26T12:38:36.591Z",
+  "catalogs": [
+    {
+      "id": "tmdb.top",
+      "name": "🍿Populaire",
+      "sort": "default",
+      "type": "movie",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": true,
+      "displayType": "movie"
+    },
+    {
+      "id": "tmdb.trending",
+      "name": "🩷Nouveautés",
+      "sort": "default",
+      "type": "movie",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": true,
+      "displayType": "movie"
+    },
+    {
+      "id": "tmdb.top_rated",
+      "name": "🍒Mieux notés",
+      "sort": "default",
+      "type": "movie",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": true,
+      "displayType": "movie"
+    },
+    {
+      "id": "tmdb.top",
+      "name": "🍿Populaire",
+      "sort": "default",
+      "type": "series",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": true,
+      "displayType": "series"
+    },
+    {
+      "id": "tmdb.trending",
+      "name": "🩷Nouveautés",
+      "sort": "default",
+      "type": "series",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": true,
+      "displayType": "series"
+    },
+    {
+      "id": "tmdb.top_rated",
+      "name": "🍒Mieux notés",
+      "sort": "default",
+      "type": "series",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": true,
+      "displayType": "series"
+    },
+    {
+      "id": "tmdb.year",
+      "name": "📅TMDB By Year",
+      "sort": "default",
+      "type": "movie",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "displayType": "movie"
+    },
+    {
+      "id": "tmdb.year",
+      "name": "📅TMDB By Year",
+      "sort": "default",
+      "type": "series",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "displayType": "series"
+    },
+    {
+      "id": "tmdb.language",
+      "name": "🌍TMDB By Language",
+      "sort": "default",
+      "type": "movie",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "displayType": "movie"
+    },
+    {
+      "id": "tmdb.language",
+      "name": "🌍TMDB By Language",
+      "sort": "default",
+      "type": "series",
+      "order": "asc",
+      "source": "tmdb",
+      "enabled": true,
+      "showInHome": false,
+      "displayType": "series"
+    }
+  ]
+}
