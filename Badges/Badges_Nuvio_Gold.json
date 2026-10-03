@@ -69,7 +69,7 @@
       "id": "lang-fr",
       "groupId": "language",
       "name": "French",
-      "pattern": "(?i)^(?=[\\s\\S]*(?:vf[f2i]|true[\\s.-]?french|fran[cç]ais|lang[\\s.-]?fr|[-.\\[]fr[-.\\]]|\\bfrench\\b))(?![\\s\\S]*\\bvfq\\b)(?![\\s\\S]*\\bcanada\\b)(?![\\s\\S]*\\bcan\\b)(?![\\s\\S]*french[._\\-\\s]?ca\\b)(?![\\s\\S]*(?<=[._\\-\\s])ca(?=[._\\-\\s]|$))",
+      "pattern": "(?i)^(?:(?=[\\s\\S]*(?:vf[f2i]|true[\\s.-]?french|fran[cç]ais))|(?![\\s\\S]*(?:vostfr|\\bvost\\b|\\bvfr\\b|sub[\\s._-]?fr(?:ench)?\\b|french[\\s._-]?sub|stfr))(?=[\\s\\S]*(?:lang[\\s.-]?fr|[-.\\[]fr[-.\\]]|\\bfrench\\b)))(?![\\s\\S]*\\bvfq\\b)(?![\\s\\S]*\\bcanada\\b)(?![\\s\\S]*\\bcan\\b)(?![\\s\\S]*french[._\\-\\s]?ca\\b)(?![\\s\\S]*(?<=[._\\-\\s])ca(?=[._\\-\\s]|$))"
       "imageURL": "https://raw.githubusercontent.com/djgenesis/stream/refs/heads/main/badges/LANG FR.png",
       "tagColor": "#00000000",
       "borderColor": "#00000000",
